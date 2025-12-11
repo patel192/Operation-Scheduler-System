@@ -1,192 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign Up — Operation Scheduler</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — Operation Scheduler</title>
 
-<style>
-:root {
-  --primary: #0A6CFF;
-  --secondary: #4FC3A1;
-  --bg: #F8FAFC;
-  --text: #1E293B;
-  --muted: #64748B;
-  --card: #FFFFFF;
-}
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-body {
-  margin: 0;
-  font-family: Inter, sans-serif;
-  background: var(--bg);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.container {
-  width: 900px;
-  background: var(--card);
-  border-radius: 22px;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
-}
-
-/* LEFT PANEL */
-.left-panel {
-  background: linear-gradient(180deg, #e8f0ff, #d9ecff);
-  padding: 48px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: left;
-  color: var(--primary);
-}
-
-.left-panel h2 {
-  margin: 0 0 12px;
-}
-
-.left-panel p {
-  color: #3d5b87;
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-/* Placeholder Illustration */
-.left-panel svg {
-  width: 240px;
-  margin-top: 18px;
-}
-
-/* RIGHT PANEL */
-.right-panel {
-  padding: 48px 42px;
-  background: var(--card);
-}
-
-.right-panel h2 {
-  margin: 0 0 18px;
-  color: var(--text);
-  font-size: 24px;
-}
-
-.social-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.social-buttons button {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  font-weight: 600;
-  border: 1px solid #d5d5d5;
-  background: white;
-  cursor: pointer;
-}
-
-.or {
-  text-align: center;
-  margin: 14px 0;
-  color: var(--muted);
-}
-
-/* Form Inputs */
-form input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #d6e2f5;
-  margin-bottom: 14px;
-  font-size: 14px;
-}
-
-form input:focus {
-  outline: 2px solid var(--primary);
-}
-
-button.create {
-  width: 100%;
-  padding: 14px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 12px;
-}
-
-.login-link a {
-  color: var(--primary);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-/* RESPONSIVE */
-@media (max-width: 820px) {
-  .container {
-    grid-template-columns: 1fr;
-    width: 92%;
-  }
-  .left-panel {
-    display: none;
-  }
-}
-</style>
+  <!-- Theme Vars -->
+  <style>
+    :root {
+      --primary: #0A6CFF;
+      --secondary: #4FC3A1;
+      --bg: #F8FAFC;
+      --text: #1E293B;
+      --muted: #64748B;
+    }
+  </style>
 </head>
 
-<body>
+<body class="bg-[--bg] text-[--text] font-sans min-h-screen flex items-center justify-center p-4">
 
-<div class="container">
+  <div class="w-full max-w-5xl bg-white shadow-xl rounded-2xl grid md:grid-cols-2 overflow-hidden">
 
-  <!-- LEFT PANEL -->
-  <div class="left-panel">
-    <h2>Welcome to MediCare+</h2>
-    <p>We are committed to helping hospitals manage surgeries safely and efficiently.</p>
+    <!-- LEFT PANEL -->
+    <div class="bg-gradient-to-b from-blue-50 to-blue-100 p-10 flex flex-col justify-center">
+      <h2 class="text-3xl font-bold text-[--primary]">Welcome to MediCare+</h2>
 
-    <!-- Illustration (replace anytime) -->
-    <svg viewBox="0 0 200 200">
-      <circle cx="100" cy="90" r="50" fill="#0A6CFF" opacity="0.2" />
-      <rect x="60" y="110" width="80" height="20" rx="6" fill="#4FC3A1" />
-      <circle cx="140" cy="75" r="10" fill="#4FC3A1" />
-    </svg>
-  </div>
+      <p class="mt-3 text-[--muted] text-sm leading-relaxed">
+        We are committed to helping hospitals manage surgeries safely and efficiently.
+      </p>
 
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
-
-    <h2>Create Account</h2>
-
-    <div class="social-buttons">
-      <button>Sign up with Google</button>
-      <button>Sign up with Facebook</button>
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/5/59/Doctor_with_stethoscope_icon.svg"
+        alt="Medical Illustration"
+        class="w-64 mx-auto mt-6"
+      />
     </div>
 
-    <div class="or">— OR —</div>
+    <!-- RIGHT PANEL -->
+    <div class="p-10 bg-white">
 
-    <form>
-      <input type="text" placeholder="Full Name" required>
-      <input type="email" placeholder="Email" required>
-      <input type="password" placeholder="Password" required>
+      <h2 class="text-2xl font-bold mb-6">Create Account</h2>
 
-      <button class="create">Create Account</button>
-    </form>
+      <!-- SOCIAL BUTTONS -->
+      <div class="space-y-3">
 
-    <p class="login-link">
-      Already have an account? <a href="login.html">Log in</a>
-    </p>
+        <!-- Google BTN -->
+        <button
+          class="w-full flex items-center justify-center gap-2 border border-gray-300 py-2.5 rounded-xl font-semibold hover:bg-gray-50">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" class="w-5 h-5">
+            <path fill="#4285F4"
+              d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027">
+            </path>
+            <path fill="#34A853"
+              d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1">
+            </path>
+            <path fill="#FBBC05"
+              d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782">
+            </path>
+            <path fill="#EB4335"
+              d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251">
+            </path>
+          </svg>
+          Continue with Google
+        </button>
+
+        <!-- Facebook BTN -->
+        <button
+          type="button"
+          class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 1792 1792"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759h-306v-759h-255v-296h255v-218q0-186 104-288.5t277-102.5q147 0 228 12z">
+            </path>
+          </svg>
+          Continue with Facebook
+        </button>
+
+      </div>
+
+      <!-- OR DIVIDER -->
+      <div class="flex items-center my-6">
+        <div class="flex-grow h-px bg-gray-300"></div>
+        <span class="px-3 text-gray-500 text-sm">OR</span>
+        <div class="flex-grow h-px bg-gray-300"></div>
+      </div>
+
+      <!-- FORM -->
+      <form class="space-y-4">
+
+        <input type="text" placeholder="Full Name" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
+
+        <input type="email" placeholder="Email" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
+
+        <input type="password" placeholder="Password" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
+
+        <button
+          class="w-full py-3 text-center rounded-xl bg-[--primary] text-white font-bold tracking-wide shadow hover:bg-blue-700 transition">
+          Create Account
+        </button>
+      </form>
+
+      <!-- LOGIN LINK -->
+      <p class="mt-5 text-center text-sm text-[--muted]">
+        Already have an account?
+        <a href="login.html" class="text-[--primary] font-semibold hover:underline">Log in</a>
+      </p>
+
+    </div>
   </div>
-
-</div>
 
 </body>
 </html>

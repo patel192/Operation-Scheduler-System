@@ -1,0 +1,206 @@
+:root {
+    --primary: #0A6CFF;
+    --secondary: #4FC3A1;
+    --bg: #F8FAFC;
+    --text: #1E293B;
+    --muted: #64748B;
+    --card: #FFFFFF;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 900px;
+    background: var(--card);
+    border-radius: 22px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+}
+
+/* LEFT PANEL */
+.left-panel {
+    background: linear-gradient(180deg, #e8f0ff, #d9ecff);
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    color: var(--primary);
+}
+
+.left-panel img {
+    width: 80%;
+    border-radius: 16px;
+    margin-top: 20px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.left-panel h2 {
+    margin: 0 0 12px;
+}
+
+.left-panel p {
+    color: #3d5b87;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+    padding: 48px 42px;
+    background: var(--card);
+}
+
+.right-panel h2 {
+    margin: 0 0 18px;
+    color: var(--text);
+    font-size: 24px;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.social-buttons button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: 1px solid #d5d5d5;
+    background: white;
+    cursor: pointer;
+}
+
+.btn-google {
+    padding: 10px 25px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 0.5rem;
+    border: 1px solid #bebebe;
+    gap: 10px;
+    color: #414141;
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    /*** full width block ***/
+    /* width: 100%; */
+}
+
+.btn-google svg {
+    height: 24px;
+}
+
+.btn-google:hover {
+    border: solid 1px #464545;
+}
+
+.btn-google:active {
+    margin-top: 1px;
+}
+
+/*** disabled style ***/
+.btn-google:disabled {
+    pointer-events: none;
+    opacity: .65;
+    color: #7e7e7e;
+    background: #dcdcdc;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.btn-facebook {
+    display: flex;
+    width: 100%;
+    max-width: 28rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background-color: rgb(29, 78, 216);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    text-align: center;               
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+    box-shadow: 0 0 0 0px #fff, 0 0 0 calc(2px + 0px) rgb(59, 130, 246, 0.5), 0 0 #0000;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    transition-duration: 200ms;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.or {
+    text-align: center;
+    margin: 14px 0;
+    color: var(--muted);
+}
+
+/* Form Inputs */
+form input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #d6e2f5;
+    margin-bottom: 14px;
+    font-size: 14px;
+}
+
+form input:focus {
+    outline: 2px solid var(--primary);
+}
+
+button.create {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.login-link a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 820px) {
+    .container {
+        grid-template-columns: 1fr;
+        width: 92%;
+    }
+
+    .left-panel {
+        display: none;
+    }
+}

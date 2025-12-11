@@ -1,71 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Operation Scheduler — Hospital Management</title>
-  <link rel="stylesheet" href="css/index.css">
-</head>
 
-<body>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Minimal CSS variables + keyframes for the SVG animation (tiny, necessary) -->
+  <style>
+    :root{
+      --primary: #0A6CFF;
+      --secondary: #4FC3A1;
+      --bg: #F8FAFC;
+      --muted: #475569;
+      --text: #1E293B;
+    }
+
+    /* tiny animation helpers used on the inline SVG */
+    @keyframes floatUpDown {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-14px) scale(1.02); }
+    }
+    @keyframes pulse {
+      0% { r: 48; opacity: .38; }
+      50% { r: 58; opacity: .14; }
+      100% { r: 48; opacity: .38; }
+    }
+
+    /* apply via utility-like class names used below */
+    .animate-float { animation: floatUpDown 4s ease-in-out infinite alternate; }
+    .animate-pulse-svg { animation: pulse 2.2s ease-in-out infinite; transform-origin: center; }
+  </style>
+</head>
+<body class="antialiased text-[--text] bg-[#F8FAFC]">
 
   <!-- HEADER -->
-  <header class="header" role="banner">
-    <div class="logo">Operation Scheduler</div>
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-blue-50">
+    <div class="max-w-[1200px] mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="text-[--primary] font-extrabold text-lg">Operation Scheduler</div>
 
-    <nav aria-label="Main navigation">
-      <div class="navlinks">
-        <a href="#features">Features</a>
-        <a href="#workflow">Workflow</a>
-        <a href="#roles">Roles</a>
-        <a href="#security">Security</a>
+      <nav aria-label="Main navigation" class="hidden md:block">
+        <ul class="flex gap-6 items-center text-sm font-semibold text-[--text]">
+          <li><a href="#features" class="hover:text-[--primary]">Features</a></li>
+          <li><a href="#workflow" class="hover:text-[--primary]">Workflow</a></li>
+          <li><a href="#roles" class="hover:text-[--primary]">Roles</a></li>
+          <li><a href="#security" class="hover:text-[--primary]">Security</a></li>
+        </ul>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="#learn" class="text-sm text-slate-600 hover:text-[--primary]">Learn</a>
+        <a href="login.html" class="px-3 py-2 rounded-md border-2 border-[--primary] text-[--primary] font-semibold text-sm">Login</a>
+        <a href="register.html" class="px-4 py-2 rounded-md bg-[--primary] text-white font-semibold text-sm">Get Started</a>
       </div>
-    </nav>
-
-    <div class="actions">
-      <a class="btn btn-ghost" href="#learn">Learn</a>
-      <a class="btn btn-outline" href="login.html">Login</a>
-      <a class="btn btn-primary" href="register.html">Get Started</a>
     </div>
   </header>
 
-  <!-- HERO -->
-  <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-left">
-        <span class="kicker">Healthcare • OT Scheduling</span>
-        <h1 id="hero-title">Smart Operation Scheduling for Hospitals — Safe, Fast & Compliant</h1>
-        <p>Prevent OT conflicts, manage surgeons' workload, reserve resources and track pre/post-operative workflows —
-          all on a single hospital-grade platform.</p>
+  <main class="pb-16">
 
-        <div class="hero-cta">
-          <a class="cta-cta" href="register.html">Start free trial</a>
-          <a class="cta-plain" href="#workflow">See workflow</a>
+    <!-- HERO -->
+    <section id="hero" class="max-w-[1200px] mx-auto px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-10 items-center">
+      <!-- left -->
+      <div class="space-y-6">
+        <span class="inline-block bg-gradient-to-r from-[--secondary] to-[#36c89f] text-white px-3 py-1 rounded-full text-xs font-bold">Healthcare • OT Scheduling</span>
+
+        <h1 id="hero-title" class="text-4xl lg:text-5xl font-extrabold leading-tight text-[--primary]">
+          Smart Operation Scheduling for Hospitals — Safe, Fast & Compliant
+        </h1>
+
+        <p class="text-lg text-[#475569] max-w-xl">
+          Prevent OT conflicts, manage surgeons' workload, reserve resources and track pre/post-operative workflows — all on a single hospital-grade platform.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <a href="register.html" class="inline-flex items-center px-6 py-3 rounded-xl bg-[--secondary] text-white font-semibold shadow">Start free trial</a>
+          <a href="#workflow" class="inline-flex items-center px-6 py-3 rounded-xl border-2 border-[--primary] text-[--primary] font-semibold">See workflow</a>
         </div>
 
-        <!-- small trust badges -->
-        <div style="margin-top:18px;display:flex;gap:14px;align-items:center">
-          <div style="background:white;padding:8px 12px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.04)">
-            <strong style="color:var(--primary);display:block">99.9%</strong>
-            <small style="color:var(--muted)">Uptime</small>
+        <!-- trust badges -->
+        <div class="flex gap-4 mt-4">
+          <div class="bg-white rounded-lg px-3 py-2 shadow-sm flex flex-col">
+            <span class="font-bold text-[--primary]">99.9%</span>
+            <small class="text-[--muted]">Uptime</small>
           </div>
-          <div style="background:white;padding:8px 12px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.04)">
-            <strong style="color:var(--primary);display:block">HIPAA-ready</strong>
-            <small style="color:var(--muted)">Security</small>
+          <div class="bg-white rounded-lg px-3 py-2 shadow-sm flex flex-col">
+            <span class="font-bold text-[--primary]">HIPAA-ready</span>
+            <small class="text-[--muted]">Security</small>
           </div>
         </div>
       </div>
 
-      <!-- REPLACED HERO-RIGHT with animated 3D SVG illustration -->
-      <div class="hero-right" aria-hidden="true">
-        <!-- Decorative floating background card for depth -->
-        <div class="floating-card" aria-hidden="true"></div>
+      <!-- right (SVG kept, animated) -->
+      <div class="relative flex items-center justify-center">
+        <!-- decorative floating card -->
+        <div class="absolute -left-5 -top-5 w-[380px] h-[260px] rounded-xl bg-gradient-to-b from-white to-[#f6fbff] shadow-lg -rotate-3 pointer-events-none"></div>
 
-        <!-- 3D FLOATING MEDICAL SVG (Self-contained, animated) -->
-        <div class="floating-illustration" role="img" aria-label="Illustration of medical team and dashboard">
-          <svg width="520" height="380" viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <!-- Base panel -->
+        <!-- animated illustration (SVG retained) -->
+        <div class="w-full max-w-[520px] animate-float">
+          <!-- Inline SVG (kept from original) -->
+          <svg width="100%" height="100%" viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="block">
             <defs>
               <linearGradient id="g1" x1="0" x2="1">
                 <stop offset="0%" stop-color="#fff" />
@@ -75,241 +110,219 @@
 
             <rect x="40" y="40" width="440" height="300" rx="22" fill="url(#g1)" stroke-opacity="0.06" stroke="#0a6cff" />
 
-            <!-- Left sidebar blocks -->
             <rect x="56" y="64" width="88" height="248" rx="12" fill="#e8f1ff" />
             <rect x="66" y="76" width="68" height="12" rx="6" fill="#dbeafe" />
             <rect x="66" y="96" width="42" height="10" rx="5" fill="#dbeafe" />
             <rect x="66" y="116" width="68" height="10" rx="5" fill="#e6f7ee" />
 
-            <!-- Main dashboard rectangles -->
             <rect x="162" y="64" width="296" height="40" rx="10" fill="#eaf6ff" />
             <rect x="162" y="118" width="220" height="16" rx="6" fill="#d5ebff" />
             <rect x="162" y="144" width="260" height="12" rx="6" fill="#bae0ff" />
 
-            <!-- Cards -->
             <rect x="162" y="172" width="140" height="84" rx="12" fill="#ebfff9" />
             <rect x="318" y="172" width="140" height="84" rx="12" fill="#ebf0ff" />
 
-            <!-- Doctor figure (stylized shapes matching theme) -->
             <g transform="translate(360,120)">
-              <!-- body shadow card -->
               <ellipse cx="0" cy="120" rx="46" ry="18" fill="rgba(0,0,0,0.06)" />
-              <!-- torso -->
               <rect x="-36" y="0" width="72" height="86" rx="18" fill="#0A6CFF" />
-              <!-- arms / coat accents -->
               <rect x="-54" y="20" width="20" height="56" rx="10" fill="#0A6CFF" transform="rotate(-12 -54 20)" />
               <rect x="34" y="20" width="20" height="56" rx="10" fill="#0A6CFF" transform="rotate(12 34 20)" />
-              <!-- head -->
               <circle cx="0" cy="-18" r="26" fill="#4FC3A1" />
-              <!-- small face detail -->
               <circle cx="-6" cy="-22" r="3" fill="#fff" opacity="0.9" />
             </g>
 
-            <!-- Pulse accent circle (animated via CSS) -->
             <circle cx="360" cy="120" r="48" fill="none" stroke="#4FC3A1" stroke-width="3" opacity="0.35"
-              class="pulse-circle" />
+              class="animate-pulse-svg" />
 
-            <!-- subtle decorative elements -->
             <rect x="180" y="260" width="200" height="8" rx="6" fill="#f0f8ff" />
             <rect x="180" y="278" width="120" height="8" rx="6" fill="#f0fff7" />
           </svg>
         </div>
 
-        <!-- Inline fallback graphic (keeps layout if needed) -->
-        <svg class="hero-fallback" width="420" height="300" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg"
-          style="max-width:420px" aria-hidden="true">
-          <rect x="0" y="0" width="420" height="300" rx="12" fill="#fff" />
-          <rect x="18" y="20" width="220" height="120" rx="8" fill="#f5f9ff" />
-          <rect x="250" y="20" width="150" height="120" rx="8" fill="#f5fff7" />
-          <rect x="18" y="150" width="382" height="120" rx="8" fill="#fbfcff" />
-          <circle cx="52" cy="60" r="18" fill="var(--primary)" />
-          <rect x="80" y="44" width="140" height="18" rx="6" fill="#dbeafe" />
-          <rect x="80" y="70" width="100" height="12" rx="4" fill="#e6f7ee" />
-          <rect x="268" y="44" width="110" height="18" rx="6" fill="#d1f7e8" />
-          <rect x="30" y="170" width="80" height="80" rx="8" fill="#eef6ff" />
-          <rect x="120" y="170" width="260" height="80" rx="8" fill="#fff" />
-        </svg>
+        <!-- fallback simple panel shown on very narrow screens (kept for layout) -->
+        <div class="hidden md:block absolute right-0 -bottom-6 w-[420px] h-[300px]"></div>
       </div>
     </section>
 
     <!-- CTA STRIP -->
-    <div class="cta-strip" role="note" aria-label="highlight">
-      <p>Trusted by hospitals — built for surgical teams. Try a 14-day trial.</p>
-      <a href="register.html">Start Trial</a>
+    <div class="max-w-[1200px] mx-auto px-6 lg:px-8 mt-6">
+      <div class="rounded-xl bg-gradient-to-r from-[--primary] to-[#4a8bff] text-white px-5 py-3 flex items-center justify-between shadow-lg">
+        <p class="font-bold">Trusted by hospitals — built for surgical teams. Try a 14-day trial.</p>
+        <a href="register.html" class="px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 font-semibold">Start Trial</a>
+      </div>
     </div>
 
     <!-- FEATURES -->
-    <section id="features" class="features" aria-labelledby="features-title">
-      <div class="feature" role="article" aria-label="OT scheduling feature">
-        <div class="icon" aria-hidden="true">
-          <!-- calendar icon (icons8) -->
-          <img src="https://img.icons8.com/ios-filled/48/0A6CFF/calendar.png" width="28" height="28" alt="">
+    <section id="features" class="max-w-[1200px] mx-auto px-6 lg:px-8 mt-12 grid lg:grid-cols-3 gap-6">
+      <!-- feature 1 -->
+      <article class="bg-white rounded-xl p-6 shadow-lg flex gap-4">
+        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-b from-[#e7f0ff] to-[#eef9f2]">
+          <img src="https://img.icons8.com/ios-filled/48/0A6CFF/calendar.png" alt="" class="w-7 h-7">
         </div>
         <div>
-          <h3>Conflict-free OT Scheduling</h3>
-          <p>Smart overlap checks prevent double-booking of operating rooms, surgeons, and anesthesiologists.</p>
+          <h3 class="text-[--primary] font-bold text-lg">Conflict-free OT Scheduling</h3>
+          <p class="text-sm text-[--muted] mt-1">Smart overlap checks prevent double-booking of operating rooms, surgeons, and anesthesiologists.</p>
         </div>
-      </div>
+      </article>
 
-      <div class="feature" role="article" aria-label="doctor management feature">
-        <div class="icon" aria-hidden="true">
-          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png" width="28" height="28" alt="">
+      <!-- feature 2 -->
+      <article class="bg-white rounded-xl p-6 shadow-lg flex gap-4">
+        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-b from-[#e7f0ff] to-[#eef9f2]">
+          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png" alt="" class="w-7 h-7">
         </div>
         <div>
-          <h3>Doctor & Staff Management</h3>
-          <p>Manage availability, specialties, shifts and workload balancing from a single panel.</p>
+          <h3 class="text-[--primary] font-bold text-lg">Doctor & Staff Management</h3>
+          <p class="text-sm text-[--muted] mt-1">Manage availability, specialties, shifts and workload balancing from a single panel.</p>
         </div>
-      </div>
+      </article>
 
-      <div class="feature" role="article" aria-label="patient integration feature">
-        <div class="icon" aria-hidden="true">
-          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/patient-file.png" width="28" height="28" alt="">
+      <!-- feature 3 -->
+      <article class="bg-white rounded-xl p-6 shadow-lg flex gap-4">
+        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-b from-[#e7f0ff] to-[#eef9f2]">
+          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/patient-file.png" alt="" class="w-7 h-7">
         </div>
         <div>
-          <h3>Patient Record Integration</h3>
-          <p>Secure access to MRNs, vitals and operation history for faster pre-op checks.</p>
+          <h3 class="text-[--primary] font-bold text-lg">Patient Record Integration</h3>
+          <p class="text-sm text-[--muted] mt-1">Secure access to MRNs, vitals and operation history for faster pre-op checks.</p>
         </div>
-      </div>
+      </article>
 
-      <div class="feature" role="article" aria-label="resource reservation feature">
-        <div class="icon" aria-hidden="true">
-          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/medical-tools.png" width="28" height="28" alt="">
+      <!-- feature 4 -->
+      <article class="bg-white rounded-xl p-6 shadow-lg flex gap-4">
+        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-b from-[#e7f0ff] to-[#eef9f2]">
+          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/medical-tools.png" alt="" class="w-7 h-7">
         </div>
         <div>
-          <h3>Resource Reservation</h3>
-          <p>Reserve surgical devices & consumables with time-window based reservations.</p>
+          <h3 class="text-[--primary] font-bold text-lg">Resource Reservation</h3>
+          <p class="text-sm text-[--muted] mt-1">Reserve surgical devices & consumables with time-window based reservations.</p>
         </div>
-      </div>
+      </article>
 
-      <div class="feature" role="article" aria-label="attachments feature">
-        <div class="icon" aria-hidden="true">
-          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/upload-to-cloud.png" width="28" height="28" alt="">
+      <!-- feature 5 -->
+      <article class="bg-white rounded-xl p-6 shadow-lg flex gap-4">
+        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-b from-[#e7f0ff] to-[#eef9f2]">
+          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/upload-to-cloud.png" alt="" class="w-7 h-7">
         </div>
         <div>
-          <h3>Surgical Reports & Attachments</h3>
-          <p>Secure upload for consent forms and postoperative reports with role-based access.</p>
+          <h3 class="text-[--primary] font-bold text-lg">Surgical Reports & Attachments</h3>
+          <p class="text-sm text-[--muted] mt-1">Secure upload for consent forms and postoperative reports with role-based access.</p>
         </div>
-      </div>
+      </article>
 
-      <div class="feature" role="article" aria-label="analytics feature">
-        <div class="icon" aria-hidden="true">
-          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/combo-chart.png" width="28" height="28" alt="">
+      <!-- feature 6 -->
+      <article class="bg-white rounded-xl p-6 shadow-lg flex gap-4">
+        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-b from-[#e7f0ff] to-[#eef9f2]">
+          <img src="https://img.icons8.com/ios-filled/50/0A6CFF/combo-chart.png" alt="" class="w-7 h-7">
         </div>
         <div>
-          <h3>Analytics Dashboard</h3>
-          <p>Utilization, throughput, and staff KPI dashboards to optimize OT efficiency.</p>
+          <h3 class="text-[--primary] font-bold text-lg">Analytics Dashboard</h3>
+          <p class="text-sm text-[--muted] mt-1">Utilization, throughput, and staff KPI dashboards to optimize OT efficiency.</p>
         </div>
-      </div>
+      </article>
     </section>
 
     <!-- PROCESS / HOW IT WORKS -->
-    <section id="workflow" class="process" aria-labelledby="workflow-title">
-      <h2 id="workflow-title">How it works — four steps</h2>
-      <div class="steps" role="list">
-        <div class="step" role="listitem" aria-label="Step 1">
-          <div class="num">1</div>
+    <section id="workflow" class="max-w-[1200px] mx-auto px-6 lg:px-8 mt-12">
+      <h2 class="text-2xl font-extrabold text-[--text]">How it works — four steps</h2>
+
+      <div class="mt-6 grid md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg p-5 shadow-sm flex gap-4 items-start">
+          <div class="flex items-center justify-center w-12 h-12 rounded-md bg-gradient-to-br from-[--primary] to-[#4b87ff] text-white font-extrabold">1</div>
           <div>
-            <h4>Add hospital records</h4>
-            <p>Create doctors, OT rooms, resources and patient records — centralized master data.</p>
+            <h4 class="text-lg font-semibold text-[--primary]">Add hospital records</h4>
+            <p class="text-sm text-[--muted] mt-1">Create doctors, OT rooms, resources and patient records — centralized master data.</p>
           </div>
         </div>
 
-        <div class="step" role="listitem" aria-label="Step 2">
-          <div class="num">2</div>
+        <div class="bg-white rounded-lg p-5 shadow-sm flex gap-4 items-start">
+          <div class="flex items-center justify-center w-12 h-12 rounded-md bg-gradient-to-br from-[--primary] to-[#4b87ff] text-white font-extrabold">2</div>
           <div>
-            <h4>Schedule surgery</h4>
-            <p>Use the multi-step form to choose patient, surgeon, OT and resources with time estimates.</p>
+            <h4 class="text-lg font-semibold text-[--primary]">Schedule surgery</h4>
+            <p class="text-sm text-[--muted] mt-1">Use the multi-step form to choose patient, surgeon, OT and resources with time estimates.</p>
           </div>
         </div>
 
-        <div class="step" role="listitem" aria-label="Step 3">
-          <div class="num">3</div>
+        <div class="bg-white rounded-lg p-5 shadow-sm flex gap-4 items-start">
+          <div class="flex items-center justify-center w-12 h-12 rounded-md bg-gradient-to-br from-[--primary] to-[#4b87ff] text-white font-extrabold">3</div>
           <div>
-            <h4>Automatic conflict checks</h4>
-            <p>Real-time checks for overlapping bookings and resource constraints prevent errors.</p>
+            <h4 class="text-lg font-semibold text-[--primary]">Automatic conflict checks</h4>
+            <p class="text-sm text-[--muted] mt-1">Real-time checks for overlapping bookings and resource constraints prevent errors.</p>
           </div>
         </div>
 
-        <div class="step" role="listitem" aria-label="Step 4">
-          <div class="num">4</div>
+        <div class="bg-white rounded-lg p-5 shadow-sm flex gap-4 items-start">
+          <div class="flex items-center justify-center w-12 h-12 rounded-md bg-gradient-to-br from-[--primary] to-[#4b87ff] text-white font-extrabold">4</div>
           <div>
-            <h4>Track & report</h4>
-            <p>Monitor progress, upload reports, and analyze utilization via secure dashboards.</p>
+            <h4 class="text-lg font-semibold text-[--primary]">Track & report</h4>
+            <p class="text-sm text-[--muted] mt-1">Monitor progress, upload reports, and analyze utilization via secure dashboards.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ROLES -->
-    <section id="roles" class="roles" aria-labelledby="roles-title">
-      <h2 id="roles-title" style="grid-column:1/-1;margin:0 0 14px 48px">Role-based access and capabilities</h2>
+    <section id="roles" class="max-w-[1200px] mx-auto px-6 lg:px-8 mt-12">
+      <h2 class="sr-only">Roles</h2>
 
-      <article class="role-card" aria-labelledby="admin">
-        <!-- avatar image: replace with Storyset/Freepik/Custom -->
-        <img
-          src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=a6a19e4b8ef3c4b4b5d3f1c3b2a3c9d8"
-          alt="admin avatar" onerror="this.style.display='none'">
-        <h3 id="admin">Admin</h3>
-        <p>Full access to manage users, resources, operations, and perform audits.</p>
-      </article>
+      <div class="grid lg:grid-cols-3 gap-6">
+        <article class="bg-white rounded-xl p-6 shadow-lg text-center">
+          <img src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=a6a19e4b8ef3c4b4b5d3f1c3b2a3c9d8" alt="admin avatar" class="w-20 h-20 rounded-full mx-auto object-cover">
+          <h3 class="text-[--primary] font-bold text-lg mt-4">Admin</h3>
+          <p class="text-sm text-[--muted] mt-2">Full access to manage users, resources, operations, and perform audits.</p>
+        </article>
 
-      <article class="role-card" aria-labelledby="doctor">
-        <img
-          src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3d9813c4c7a6f7e0c7b9c8f2d3f4b1b2"
-          alt="doctor avatar" onerror="this.style.display='none'">
-        <h3 id="doctor">Doctor</h3>
-        <p>View schedule, update operation status, view patient files and confirm cases.</p>
-      </article>
+        <article class="bg-white rounded-xl p-6 shadow-lg text-center">
+          <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3d9813c4c7a6f7e0c7b9c8f2d3f4b1b2" alt="doctor avatar" class="w-20 h-20 rounded-full mx-auto object-cover">
+          <h3 class="text-[--primary] font-bold text-lg mt-4">Doctor</h3>
+          <p class="text-sm text-[--muted] mt-2">View schedule, update operation status, view patient files and confirm cases.</p>
+        </article>
 
-      <article class="role-card" aria-labelledby="ot">
-        <img
-          src="https://images.unsplash.com/photo-1580281657521-48c7f57a9f23?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=8d3f0b660e3f1e8e5c7a3a8e1c4a3f1a"
-          alt="ot staff avatar" onerror="this.style.display='none'">
-        <h3 id="ot">OT Staff</h3>
-        <p>Manage daily OT operations, checklists, and resource readiness for upcoming lists.</p>
-      </article>
+        <article class="bg-white rounded-xl p-6 shadow-lg text-center">
+          <img src="https://images.unsplash.com/photo-1580281657521-48c7f57a9f23?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=8d3f0b660e3f1e8e5c7a3a8e1c4a3f1a" alt="ot staff avatar" class="w-20 h-20 rounded-full mx-auto object-cover">
+          <h3 class="text-[--primary] font-bold text-lg mt-4">OT Staff</h3>
+          <p class="text-sm text-[--muted] mt-2">Manage daily OT operations, checklists, and resource readiness for upcoming lists.</p>
+        </article>
+      </div>
     </section>
 
     <!-- SECURITY -->
-    <section id="security" class="security" aria-labelledby="security-title">
-      <div class="sec-left">
-        <h2 id="security-title">Security • Compliance • Audit</h2>
-        <p>End-to-end encryption, role-based access control, detailed audit logs and secure file storage ensure
-          regulatory compliance and data integrity.</p>
-      </div>
-      <div class="sec-right" aria-hidden="true">
-        <!-- Security illustration (abstract shapes) -->
-        <svg width="300" height="160" viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true">
-          <rect x="12" y="8" width="276" height="144" rx="12" fill="rgba(255,255,255,0.08)" />
-          <rect x="32" y="28" width="100" height="28" rx="8" fill="rgba(255,255,255,0.12)" />
-          <rect x="32" y="66" width="220" height="10" rx="6" fill="rgba(255,255,255,0.12)" />
-          <circle cx="232" cy="40" r="28" fill="rgba(255,255,255,0.16)" />
-          <path d="M225 36 L235 46 M235 36 L225 46" stroke="white" stroke-width="2" stroke-linecap="round" />
-        </svg>
+    <section id="security" class="max-w-[1200px] mx-auto px-6 lg:px-8 mt-12">
+      <div class="rounded-xl p-8 bg-gradient-to-b from-[--primary] to-[#1270ff] text-white flex flex-col md:flex-row items-center gap-6">
+        <div class="flex-1">
+          <h2 class="text-2xl font-extrabold">Security • Compliance • Audit</h2>
+          <p class="mt-3 text-white/90">End-to-end encryption, role-based access control, detailed audit logs and secure file storage ensure regulatory compliance and data integrity.</p>
+        </div>
+        <div class="w-72">
+          <!-- simple abstract graphic -->
+          <svg width="100%" height="100%" viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="12" y="8" width="276" height="144" rx="12" fill="rgba(255,255,255,0.08)"/>
+            <rect x="32" y="28" width="100" height="28" rx="8" fill="rgba(255,255,255,0.12)"/>
+            <rect x="32" y="66" width="220" height="10" rx="6" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="232" cy="40" r="28" fill="rgba(255,255,255,0.16)"/>
+            <path d="M225 36 L235 46 M235 36 L225 46" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer>
-      <div class="inner">
-        <small>© 2025 Operation Scheduler • Designed for hospitals. All rights reserved.</small>
-        <div>
-          <a class="btn btn-ghost" href="#privacy">Privacy</a>
-          <a class="btn btn-ghost" href="#terms">Terms</a>
+    <footer class="mt-12">
+      <div class="max-w-[1200px] mx-auto px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#eaf3ff] rounded-md">
+        <small class="text-[--muted]">© 2025 Operation Scheduler • Designed for hospitals. All rights reserved.</small>
+        <div class="flex gap-3">
+          <a href="#privacy" class="text-[--muted] hover:text-[--primary]">Privacy</a>
+          <a href="#terms" class="text-[--muted] hover:text-[--primary]">Terms</a>
         </div>
       </div>
     </footer>
 
   </main>
 
-  <!-- Optional: small script to improve accessibility -->
+  <!-- Accessibility helper script -->
   <script>
-    // accessibility improvement: add focus styles for keyboard navigation
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Tab') document.body.classList.add('user-is-tabbing');
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Tab') document.documentElement.classList.add('user-is-tabbing');
     });
   </script>
 </body>
-
 </html>
