@@ -1,6 +1,13 @@
+// Firebase Core
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+// Firebase Services
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
+// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDA2kBvEpF6WU5J54XyY7vIU6zAVKukkF8",
   authDomain: "operation-scheduler-a44f8.firebaseapp.com",
@@ -11,6 +18,11 @@ const firebaseConfig = {
   measurementId: "G-HX7YXB9ET7",
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Initialize Firebase App
+export const app = initializeApp(firebaseConfig);
+
+// Export services to use anywhere
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+export const analytics = getAnalytics(app);
