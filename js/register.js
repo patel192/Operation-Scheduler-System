@@ -180,7 +180,7 @@ submitAccount.addEventListener("click", async () => {
     await setDoc(doc(db, "users", uid), saveUser);
 
     // 5️⃣ Redirect
-    window.location.href = "/dashboard.html";
+    window.location.href = "login.html";
 
   } catch (err) {
     console.error(err);

@@ -69,19 +69,19 @@
       </div>
 
       <!-- FORM -->
-      <form class="space-y-4">
+      <form class="space-y-4" id="login-form">
 
-        <input type="email" placeholder="Email" required
+        <input id="email-input" type="email" placeholder="Email" required
           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
 
-        <input type="password" placeholder="Password" required
+        <input id="password-input" type="password" placeholder="Password" required
           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
 
         <div class="flex justify-end">
           <a href="#" class="text-sm text-[--primary] font-medium hover:underline">Forgot password?</a>
         </div>
 
-        <button
+        <button id="login-btn"
           class="w-full py-3 rounded-xl bg-[--primary] text-white font-bold shadow hover:bg-blue-700 transition">
           Login
         </button>
@@ -96,7 +96,7 @@
     </div>
 
   </div>
-
+<script type="module" src="js/login.js"></script>
 </body>
 
 </html>
