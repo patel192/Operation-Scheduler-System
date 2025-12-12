@@ -1,5 +1,7 @@
 // Firebase Core
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
 
 // Firebase Services
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
@@ -26,3 +28,4 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const analytics = getAnalytics(app);
+export const googleProvider = new GoogleAuthProvider();

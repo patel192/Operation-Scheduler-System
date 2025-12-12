@@ -1,19 +1,21 @@
 // ================================
 // IMPORTS
 // ================================
-import { auth, db } from "./firebase.js";
+import { googleProvider, auth, db } from "./firebase.js";
 
 import {
   createUserWithEmailAndPassword,
+  signInWithPopup,
   updateProfile,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 import {
   doc,
   setDoc,
+  getDoc,
+  updateDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
 
 // ================================
 // STEP ELEMENTS
@@ -30,10 +32,13 @@ const submitAccount = document.getElementById("submitAccount");
 
 const stepLabel = document.getElementById("stepLabel");
 
+const googleBtn = document.getElementById("googleSignUp");
 
 // ================================
-// USER DATA (TEMP STORAGE)
+// STATE VARIABLES
 // ================================
+let isGoogleSignup = false;
+
 let userData = {
   displayName: "",
   email: "",
@@ -44,10 +49,9 @@ let userData = {
   roles: [],
   profilePic: "",
   status: "active",
-  createdBy: "self", // later replaced with uid
+  createdBy: "self",
   metaData: {},
 };
-
 
 // ================================
 // STEP 1 → STEP 2
@@ -71,7 +75,6 @@ next1.addEventListener("click", () => {
   stepLabel.textContent = "Step 2 of 3";
 });
 
-
 // ================================
 // STEP 2 → STEP 3
 // ================================
@@ -92,7 +95,6 @@ next2.addEventListener("click", () => {
   stepLabel.textContent = "Step 3 of 3";
 });
 
-
 // ================================
 // BACK BUTTONS
 // ================================
@@ -108,16 +110,14 @@ back3.addEventListener("click", () => {
   stepLabel.textContent = "Step 2 of 3";
 });
 
-
 // ================================
-// ROLE SELECTOR
+// ROLE SELECTION
 // ================================
 const roleCards = document.querySelectorAll(".roleCard");
 let selectedRole = null;
 
 roleCards.forEach((card) => {
   card.addEventListener("click", () => {
-    // remove highlights
     roleCards.forEach((c) =>
       c.classList.remove("border-blue-500", "bg-blue-100")
     );
@@ -133,9 +133,8 @@ roleCards.forEach((card) => {
   });
 });
 
-
 // ================================
-// FINAL SUBMISSION → Firebase
+// FINAL SUBMISSION (NORMAL + GOOGLE SIGNUP)
 // ================================
 submitAccount.addEventListener("click", async () => {
   if (!selectedRole) {
@@ -144,21 +143,49 @@ submitAccount.addEventListener("click", async () => {
   }
 
   try {
-    // 1️⃣ Create user in Firebase Auth
+    let uid;
+
+    // ⭐ GOOGLE SIGNUP FLOW (ALWAYS setDoc)
+    if (isGoogleSignup) {
+      const user = auth.currentUser;
+      uid = user.uid;
+
+      const saveUser = {
+        uid,
+        displayName: user.displayName,
+        email: user.email,
+        phone: userData.phone || "",
+        department: userData.department || "",
+        role: userData.role,
+        roles: [userData.role],
+        profilePic: user.photoURL || "",
+        status: "active",
+        createdBy: uid,
+        metaData: {
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+        },
+      };
+
+      await setDoc(doc(db, "users", uid), saveUser);
+
+      window.location.href = "login.html";
+      return;
+    }
+
+    // ⭐ NORMAL EMAIL/PASSWORD SIGNUP
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       userData.email,
       userData.password
     );
 
-    const uid = userCredential.user.uid;
+    uid = userCredential.user.uid;
 
-    // 2️⃣ Update Firebase Auth profile
     await updateProfile(userCredential.user, {
       displayName: userData.displayName,
     });
 
-    // 3️⃣ Prepare Firestore user object
     const saveUser = {
       uid,
       displayName: userData.displayName,
@@ -166,8 +193,8 @@ submitAccount.addEventListener("click", async () => {
       phone: userData.phone,
       department: userData.department,
       role: userData.role,
-      roles: userData.roles,
-      profilePic: userData.profilePic || "",
+      roles: [userData.role],
+      profilePic: "",
       status: "active",
       createdBy: uid,
       metaData: {
@@ -176,14 +203,65 @@ submitAccount.addEventListener("click", async () => {
       },
     };
 
-    // 4️⃣ Save into Firestore
     await setDoc(doc(db, "users", uid), saveUser);
 
-    // 5️⃣ Redirect
     window.location.href = "login.html";
-
   } catch (err) {
     console.error(err);
     alert(err.message);
+  }
+});
+
+// ================================
+// GOOGLE SIGN-UP
+// ================================
+googleBtn.addEventListener("click", async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    // ⭐ NEW GOOGLE USER → Continue with Step-3
+    if (!userSnap.exists()) {
+      isGoogleSignup = true;
+
+      userData.displayName = user.displayName;
+      userData.email = user.email;
+      userData.profilePic = user.photoURL || "";
+      userData.createdBy = user.uid;
+
+      step1.classList.add("hidden");
+      step2.classList.add("hidden");
+      step3.classList.remove("hidden");
+      stepLabel.textContent = "Step 3 of 3";
+
+      return;
+    }
+
+    // ⭐ EXISTING GOOGLE USER → update timestamp
+    await updateDoc(userRef, {
+      "metaData.lastLogin": serverTimestamp(),
+    });
+
+    const data = userSnap.data();
+
+    if (!data.role) {
+      step1.classList.add("hidden");
+      step2.classList.add("hidden");
+      step3.classList.remove("hidden");
+      stepLabel.textContent = "Step 3 of 3";
+      return;
+    }
+
+    if (data.role === "Admin") {
+      window.location.href = "/admin/dashboard.html";
+    } else {
+      window.location.href = "/user/dashboard.html";
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Google SignUp Failed. Try Again.");
   }
 });
