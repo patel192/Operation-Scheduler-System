@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
+  sendEmailVerification,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 import {
@@ -31,7 +32,6 @@ const back3 = document.getElementById("back3");
 const submitAccount = document.getElementById("submitAccount");
 
 const stepLabel = document.getElementById("stepLabel");
-
 const googleBtn = document.getElementById("googleSignUp");
 
 // ================================
@@ -134,7 +134,7 @@ roleCards.forEach((card) => {
 });
 
 // ================================
-// FINAL SUBMISSION (NORMAL + GOOGLE SIGNUP)
+// FINAL SUBMISSION (NORMAL + GOOGLE)
 // ================================
 submitAccount.addEventListener("click", async () => {
   if (!selectedRole) {
@@ -145,7 +145,6 @@ submitAccount.addEventListener("click", async () => {
   try {
     let uid;
 
-    // ⭐ GOOGLE SIGNUP FLOW (ALWAYS setDoc)
     if (isGoogleSignup) {
       const user = auth.currentUser;
       uid = user.uid;
@@ -161,6 +160,7 @@ submitAccount.addEventListener("click", async () => {
         profilePic: user.photoURL || "",
         status: "active",
         createdBy: uid,
+        emailVerified: true,   // GOOGLE is already verified
         metaData: {
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
@@ -173,7 +173,6 @@ submitAccount.addEventListener("click", async () => {
       return;
     }
 
-    // ⭐ NORMAL EMAIL/PASSWORD SIGNUP
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       userData.email,
@@ -186,6 +185,9 @@ submitAccount.addEventListener("click", async () => {
       displayName: userData.displayName,
     });
 
+    //  SEND EMAIL VERIFICATION
+    await sendEmailVerification(userCredential.user);
+
     const saveUser = {
       uid,
       displayName: userData.displayName,
@@ -197,6 +199,7 @@ submitAccount.addEventListener("click", async () => {
       profilePic: "",
       status: "active",
       createdBy: uid,
+      emailVerified: false, // user must verify
       metaData: {
         createdAt: serverTimestamp(),
         lastLogin: serverTimestamp(),
@@ -205,7 +208,9 @@ submitAccount.addEventListener("click", async () => {
 
     await setDoc(doc(db, "users", uid), saveUser);
 
-    window.location.href = "login.html";
+    // 🔵 REDIRECT TO VERIFY EMAIL PAGE
+    window.location.href = "verify-email.html";
+
   } catch (err) {
     console.error(err);
     alert(err.message);
@@ -223,14 +228,13 @@ googleBtn.addEventListener("click", async () => {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
-    // ⭐ NEW GOOGLE USER → Continue with Step-3
+    // NEW GOOGLE USER → move to Step 3
     if (!userSnap.exists()) {
       isGoogleSignup = true;
 
       userData.displayName = user.displayName;
       userData.email = user.email;
       userData.profilePic = user.photoURL || "";
-      userData.createdBy = user.uid;
 
       step1.classList.add("hidden");
       step2.classList.add("hidden");
@@ -240,7 +244,7 @@ googleBtn.addEventListener("click", async () => {
       return;
     }
 
-    // ⭐ EXISTING GOOGLE USER → update timestamp
+    // EXISTING GOOGLE USER
     await updateDoc(userRef, {
       "metaData.lastLogin": serverTimestamp(),
     });
