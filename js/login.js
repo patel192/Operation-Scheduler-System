@@ -132,6 +132,8 @@ googleBtn.addEventListener("click", async () => {
 
     // ⭐ ROLE FOUND → Redirect properly
     redirectUser(data.role);
+    console.log("LOGIN ROLE =", `"${data.role}"`);
+
 
   } catch (err) {
     console.error("Google Login Error:", err);
@@ -145,16 +147,27 @@ googleBtn.addEventListener("click", async () => {
 // ================================
 function redirectUser(role) {
   if (!role) {
-    // Should not happen normally
-    window.location.href = "/register.html?google=1";
+    // User authenticated but profile incomplete
+    window.location.href = "/register.html?step=role";
     return;
   }
 
-  const lower = role.toLowerCase();
+  const ROLE_ROUTES = {
+    Admin: "/admin/dashboard.html",
+    Doctor: "/doctor/dashboard.html",
+    "OT Staff": "/ot/dashboard.html",
+    Patient: "/patient/dashboard.html",
+  };
 
-  if (lower === "admin") {
-    window.location.href = "/admin/dashboard.html";
-  } else {
-    window.location.href = "/user/dashboard.html";
+  const target = ROLE_ROUTES[role];
+
+  if (!target) {
+    // Unknown / corrupted role
+    console.error("Unknown role:", role);
+    window.location.href = "/login.html";
+    return;
   }
+
+  window.location.href = target;
 }
+
