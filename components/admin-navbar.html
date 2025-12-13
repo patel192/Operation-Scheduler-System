@@ -1,0 +1,49 @@
+<nav class="bg-white border-b shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Logo -->
+      <div class="text-lg font-bold text-blue-600">
+        Operation Scheduler
+      </div>
+
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex space-x-6 font-medium text-gray-700">
+        <a href="/admin/dashboard.html" class="hover:text-blue-600">Dashboard</a>
+        <a href="/admin/departments.html" class="hover:text-blue-600">Departments</a>
+        <a href="/admin/doctors.html" class="hover:text-blue-600">Doctors</a>
+        <a href="/admin/ot-rooms.html" class="hover:text-blue-600">OT Rooms</a>
+        <a href="/admin/resources.html" class="hover:text-blue-600">Resources</a>
+      </div>
+
+      <!-- Desktop Logout -->
+      <div class="hidden md:block">
+        <button id="logoutBtn"
+          class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm">
+          Logout
+        </button>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="menuBtn" class="md:hidden text-gray-700 focus:outline-none">
+        ☰
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+    <div class="px-4 py-3 space-y-2 text-gray-700 font-medium">
+      <a href="/admin/dashboard.html" class="block">Dashboard</a>
+      <a href="/admin/departments.html" class="block">Departments</a>
+      <a href="/admin/doctors.html" class="block">Doctors</a>
+      <a href="/admin/ot-rooms.html" class="block">OT Rooms</a>
+      <a href="/admin/resources.html" class="block">Resources</a>
+
+      <button id="logoutBtnMobile"
+        class="w-full mt-3 bg-red-500 text-white py-2 rounded-lg">
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
