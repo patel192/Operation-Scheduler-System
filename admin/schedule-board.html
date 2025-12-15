@@ -20,6 +20,7 @@
   <!-- Auth Guard + Admin Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" src="/js/admin/scheduleBoard.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
@@ -36,10 +37,10 @@
     </div>
 
     <div class="flex flex-wrap gap-2">
-      <button class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
+      <button id="filterToday" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
         Today
       </button>
-      <button class="px-4 py-2 rounded-lg bg-slate-100 text-sm font-semibold hover:bg-slate-200">
+      <button id="filterWeek" class="px-4 py-2 rounded-lg bg-slate-100 text-sm font-semibold hover:bg-slate-200">
         Week
       </button>
       <a href="/admin/create-schedule.html"
@@ -79,7 +80,7 @@
       </div>
 
       <!-- ================= OT ROWS ================= -->
-      <div class="space-y-4">
+      <div id="scheduleRows" class="space-y-4">
 
         <!-- ===== OT-1 ===== -->
         <div class="grid grid-cols-[110px_repeat(6,1fr)] gap-2 items-stretch">
