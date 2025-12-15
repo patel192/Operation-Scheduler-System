@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedules — Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary: #0A6CFF;
+      --bg: #F8FAFC;
+      --text: #1E293B;
+      --muted: #64748B;
+    }
+  </style>
+
+  <!-- Auth Guard -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+  <!-- ================= MAIN ================= -->
+  <main class="max-w-7xl mx-auto px-4 py-10">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-2xl font-bold">Operation Schedules</h1>
+        <p class="text-sm text-[--muted] mt-1">
+          View, manage and monitor all OT schedules
+        </p>
+      </div>
+
+      <a href="/admin/create-schedule.html"
+        class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[--primary] text-white font-semibold">
+        + Create Schedule
+      </a>
+    </section>
+
+    <!-- ===== FILTER BAR ===== -->
+    <section class="bg-white p-4 rounded-xl shadow mb-6 grid md:grid-cols-5 gap-3 text-sm">
+
+      <input type="date" class="border rounded-lg px-3 py-2" />
+
+      <select class="border rounded-lg px-3 py-2">
+        <option>All Departments</option>
+        <option>Cardiology</option>
+        <option>Orthopedics</option>
+        <option>Neurology</option>
+      </select>
+
+      <select class="border rounded-lg px-3 py-2">
+        <option>All OT Rooms</option>
+        <option>OT-1</option>
+        <option>OT-2</option>
+        <option>OT-3</option>
+      </select>
+
+      <select class="border rounded-lg px-3 py-2">
+        <option>Status</option>
+        <option>Scheduled</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+        <option>Cancelled</option>
+      </select>
+
+      <button class="rounded-lg bg-slate-100 font-semibold">
+        Apply
+      </button>
+
+    </section>
+
+    <!-- ===== SCHEDULE TABLE ===== -->
+    <section class="bg-white rounded-xl shadow overflow-x-auto">
+
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left">
+          <tr>
+            <th class="px-4 py-3">Patient</th>
+            <th class="px-4 py-3">Procedure</th>
+            <th class="px-4 py-3">Department</th>
+            <th class="px-4 py-3">OT</th>
+            <th class="px-4 py-3">Time</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y">
+
+          <!-- ROW -->
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3 font-semibold">John Doe</td>
+            <td class="px-4 py-3">Bypass Surgery</td>
+            <td class="px-4 py-3">Cardiology</td>
+            <td class="px-4 py-3">OT-1</td>
+            <td class="px-4 py-3">10:00 – 12:30</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                Scheduled
+              </span>
+            </td>
+            <td class="px-4 py-3 flex gap-3">
+              <a href="#" class="text-[--primary] font-semibold">View</a>
+              <a href="#" class="text-yellow-600 font-semibold">Edit</a>
+              <a href="#" class="text-red-600 font-semibold">Cancel</a>
+            </td>
+          </tr>
+
+          <!-- MORE ROWS LATER -->
+
+        </tbody>
+      </table>
+
+    </section>
+
+  </main>
+
+</body>
+
+</html>

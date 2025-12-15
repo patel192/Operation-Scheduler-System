@@ -1,30 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Dashboard</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — Operation Scheduler</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Auth Guard -->
-  <script type="module" src="../middleware/auth-guard.js"></script>
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
 
-  <!-- Navbar Loader -->
-  <script type="module" src="../js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-[--bg] text-[--text] min-h-screen">
 
-  <main class="p-6 max-w-7xl mx-auto">
-    <h1 class="text-2xl font-bold text-gray-800">
-      Welcome, Admin
-    </h1>
+<!-- ================= MAIN ================= -->
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-10">
 
-    <p class="text-gray-600 mt-2">
-      Manage hospital operations from here.
+<!-- ===== HERO ===== -->
+<section class="flex flex-col md:flex-row justify-between gap-6">
+  <div>
+    <h1 class="text-2xl font-bold">Welcome, Admin</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Hospital operations overview — Today
     </p>
-  </main>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-4 text-sm">
+    <p class="font-semibold">System Status</p>
+    <p class="text-green-600 mt-1">All systems operational</p>
+  </div>
+</section>
+
+<!-- ===== KPI GRID ===== -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+  <div class="bg-white p-5 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Surgeries Today</p>
+    <h2 class="text-3xl font-bold mt-1">18</h2>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">OT Utilization</p>
+    <h2 class="text-3xl font-bold mt-1">82%</h2>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Doctors On Duty</p>
+    <h2 class="text-3xl font-bold mt-1">27</h2>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Pending Approvals</p>
+    <h2 class="text-3xl font-bold mt-1 text-red-500">3</h2>
+  </div>
+
+</section>
+
+<!-- ===== CHARTS PLACEHOLDER ===== -->
+<section class="grid md:grid-cols-2 gap-6">
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="font-semibold mb-2">OT Utilization Trend</h3>
+    <div class="h-40 bg-slate-100 rounded-lg flex items-center justify-center text-sm text-[--muted]">
+      Chart Placeholder
+    </div>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="font-semibold mb-2">Surgeries by Department</h3>
+    <div class="h-40 bg-slate-100 rounded-lg flex items-center justify-center text-sm text-[--muted]">
+      Chart Placeholder
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== TODAY OPERATIONS ===== -->
+<section>
+  <h2 class="font-semibold mb-4">Today’s OT Schedule</h2>
+
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-left">
+        <tr>
+          <th class="p-4">OT</th>
+          <th class="p-4">Doctor</th>
+          <th class="p-4">Procedure</th>
+          <th class="p-4">Time</th>
+          <th class="p-4">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        <tr>
+          <td class="p-4">OT-1</td>
+          <td class="p-4">Dr. Sharma</td>
+          <td class="p-4">Bypass</td>
+          <td class="p-4">10:00–12:00</td>
+          <td class="p-4 text-green-600">Ongoing</td>
+        </tr>
+        <tr>
+          <td class="p-4">OT-3</td>
+          <td class="p-4">Dr. Patel</td>
+          <td class="p-4">Knee Replacement</td>
+          <td class="p-4">12:30–14:00</td>
+          <td class="p-4 text-yellow-600">Upcoming</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
 
 </body>
-
 </html>

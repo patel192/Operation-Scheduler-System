@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctors — Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth Guard -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+<!-- ================= MAIN ================= -->
+<main class="max-w-7xl mx-auto px-4 py-10">
+
+<!-- ===== HEADER ===== -->
+<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-2xl font-bold">Doctors</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Manage doctors, specialties, availability and status
+    </p>
+  </div>
+
+  <a href="/admin/add-doctor.html"
+     class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[--primary] text-white font-semibold">
+    + Add Doctor
+  </a>
+</section>
+
+<!-- ===== FILTERS ===== -->
+<section class="bg-white p-4 rounded-xl shadow mb-6 grid md:grid-cols-4 gap-3 text-sm">
+
+  <input type="text" placeholder="Search by name"
+         class="border rounded-lg px-3 py-2"/>
+
+  <select class="border rounded-lg px-3 py-2">
+    <option>All Departments</option>
+    <option>Cardiology</option>
+    <option>Orthopedics</option>
+    <option>Neurology</option>
+  </select>
+
+  <select class="border rounded-lg px-3 py-2">
+    <option>Status</option>
+    <option>Active</option>
+    <option>On Leave</option>
+    <option>Inactive</option>
+  </select>
+
+  <button class="rounded-lg bg-slate-100 font-semibold">
+    Apply
+  </button>
+
+</section>
+
+<!-- ===== DOCTORS TABLE ===== -->
+<section class="bg-white rounded-xl shadow overflow-x-auto">
+
+<table class="w-full text-sm">
+  <thead class="bg-slate-50 text-left">
+    <tr>
+      <th class="px-4 py-3">Doctor</th>
+      <th class="px-4 py-3">Department</th>
+      <th class="px-4 py-3">Specialty</th>
+      <th class="px-4 py-3">Availability</th>
+      <th class="px-4 py-3">Status</th>
+      <th class="px-4 py-3">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody class="divide-y">
+
+    <!-- ROW -->
+    <tr class="hover:bg-slate-50">
+      <td class="px-4 py-3 font-semibold flex items-center gap-3">
+        <img src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png"
+             class="w-8 h-8 rounded-full"/>
+        Dr. Rahul Mehta
+      </td>
+      <td class="px-4 py-3">Cardiology</td>
+      <td class="px-4 py-3">Heart Surgery</td>
+      <td class="px-4 py-3">Mon–Fri</td>
+      <td class="px-4 py-3">
+        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+          Active
+        </span>
+      </td>
+      <td class="px-4 py-3 flex gap-3">
+        <a href="#" class="text-[--primary] font-semibold">View</a>
+        <a href="#" class="text-yellow-600 font-semibold">Edit</a>
+        <a href="#" class="text-red-600 font-semibold">Disable</a>
+      </td>
+    </tr>
+
+    <!-- MORE ROWS LATER -->
+
+  </tbody>
+</table>
+
+</section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OT Rooms — Admin</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth Guard -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<!-- ================= NAVBAR ================= -->
+<header class="sticky top-0 bg-white border-b z-50">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+
+    <div class="font-bold text-lg text-[--primary]">
+      Operation Scheduler
+    </div>
+
+    <nav class="hidden md:flex gap-6 text-sm font-semibold">
+      <a href="/admin/dashboard.html" class="text-[--muted] hover:text-[--primary]">Dashboard</a>
+      <a href="/admin/schedules.html" class="text-[--muted] hover:text-[--primary]">Schedules</a>
+      <a href="/admin/doctors.html" class="text-[--muted] hover:text-[--primary]">Doctors</a>
+      <a href="/admin/departments.html" class="text-[--muted] hover:text-[--primary]">Departments</a>
+      <a href="/admin/ot-rooms.html" class="text-[--primary]">OT Rooms</a>
+    </nav>
+
+    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/user.png"
+         class="w-8 h-8 rounded-full"/>
+  </div>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="max-w-7xl mx-auto px-4 py-10">
+
+<!-- ===== HEADER ===== -->
+<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-2xl font-bold">Operation Theatres (OT)</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Manage OT rooms, capacity, equipment and availability
+    </p>
+  </div>
+
+  <a href="/admin/add-ot-room.html"
+     class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[--primary] text-white font-semibold">
+    + Add OT Room
+  </a>
+</section>
+
+<!-- ===== SUMMARY CARDS ===== -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Total OT Rooms</p>
+    <h3 class="text-2xl font-bold mt-1">8</h3>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Available</p>
+    <h3 class="text-2xl font-bold mt-1 text-green-600">5</h3>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">In Use</p>
+    <h3 class="text-2xl font-bold mt-1 text-blue-600">2</h3>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Maintenance</p>
+    <h3 class="text-2xl font-bold mt-1 text-red-600">1</h3>
+  </div>
+</section>
+
+<!-- ===== OT TABLE ===== -->
+<section class="bg-white rounded-xl shadow overflow-x-auto">
+
+<table class="w-full text-sm">
+  <thead class="bg-slate-50 text-left">
+    <tr>
+      <th class="px-4 py-3">OT Name</th>
+      <th class="px-4 py-3">Department</th>
+      <th class="px-4 py-3">Capacity</th>
+      <th class="px-4 py-3">Equipment</th>
+      <th class="px-4 py-3">Status</th>
+      <th class="px-4 py-3">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody class="divide-y">
+
+    <!-- ROW -->
+    <tr class="hover:bg-slate-50">
+      <td class="px-4 py-3 font-semibold">OT-1</td>
+      <td class="px-4 py-3">Cardiology</td>
+      <td class="px-4 py-3">Full</td>
+      <td class="px-4 py-3">Ventilator, ECG, Monitor</td>
+      <td class="px-4 py-3">
+        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+          Available
+        </span>
+      </td>
+      <td class="px-4 py-3 flex gap-3">
+        <a href="#" class="text-[--primary] font-semibold">View</a>
+        <a href="#" class="text-yellow-600 font-semibold">Edit</a>
+        <a href="#" class="text-red-600 font-semibold">Disable</a>
+      </td>
+    </tr>
+
+    <!-- ROW -->
+    <tr class="hover:bg-slate-50">
+      <td class="px-4 py-3 font-semibold">OT-3</td>
+      <td class="px-4 py-3">Orthopedics</td>
+      <td class="px-4 py-3">Partial</td>
+      <td class="px-4 py-3">X-Ray, Drill Unit</td>
+      <td class="px-4 py-3">
+        <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+          In Use
+        </span>
+      </td>
+      <td class="px-4 py-3 flex gap-3">
+        <a href="#" class="text-[--primary] font-semibold">View</a>
+        <a href="#" class="text-yellow-600 font-semibold">Edit</a>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+</section>
+
+</main>
+
+</body>
+</html>

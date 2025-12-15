@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Schedule — Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<!-- ================= MAIN ================= -->
+<main class="max-w-4xl mx-auto px-4 py-10">
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="mb-8">
+  <h1 class="text-2xl font-bold">Create Operation Schedule</h1>
+  <p class="text-sm text-[--muted] mt-1">
+    Plan surgeries with conflict-free OT, doctor, and resource allocation
+  </p>
+</section>
+
+<!-- ===== STEP INDICATOR ===== -->
+<section class="flex justify-between items-center mb-8 text-sm font-semibold">
+  <span class="text-[--primary]">Step 1: Patient</span>
+  <span class="text-[--muted]">Step 2: OT & Time</span>
+  <span class="text-[--muted]">Step 3: Doctors</span>
+  <span class="text-[--muted]">Step 4: Review</span>
+</section>
+
+<!-- ================= STEP 1 ================= -->
+<section class="bg-white p-6 rounded-xl shadow space-y-6">
+
+  <h2 class="font-semibold text-lg">Patient & Procedure Details</h2>
+
+  <div class="grid md:grid-cols-2 gap-4">
+    <input type="text" placeholder="Patient Name"
+           class="border rounded-lg px-4 py-2"/>
+
+    <input type="text" placeholder="Patient ID / MRN"
+           class="border rounded-lg px-4 py-2"/>
+
+    <select class="border rounded-lg px-4 py-2">
+      <option>Select Department</option>
+      <option>Cardiology</option>
+      <option>Orthopedics</option>
+      <option>Neurology</option>
+    </select>
+
+    <input type="text" placeholder="Procedure Name"
+           class="border rounded-lg px-4 py-2"/>
+
+    <textarea placeholder="Clinical Notes (optional)"
+              class="border rounded-lg px-4 py-2 md:col-span-2"></textarea>
+  </div>
+
+  <div class="flex justify-end">
+    <button class="px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold">
+      Next
+    </button>
+  </div>
+</section>
+
+<!-- ================= STEP 2 ================= -->
+<section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8">
+
+  <h2 class="font-semibold text-lg">OT & Time Allocation</h2>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <input type="date" class="border rounded-lg px-4 py-2"/>
+
+    <select class="border rounded-lg px-4 py-2">
+      <option>Select OT Room</option>
+      <option>OT-1</option>
+      <option>OT-2</option>
+      <option>OT-3</option>
+    </select>
+
+    <select class="border rounded-lg px-4 py-2">
+      <option>Expected Duration</option>
+      <option>30 mins</option>
+      <option>1 hour</option>
+      <option>2 hours</option>
+      <option>4+ hours</option>
+    </select>
+
+    <input type="time" class="border rounded-lg px-4 py-2"/>
+    <input type="time" class="border rounded-lg px-4 py-2"/>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <button class="px-6 py-2 rounded-xl border font-semibold">
+      Back
+    </button>
+    <button class="px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold">
+      Next
+    </button>
+  </div>
+</section>
+
+<!-- ================= STEP 3 ================= -->
+<section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8">
+
+  <h2 class="font-semibold text-lg">Doctors & Resources</h2>
+
+  <div class="grid md:grid-cols-2 gap-4">
+    <select class="border rounded-lg px-4 py-2">
+      <option>Select Surgeon</option>
+      <option>Dr. Sharma</option>
+      <option>Dr. Patel</option>
+    </select>
+
+    <select class="border rounded-lg px-4 py-2">
+      <option>Select Anesthesiologist</option>
+      <option>Dr. Rao</option>
+      <option>Dr. Mehta</option>
+    </select>
+
+    <select class="border rounded-lg px-4 py-2 md:col-span-2">
+      <option>Select Required Equipment</option>
+      <option>Ventilator</option>
+      <option>Heart-lung machine</option>
+      <option>Orthopedic kit</option>
+    </select>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <button class="px-6 py-2 rounded-xl border font-semibold">
+      Back
+    </button>
+    <button class="px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold">
+      Next
+    </button>
+  </div>
+</section>
+
+<!-- ================= STEP 4 ================= -->
+<section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8">
+
+  <h2 class="font-semibold text-lg">Review & Confirm</h2>
+
+  <div class="bg-slate-50 p-4 rounded-lg text-sm space-y-2">
+    <p><strong>Patient:</strong> John Doe</p>
+    <p><strong>Procedure:</strong> Bypass Surgery</p>
+    <p><strong>OT:</strong> OT-1 | 10:00 – 12:30</p>
+    <p><strong>Doctors:</strong> Dr. Sharma, Dr. Rao</p>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <button class="px-6 py-2 rounded-xl border font-semibold">
+      Back
+    </button>
+    <button class="px-6 py-2 rounded-xl bg-green-600 text-white font-semibold">
+      Confirm Schedule
+    </button>
+  </div>
+</section>
+
+</main>
+
+</body>
+</html>
