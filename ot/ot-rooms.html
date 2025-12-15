@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OT Rooms</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadOtNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- HEADER -->
+  <section class="mb-8">
+    <h1 class="text-2xl font-bold">OT Rooms</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Monitor operating theatre availability and status
+    </p>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">Total OT Rooms</p>
+      <h3 class="text-2xl font-bold mt-1">5</h3>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">Available</p>
+      <h3 class="text-2xl font-bold mt-1 text-green-600">2</h3>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">In Use</p>
+      <h3 class="text-2xl font-bold mt-1 text-blue-600">2</h3>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">Cleaning</p>
+      <h3 class="text-2xl font-bold mt-1 text-orange-600">1</h3>
+    </div>
+  </section>
+
+  <!-- OT ROOM CARDS -->
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- OT ROOM -->
+    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-green-500">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold text-lg">OT-1</h3>
+        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+          Available
+        </span>
+      </div>
+
+      <p class="text-sm text-[--muted]">Last Surgery: 8:30 AM</p>
+      <p class="text-sm text-[--muted]">Next Scheduled: 11:00 AM</p>
+    </div>
+
+    <!-- OT ROOM -->
+    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-blue-500">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold text-lg">OT-2</h3>
+        <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+          In Use
+        </span>
+      </div>
+
+      <p class="text-sm text-[--muted]">Procedure: Heart Bypass</p>
+      <p class="text-sm text-[--muted]">Doctor: Dr. Sharma</p>
+    </div>
+
+    <!-- OT ROOM -->
+    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-orange-500">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold text-lg">OT-3</h3>
+        <span class="px-3 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
+          Cleaning
+        </span>
+      </div>
+
+      <p class="text-sm text-[--muted]">Completed at: 2:15 PM</p>
+      <p class="text-sm text-[--muted]">Ready by: 3:00 PM</p>
+    </div>
+
+    <!-- OT ROOM -->
+    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-blue-500">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold text-lg">OT-4</h3>
+        <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+          In Use
+        </span>
+      </div>
+
+      <p class="text-sm text-[--muted]">Procedure: Knee Replacement</p>
+      <p class="text-sm text-[--muted]">Doctor: Dr. Patel</p>
+    </div>
+
+    <!-- OT ROOM -->
+    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-green-500">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold text-lg">OT-5</h3>
+        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+          Available
+        </span>
+      </div>
+
+      <p class="text-sm text-[--muted]">Idle</p>
+      <p class="text-sm text-[--muted]">Ready for scheduling</p>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>

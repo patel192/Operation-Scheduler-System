@@ -1,12 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OT Schedule Board</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadOtNavbar.js"></script>
 </head>
-<body>
-    <h2>OT Dashboard</h2>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- HEADER -->
+  <section class="mb-8">
+    <h1 class="text-2xl font-bold">OT Schedule Board</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Live overview of all scheduled operations
+    </p>
+  </section>
+
+  <!-- FILTERS -->
+  <section class="bg-white rounded-xl shadow p-4 mb-6">
+    <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+
+      <div class="flex gap-3">
+        <select class="border rounded-lg px-3 py-2 text-sm">
+          <option>All OT Rooms</option>
+          <option>OT-1</option>
+          <option>OT-2</option>
+          <option>OT-3</option>
+        </select>
+
+        <select class="border rounded-lg px-3 py-2 text-sm">
+          <option>All Status</option>
+          <option>Scheduled</option>
+          <option>Ready</option>
+          <option>In Progress</option>
+          <option>Completed</option>
+        </select>
+      </div>
+
+      <span class="text-sm text-[--muted]">
+        Today: <strong>6 Surgeries</strong>
+      </span>
+    </div>
+  </section>
+
+  <!-- SCHEDULE LIST -->
+  <section class="space-y-4">
+
+    <!-- ITEM -->
+    <div class="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="font-semibold text-lg">Heart Bypass Surgery</p>
+        <p class="text-sm text-[--muted]">Patient: Ramesh Kumar</p>
+        <p class="text-sm text-[--muted]">Doctor: Dr. Sharma</p>
+        <p class="text-sm text-[--muted]">OT-1 • 10:00 AM</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+          Scheduled
+        </span>
+        <a href="/ot/checklist.html"
+           class="text-sm font-semibold text-[--primary]">
+          View Checklist
+        </a>
+      </div>
+    </div>
+
+    <!-- ITEM -->
+    <div class="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="font-semibold text-lg">Knee Replacement</p>
+        <p class="text-sm text-[--muted]">Patient: Anjali Mehta</p>
+        <p class="text-sm text-[--muted]">Doctor: Dr. Patel</p>
+        <p class="text-sm text-[--muted]">OT-2 • 1:30 PM</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
+          Ready
+        </span>
+        <a href="/ot/checklist.html"
+           class="text-sm font-semibold text-[--primary]">
+          View Checklist
+        </a>
+      </div>
+    </div>
+
+    <!-- ITEM -->
+    <div class="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="font-semibold text-lg">Appendectomy</p>
+        <p class="text-sm text-[--muted]">Patient: Rohit Verma</p>
+        <p class="text-sm text-[--muted]">Doctor: Dr. Khan</p>
+        <p class="text-sm text-[--muted]">OT-3 • 3:00 PM</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+          In Progress
+        </span>
+        <span class="text-sm font-semibold text-green-600">
+          Live
+        </span>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
 </body>
 </html>

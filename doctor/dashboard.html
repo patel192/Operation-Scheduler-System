@@ -1,12 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Dashboard</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth Guard -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadDoctorNavbar.js"></script>
 </head>
-<body>
-    <h2>Doctor Dashboard</h2>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+<!-- ================= MAIN ================= -->
+<main class="max-w-7xl mx-auto px-4 py-10">
+
+<!-- ===== WELCOME ===== -->
+<section class="mb-8">
+  <h1 class="text-2xl font-bold">Welcome, Doctor</h1>
+  <p class="text-sm text-[--muted] mt-1">
+    Here is an overview of your schedules and patients
+  </p>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Today’s Surgeries</p>
+    <h3 class="text-2xl font-bold mt-1">3</h3>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Upcoming</p>
+    <h3 class="text-2xl font-bold mt-1">7</h3>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Patients</p>
+    <h3 class="text-2xl font-bold mt-1">18</h3>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-[--muted]">Status</p>
+    <h3 class="text-lg font-bold mt-2 text-green-600">Available</h3>
+  </div>
+</section>
+
+<!-- ===== TODAY'S SCHEDULE ===== -->
+<section class="bg-white rounded-xl shadow p-6 mb-10">
+
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-bold">Today’s Schedule</h2>
+    <a href="/doctor/my-schedule.html"
+       class="text-sm font-semibold text-[--primary]">
+      View All
+    </a>
+  </div>
+
+  <div class="space-y-4">
+
+    <!-- ITEM -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between border rounded-xl p-4 hover:bg-slate-50">
+      <div>
+        <p class="font-semibold">Heart Bypass Surgery</p>
+        <p class="text-sm text-[--muted]">Patient: Ramesh Kumar</p>
+        <p class="text-sm text-[--muted]">OT-1 • 10:00 AM</p>
+      </div>
+      <span class="mt-2 md:mt-0 px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+        Upcoming
+      </span>
+    </div>
+
+    <!-- ITEM -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between border rounded-xl p-4 hover:bg-slate-50">
+      <div>
+        <p class="font-semibold">Angioplasty</p>
+        <p class="text-sm text-[--muted]">Patient: Suresh Patel</p>
+        <p class="text-sm text-[--muted]">OT-2 • 2:30 PM</p>
+      </div>
+      <span class="mt-2 md:mt-0 px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+        Completed
+      </span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== RECENT PATIENTS ===== -->
+<section class="bg-white rounded-xl shadow p-6">
+
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-bold">Recent Patients</h2>
+    <a href="/doctor/patient-list.html"
+       class="text-sm font-semibold text-[--primary]">
+      View All
+    </a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-left">Patient</th>
+          <th class="px-4 py-3 text-left">Procedure</th>
+          <th class="px-4 py-3 text-left">Date</th>
+          <th class="px-4 py-3 text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-semibold">Amit Shah</td>
+          <td class="px-4 py-3">Bypass</td>
+          <td class="px-4 py-3">Today</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              Stable
+            </span>
+          </td>
+        </tr>
+
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-semibold">Neha Verma</td>
+          <td class="px-4 py-3">Angiography</td>
+          <td class="px-4 py-3">Yesterday</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+              Recovering
+            </span>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+</main>
+
 </body>
 </html>

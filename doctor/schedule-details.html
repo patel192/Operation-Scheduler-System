@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Schedule Details — Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadDoctorNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<!-- ================= MAIN ================= -->
+<main class="max-w-5xl mx-auto px-4 py-10">
+
+  <!-- ===== HEADER ===== -->
+  <section class="mb-8">
+    <a href="/doctor/my-schedule.html"
+       class="text-sm text-[--primary] font-semibold hover:underline">
+      ← Back to My Schedule
+    </a>
+
+    <h1 class="text-2xl font-bold mt-2">Surgery Schedule Details</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      View complete information about the scheduled operation
+    </p>
+  </section>
+
+  <!-- ===== STATUS BAR ===== -->
+  <section class="bg-white rounded-xl shadow p-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <p class="text-sm text-[--muted]">Current Status</p>
+      <p class="font-bold text-lg text-blue-600">Upcoming</p>
+    </div>
+
+    <div class="flex gap-2">
+      <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-semibold">
+        Scheduled
+      </span>
+      <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700 font-semibold">
+        OT Ready
+      </span>
+    </div>
+  </section>
+
+  <!-- ===== DETAILS GRID ===== -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- ===== PATIENT INFO ===== -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h3 class="font-bold mb-4">Patient Information</h3>
+
+      <div class="space-y-3 text-sm">
+        <div>
+          <p class="text-[--muted]">Patient Name</p>
+          <p class="font-semibold">Ramesh Kumar</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Age / Gender</p>
+          <p class="font-semibold">58 / Male</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Patient ID</p>
+          <p class="font-semibold">PAT-2025-019</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Contact</p>
+          <p class="font-semibold">+91 99887 66554</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SURGERY INFO ===== -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h3 class="font-bold mb-4">Surgery Information</h3>
+
+      <div class="space-y-3 text-sm">
+        <div>
+          <p class="text-[--muted]">Procedure</p>
+          <p class="font-semibold">Heart Bypass Surgery</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Department</p>
+          <p class="font-semibold">Cardiology</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Scheduled Date</p>
+          <p class="font-semibold">18 Dec 2025</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Time Slot</p>
+          <p class="font-semibold">10:00 AM – 01:00 PM</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== OT & STAFF ===== -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h3 class="font-bold mb-4">OT & Staff</h3>
+
+      <div class="space-y-3 text-sm">
+        <div>
+          <p class="text-[--muted]">Operation Theatre</p>
+          <p class="font-semibold">OT-1</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Assigned Surgeon</p>
+          <p class="font-semibold">Dr. John Doe</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">Anesthesiologist</p>
+          <p class="font-semibold">Dr. Meena Shah</p>
+        </div>
+
+        <div>
+          <p class="text-[--muted]">OT Staff</p>
+          <p class="font-semibold">3 Assigned</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NOTES & PRE-OP ===== -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h3 class="font-bold mb-4">Notes & Pre-Op Checklist</h3>
+
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+          Consent Form Uploaded
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+          Blood Tests Completed
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+          Anesthesia Clearance Pending
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+          ICU Bed Allocation Pending
+        </li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ===== ACTIONS ===== -->
+  <section class="mt-8 flex flex-wrap gap-3 justify-end">
+    <button
+      class="px-5 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700">
+      Mark as Completed
+    </button>
+
+    <button
+      class="px-5 py-2 rounded-lg bg-yellow-500 text-white font-semibold hover:bg-yellow-600">
+      Update Status
+    </button>
+
+    <button
+      class="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300">
+      Add Notes
+    </button>
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OT Checklist</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadOtNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- HEADER -->
+  <section class="mb-8">
+    <h1 class="text-2xl font-bold">Pre-Operation Checklist</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Ensure all requirements are completed before surgery begins
+    </p>
+  </section>
+
+  <!-- SURGERY INFO -->
+  <section class="bg-white rounded-xl shadow p-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <div>
+        <p class="text-[--muted]">Procedure</p>
+        <p class="font-semibold">Heart Bypass Surgery</p>
+      </div>
+      <div>
+        <p class="text-[--muted]">Patient</p>
+        <p class="font-semibold">Ramesh Kumar</p>
+      </div>
+      <div>
+        <p class="text-[--muted]">OT Room</p>
+        <p class="font-semibold">OT-1 • 10:00 AM</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="bg-white rounded-xl shadow p-6">
+
+    <h2 class="text-lg font-bold mb-4">Checklist Items</h2>
+
+    <div class="space-y-4">
+
+      <!-- ITEM -->
+      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+        <input type="checkbox" class="mt-1 accent-blue-600" />
+        <div>
+          <p class="font-semibold">Patient Consent Verified</p>
+          <p class="text-sm text-[--muted]">
+            Signed consent form available and verified
+          </p>
+        </div>
+      </label>
+
+      <!-- ITEM -->
+      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+        <input type="checkbox" class="mt-1 accent-blue-600" />
+        <div>
+          <p class="font-semibold">Pre-Op Vitals Checked</p>
+          <p class="text-sm text-[--muted]">
+            Blood pressure, oxygen level, and pulse recorded
+          </p>
+        </div>
+      </label>
+
+      <!-- ITEM -->
+      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+        <input type="checkbox" class="mt-1 accent-blue-600" />
+        <div>
+          <p class="font-semibold">Anesthesia Ready</p>
+          <p class="text-sm text-[--muted]">
+            Anesthesiologist and equipment confirmed
+          </p>
+        </div>
+      </label>
+
+      <!-- ITEM -->
+      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+        <input type="checkbox" class="mt-1 accent-blue-600" />
+        <div>
+          <p class="font-semibold">Surgical Instruments Prepared</p>
+          <p class="text-sm text-[--muted]">
+            Sterilized instruments arranged in OT
+          </p>
+        </div>
+      </label>
+
+      <!-- ITEM -->
+      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+        <input type="checkbox" class="mt-1 accent-blue-600" />
+        <div>
+          <p class="font-semibold">OT Room Sanitized</p>
+          <p class="text-sm text-[--muted]">
+            Cleaning and sanitation completed
+          </p>
+        </div>
+      </label>
+
+    </div>
+
+    <!-- ACTION -->
+    <div class="mt-6 flex justify-end">
+      <button
+        class="px-6 py-3 rounded-xl bg-[--primary] text-white font-bold hover:bg-blue-700 transition">
+        Mark Ready for Surgery
+      </button>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!-- OT NAVBAR -->
+<header class="sticky top-0 z-50 bg-white border-b">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+
+    <!-- BRAND -->
+    <div class="flex items-center gap-2">
+      <span class="font-bold text-lg text-blue-600">
+        Operation Scheduler
+      </span>
+      <span class="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-semibold">
+        OT Staff
+      </span>
+    </div>
+
+    <!-- DESKTOP NAV -->
+    <nav class="hidden md:flex gap-6 text-sm font-semibold">
+      <a href="/ot/dashboard.html" data-nav class="nav-link">Dashboard</a>
+      <a href="/ot/schedule-board.html" data-nav class="nav-link">Schedule Board</a>
+      <a href="/ot/ot-rooms.html" data-nav class="nav-link">OT Rooms</a>
+      <a href="/ot/checklist.html" data-nav class="nav-link">Checklist</a>
+      <a href="/ot/profile.html" data-nav class="nav-link">Profile</a>
+    </nav>
+
+    <!-- RIGHT -->
+    <div class="flex items-center gap-3">
+      <span class="hidden md:inline text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
+        On Duty
+      </span>
+
+      <img
+        src="https://img.icons8.com/ios-filled/50/0A6CFF/nurse.png"
+        class="w-8 h-8 rounded-full"
+        alt="OT Staff"
+      />
+
+      <!-- MOBILE MENU BUTTON -->
+      <button id="menuBtn" class="md:hidden">
+        <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="md:hidden hidden border-t bg-white">
+    <nav class="flex flex-col px-4 py-4 gap-4 text-sm font-semibold">
+      <a href="/ot/dashboard.html" data-nav class="nav-link">Dashboard</a>
+      <a href="/ot/schedule-board.html" data-nav class="nav-link">Schedule Board</a>
+      <a href="/ot/ot-rooms.html" data-nav class="nav-link">OT Rooms</a>
+      <a href="/ot/checklist.html" data-nav class="nav-link">Checklist</a>
+      <a href="/ot/profile.html" data-nav class="nav-link">Profile</a>
+
+      <button id="logoutBtnMobile"
+        class="mt-2 text-left text-red-600 font-semibold">
+        Logout
+      </button>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav-link {
+    color: #475569;
+    position: relative;
+    padding-bottom: 4px;
+  }
+
+  .nav-link:hover {
+    color: #2563eb;
+  }
+
+  .nav-link.active {
+    color: #2563eb;
+    font-weight: 600;
+  }
+
+  .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 2px;
+    background: #2563eb;
+    border-radius: 999px;
+  }
+</style>

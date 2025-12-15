@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin • Patients</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth Guard -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+
+  <!-- Admin Navbar Loader -->
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- HEADER -->
+  <section class="mb-6">
+    <h1 class="text-2xl font-bold">Patients</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      View and manage all registered patients
+    </p>
+  </section>
+
+  <!-- CONTROLS -->
+  <section class="bg-white p-4 rounded-xl shadow mb-6">
+    <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+
+      <!-- SEARCH -->
+      <input
+        type="text"
+        placeholder="Search by name / patient ID / phone"
+        class="w-full md:w-1/2 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-[--primary]"
+      />
+
+      <!-- FILTERS -->
+      <div class="flex gap-3">
+        <select class="border rounded-lg px-3 py-2 text-sm">
+          <option value="">All Departments</option>
+          <option>Cardiology</option>
+          <option>Neurology</option>
+          <option>Orthopedics</option>
+        </select>
+
+        <select class="border rounded-lg px-3 py-2 text-sm">
+          <option value="">All Status</option>
+          <option>Active</option>
+          <option>Discharged</option>
+        </select>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PATIENTS TABLE -->
+  <section class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b">
+        <tr>
+          <th class="px-4 py-3 text-left">Patient ID</th>
+          <th class="px-4 py-3 text-left">Name</th>
+          <th class="px-4 py-3 text-left">Age</th>
+          <th class="px-4 py-3 text-left">Department</th>
+          <th class="px-4 py-3 text-left">Last Visit</th>
+          <th class="px-4 py-3 text-left">Status</th>
+          <th class="px-4 py-3 text-right">Action</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y">
+
+        <!-- ROW -->
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium">P-1023</td>
+          <td class="px-4 py-3">Ramesh Kumar</td>
+          <td class="px-4 py-3">54</td>
+          <td class="px-4 py-3">Cardiology</td>
+          <td class="px-4 py-3">Today</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              Active
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <a href="/admin/patient-details.html"
+               class="text-[--primary] font-semibold hover:underline">
+              View
+            </a>
+          </td>
+        </tr>
+
+        <!-- ROW -->
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium">P-1041</td>
+          <td class="px-4 py-3">Neha Verma</td>
+          <td class="px-4 py-3">38</td>
+          <td class="px-4 py-3">Neurology</td>
+          <td class="px-4 py-3">Yesterday</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs bg-slate-200 text-slate-700">
+              Discharged
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <a href="/admin/patient-details.html"
+               class="text-[--primary] font-semibold hover:underline">
+              View
+            </a>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin • Reports</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+    }
+  </style>
+
+  <!-- Auth Guard -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+
+  <!-- Admin Navbar -->
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- HEADER -->
+  <section class="mb-8">
+    <h1 class="text-2xl font-bold">Reports & Analytics</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Monitor OT utilization, surgery trends, and hospital efficiency
+    </p>
+  </section>
+
+  <!-- KPI CARDS -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">OT Utilization</p>
+      <h3 class="text-2xl font-bold mt-2">78%</h3>
+      <p class="text-xs text-green-600 mt-1">▲ +6% this week</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">Surgeries / Day</p>
+      <h3 class="text-2xl font-bold mt-2">24</h3>
+      <p class="text-xs text-blue-600 mt-1">Average</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">Cancelled</p>
+      <h3 class="text-2xl font-bold mt-2">3</h3>
+      <p class="text-xs text-red-600 mt-1">This week</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-[--muted]">Idle OT Time</p>
+      <h3 class="text-2xl font-bold mt-2">1.4 hrs</h3>
+      <p class="text-xs text-slate-500 mt-1">Per day</p>
+    </div>
+
+  </section>
+
+  <!-- CHART PLACEHOLDERS -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- OT UTILIZATION -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="font-semibold mb-4">OT Utilization (Weekly)</h2>
+      <div class="h-64 flex items-center justify-center text-sm text-[--muted] border rounded-lg">
+        Chart Placeholder (OT Usage)
+      </div>
+    </div>
+
+    <!-- DEPARTMENT LOAD -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="font-semibold mb-4">Department-wise Load</h2>
+      <div class="h-64 flex items-center justify-center text-sm text-[--muted] border rounded-lg">
+        Chart Placeholder (Department Load)
+      </div>
+    </div>
+
+  </section>
+
+  <!-- TABLE SUMMARY -->
+  <section class="bg-white rounded-xl shadow p-6 mt-10">
+
+    <h2 class="font-semibold mb-4">Doctor Workload Summary</h2>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 border-b">
+          <tr>
+            <th class="px-4 py-3 text-left">Doctor</th>
+            <th class="px-4 py-3 text-left">Department</th>
+            <th class="px-4 py-3 text-left">Surgeries</th>
+            <th class="px-4 py-3 text-left">Avg Duration</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y">
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3 font-semibold">Dr. Anil Sharma</td>
+            <td class="px-4 py-3">Cardiology</td>
+            <td class="px-4 py-3">12</td>
+            <td class="px-4 py-3">2h 10m</td>
+          </tr>
+
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3 font-semibold">Dr. Neha Verma</td>
+            <td class="px-4 py-3">Neurology</td>
+            <td class="px-4 py-3">9</td>
+            <td class="px-4 py-3">1h 45m</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
