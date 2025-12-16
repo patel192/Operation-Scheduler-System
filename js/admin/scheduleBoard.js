@@ -36,6 +36,7 @@ async function loadSchedules(filter = "today") {
 
   const q = query(collection(db, "schedules"), orderBy("startTime", "asc"));
   const snapshot = await getDocs(q);
+
   const schedules = snapshot.docs.map((d) => ({
     id: d.id,
     ...d.data(),
@@ -47,6 +48,7 @@ async function loadSchedules(filter = "today") {
     const row = document.createElement("div");
     row.className = "grid grid-cols-[110px_repeat(6,1fr)] gap-2 items-stretch";
 
+    // OT label
     const label = document.createElement("div");
     label.className = "font-semibold text-sm flex items-center";
     label.textContent = ot;
@@ -57,40 +59,55 @@ async function loadSchedules(filter = "today") {
     otSchedules.forEach((sch) => {
       const start = sch.startTime.toDate();
       const end = sch.endTime.toDate();
-
       const span = getColSpan(start, end);
 
       const card = document.createElement("div");
-      card.className = `col-span-${span} rounded-xl p-3 border ${statusStyles(
-        sch.status
-      )}`;
+
+      card.className = `
+  col-span-${span}
+  rounded-xl p-3 border cursor-pointer
+  hover:shadow-md transition
+  ${statusStyles(sch.status)}
+`;
+
+      // 🔑 ATTACH CLICK HANDLER
+      card.addEventListener("click", () => {
+        window.location.href = `/admin/schedule-details.html?id=${sch.id}`;
+      });
+
       card.innerHTML = `
-    <p class="font-semibold text-sm">${sch.procedure}</p>
-    <p class="text-xs text-slate-600">${sch.surgoen}</p>
-    <p class="text-xs text-slate-600">
+  <p class="font-semibold text-sm">${sch.procedure}</p>
+  <p class="text-xs text-slate-600">${sch.surgeon}</p>
+  <p class="text-xs text-slate-600">
     ${formatTime(start)} - ${formatTime(end)}
-    </p>
-    <span class="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-white/60">
+  </p>
+  <span class="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-white/60">
     ${sch.status || "Upcoming"}
-    </span>
-    `;
+  </span>
+`;
+
+      // ✅ CLICK → DETAILS PAGE
+      card.addEventListener("click", () => {
+        window.location.href = `/admin/schedule-details.html?id=${sch.id}`;
+      });
+
       row.appendChild(card);
       filledCols += span;
     });
 
+    // Fill empty slots
     while (filledCols < 6) {
       row.appendChild(document.createElement("div"));
       filledCols++;
     }
+
     rowsContainer.appendChild(row);
   });
 }
 
-filterToday?.addEventListener("click", () => {
-  loadSchedules("today");
-});
-filterWeek?.addEventListener("click", () => {
-  loadSchedules("week");
-});
+// FILTERS
+filterToday?.addEventListener("click", () => loadSchedules("today"));
+filterWeek?.addEventListener("click", () => loadSchedules("week"));
 
+// INITIAL LOAD
 loadSchedules();
