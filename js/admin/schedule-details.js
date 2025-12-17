@@ -58,8 +58,8 @@ async function loadSchedule() {
   patientNameEl.textContent = d.patientName || "-";
   procedureEl.textContent = d.procedure || "-";
   otRoomEl.textContent = d.otRoom || "-";
-  surgeonEl.textContent = d.surgoen || "-";
-  anesthEl.textContent = d.aneshesiologist || "-";
+  surgeonEl.textContent = d.surgeon || "-";
+  anesthEl.textContent = d.anesthesiologist || "-";
   notesEl.textContent = d.notes || "No notes";
 
   timeRangeEl.textContent = `${formatTime(d.startTime)} - ${formatTime(
