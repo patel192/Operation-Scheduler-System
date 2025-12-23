@@ -9,18 +9,30 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
+import { loadOtStaff } from "./loadOtStaff.js";
+import { loadDoctors } from "./loadDoctors.js";
+
+/* ---------- STATE ---------- */
 const steps = document.querySelectorAll(".form-section");
 let currentStep = 0;
-
 const scheduleDraft = {};
 
+/* ---------- ELEMENTS ---------- */
+const otStaffSelect = document.getElementById("otStaffSelect");
+const surgeonSelect = document.getElementById("surgeonSelect");
+
+/* ---------- LOAD DROPDOWNS ---------- */
+await loadOtStaff(otStaffSelect);
+await loadDoctors(surgeonSelect);
+
+/* ---------- STEP CONTROL ---------- */
 function showStep(i) {
   steps.forEach((s, idx) => (s.style.display = idx === i ? "block" : "none"));
   currentStep = i;
 }
 showStep(0);
 
-// STEP 1
+/* ---------- STEP 1 ---------- */
 steps[0].querySelector("button").onclick = () => {
   const [name, id, dept, proc, notes] =
     steps[0].querySelectorAll("input,select,textarea");
@@ -30,64 +42,80 @@ steps[0].querySelector("button").onclick = () => {
     return;
   }
 
-  scheduleDraft.patientName = name.value;
-  scheduleDraft.patientId = id.value;
-  scheduleDraft.department = dept.value;
-  scheduleDraft.procedure = proc.value;
-  scheduleDraft.notes = notes.value;
+  Object.assign(scheduleDraft, {
+    patientName: name.value,
+    patientId: id.value,
+    department: dept.value,
+    procedure: proc.value,
+    notes: notes.value,
+  });
 
   showStep(1);
 };
 
-// STEP 2
+/* ---------- STEP 2 ---------- */
 const [back2, next2] = steps[1].querySelectorAll("button");
 back2.onclick = () => showStep(0);
+
 next2.onclick = () => {
-  const [date, ot, , start, end] =
+  const [date, otRoom, , start, end] =
     steps[1].querySelectorAll("input,select");
 
-  if (!date.value || !ot.value || !start.value || !end.value) {
+  const staffIds = Array.from(otStaffSelect.selectedOptions).map(o => o.value);
+
+  if (!date.value || !otRoom.value || !start.value || !end.value) {
     alert("OT & time required");
     return;
   }
 
-  scheduleDraft.date = date.value;
-  scheduleDraft.otRoom = ot.value;
-  scheduleDraft.startTime = start.value;
-  scheduleDraft.endTime = end.value;
+  if (!staffIds.length) {
+    alert("Select at least one OT staff");
+    return;
+  }
+
+  Object.assign(scheduleDraft, {
+    date: date.value,
+    otRoom: otRoom.value,
+    startTime: start.value,
+    endTime: end.value,
+    otStaffIds: staffIds,
+  });
 
   showStep(2);
 };
 
-// STEP 3
+/* ---------- STEP 3 ---------- */
 const [back3, next3] = steps[2].querySelectorAll("button");
 back3.onclick = () => showStep(1);
+
 next3.onclick = () => {
-  const [surgeon, anesth] = steps[2].querySelectorAll("select");
-  if (!surgeon.value) {
+  if (!surgeonSelect.value) {
     alert("Select surgeon");
     return;
   }
 
-  scheduleDraft.surgeon = surgeon.value;
-  scheduleDraft.anesthesiologist = anesth.value;
+  scheduleDraft.surgeonId = surgeonSelect.value;
+  scheduleDraft.surgeonName =
+    surgeonSelect.options[surgeonSelect.selectedIndex].textContent;
 
-  steps[3].querySelector(".bg-slate-50").innerHTML = `
+  steps[3].querySelector(".bg-slate-100").innerHTML = `
     <p><strong>Patient:</strong> ${scheduleDraft.patientName}</p>
     <p><strong>Procedure:</strong> ${scheduleDraft.procedure}</p>
     <p><strong>OT:</strong> ${scheduleDraft.otRoom}</p>
-    <p><strong>Doctors:</strong> ${scheduleDraft.surgeon}</p>
+    <p><strong>Surgeon:</strong> ${scheduleDraft.surgeonName}</p>
+    <p><strong>OT Staff:</strong> ${scheduleDraft.otStaffIds.length}</p>
   `;
+
   showStep(3);
 };
 
-// STEP 4
+/* ---------- STEP 4 ---------- */
 const [back4, confirm] = steps[3].querySelectorAll("button");
 back4.onclick = () => showStep(2);
 
 confirm.onclick = async () => {
   if (!auth.currentUser) {
-    alert("Please login again.");
+    alert("Please login again");
     return;
   }
 
@@ -99,36 +127,6 @@ confirm.onclick = async () => {
     return;
   }
 
-  // OT conflict
-  const otQ = query(
-    collection(db, "schedules"),
-    where("otRoom", "==", scheduleDraft.otRoom)
-  );
-  const otSnap = await getDocs(otQ);
-
-  for (const d of otSnap.docs) {
-    const s = d.data();
-    if (start < s.endTime.toDate() && end > s.startTime.toDate()) {
-      alert("OT already booked");
-      return;
-    }
-  }
-
-  // Doctor conflict
-  const docQ = query(
-    collection(db, "schedules"),
-    where("surgeon", "==", scheduleDraft.surgeon)
-  );
-  const docSnap = await getDocs(docQ);
-
-  for (const d of docSnap.docs) {
-    const s = d.data();
-    if (start < s.endTime.toDate() && end > s.startTime.toDate()) {
-      alert("Doctor busy");
-      return;
-    }
-  }
-
   await addDoc(collection(db, "schedules"), {
     ...scheduleDraft,
     startTime: Timestamp.fromDate(start),
@@ -138,6 +136,6 @@ confirm.onclick = async () => {
     createdAt: serverTimestamp(),
   });
 
-  alert("Schedule created");
+  alert("Schedule created successfully");
   window.location.href = "/admin/schedule-board.html";
 };

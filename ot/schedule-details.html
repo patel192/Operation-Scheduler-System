@@ -5,33 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>OT Staff • Schedule Details</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --text:#1E293B;
-      --muted:#64748B;
-    }
-  </style>
-
-  <!-- Auth Guard -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-
-  <!-- OT Navbar -->
   <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
+  <script type="module" src="/js/ot/scheduleDetails.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
 <main class="max-w-7xl mx-auto px-4 py-8">
 
   <!-- HEADER -->
   <section class="mb-6">
     <h1 class="text-2xl font-bold">OT Schedule Details</h1>
-    <p class="text-sm text-[--muted] mt-1">
+    <p class="text-sm text-slate-500 mt-1">
       Operation theatre schedule and readiness overview
     </p>
   </section>
@@ -41,108 +29,53 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
       <div>
-        <p class="text-sm text-[--muted]">Procedure</p>
-        <p class="font-semibold">Heart Bypass Surgery</p>
+        <p class="text-sm text-slate-500">Procedure</p>
+        <p id="procedure" class="font-semibold">—</p>
       </div>
 
       <div>
-        <p class="text-sm text-[--muted]">OT Room</p>
-        <p class="font-semibold">OT-1</p>
+        <p class="text-sm text-slate-500">OT Room</p>
+        <p id="otRoom" class="font-semibold">—</p>
       </div>
 
       <div>
-        <p class="text-sm text-[--muted]">Scheduled Time</p>
-        <p class="font-semibold">10:00 AM – 1:30 PM</p>
+        <p class="text-sm text-slate-500">Scheduled Time</p>
+        <p id="timeRange" class="font-semibold">—</p>
       </div>
 
       <div>
-        <p class="text-sm text-[--muted]">Doctor</p>
-        <p class="font-semibold">Dr. Amit Sharma</p>
+        <p class="text-sm text-slate-500">Doctor</p>
+        <p id="doctor" class="font-semibold">—</p>
       </div>
 
       <div>
-        <p class="text-sm text-[--muted]">Patient</p>
-        <p class="font-semibold">Ramesh Kumar</p>
+        <p class="text-sm text-slate-500">Patient</p>
+        <p id="patient" class="font-semibold">—</p>
       </div>
 
       <div>
-        <p class="text-sm text-[--muted]">Status</p>
-        <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-semibold">
-          Upcoming
+        <p class="text-sm text-slate-500">Status</p>
+        <span id="statusBadge"
+          class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold">
+          —
         </span>
       </div>
 
     </div>
   </section>
 
-  <!-- OT READINESS -->
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-    <!-- EQUIPMENT -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="font-semibold mb-4">Equipment Readiness</h3>
-
-      <ul class="space-y-2 text-sm">
-        <li class="flex justify-between">
-          <span>Anesthesia Machine</span>
-          <span class="text-green-600 font-semibold">Ready</span>
-        </li>
-        <li class="flex justify-between">
-          <span>Heart-Lung Machine</span>
-          <span class="text-green-600 font-semibold">Ready</span>
-        </li>
-        <li class="flex justify-between">
-          <span>Surgical Instruments</span>
-          <span class="text-yellow-600 font-semibold">Pending</span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- STAFF -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="font-semibold mb-4">Assigned OT Staff</h3>
-
-      <ul class="space-y-2 text-sm text-[--muted]">
-        <li><strong class="text-[--text]">Nurse:</strong> Pooja Patel</li>
-        <li><strong class="text-[--text]">Technician:</strong> Ravi Mehta</li>
-        <li><strong class="text-[--text]">Anesthetist:</strong> Dr. Neha Jain</li>
-      </ul>
-    </div>
-
-  </section>
-
-  <!-- CHECKLIST -->
+  <!-- STAFF -->
   <section class="bg-white rounded-xl shadow p-6 mb-8">
-    <h3 class="font-semibold mb-4">Pre-Operation Checklist</h3>
-
-    <div class="space-y-3 text-sm">
-      <label class="flex items-center gap-3">
-        <input type="checkbox" checked disabled class="accent-blue-600">
-        OT Sanitized
-      </label>
-
-      <label class="flex items-center gap-3">
-        <input type="checkbox" checked disabled class="accent-blue-600">
-        Equipment Sterilized
-      </label>
-
-      <label class="flex items-center gap-3">
-        <input type="checkbox" disabled class="accent-blue-600">
-        Patient Shifted to OT
-      </label>
-    </div>
+    <h3 class="font-semibold mb-4">Assigned OT Staff</h3>
+    <ul id="staffList" class="space-y-2 text-sm text-slate-600"></ul>
   </section>
 
   <!-- NOTES -->
   <section class="bg-white rounded-xl shadow p-6">
     <h3 class="font-semibold mb-4">OT Notes</h3>
-
-    <p class="text-sm text-[--muted]">
-      Surgical instruments tray pending final sterilization. Expected completion before scheduled time.
-    </p>
+    <p id="notes" class="text-sm text-slate-500">—</p>
   </section>
 
 </main>
-
 </body>
 </html>

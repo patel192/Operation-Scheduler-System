@@ -7,36 +7,20 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --text:#1E293B;
-      --muted:#64748B;
-    }
-  </style>
-
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
-  <script type="module" src="/js/admin/createSchedule.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/createSchedule.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-slate-50 min-h-screen text-slate-800">
 
 <main class="max-w-4xl mx-auto px-4 py-10">
 
 <section class="mb-8">
   <h1 class="text-2xl font-bold">Create Operation Schedule</h1>
-  <p class="text-sm text-[--muted] mt-1">
-    Plan surgeries with conflict-free OT, doctor, and resource allocation
+  <p class="text-sm text-slate-500 mt-1">
+    Plan surgeries with conflict-free OT, doctor, and staff allocation
   </p>
-</section>
-
-<section class="flex justify-between items-center mb-8 text-sm font-semibold">
-  <span class="text-[--primary]">Step 1: Patient</span>
-  <span class="text-[--muted]">Step 2: OT & Time</span>
-  <span class="text-[--muted]">Step 3: Doctors</span>
-  <span class="text-[--muted]">Step 4: Review</span>
 </section>
 
 <!-- STEP 1 -->
@@ -47,7 +31,7 @@
     <input type="text" placeholder="Patient Name" class="border px-4 py-2 rounded"/>
     <input type="text" placeholder="Patient ID" class="border px-4 py-2 rounded"/>
     <select class="border px-4 py-2 rounded">
-      <option>Select Department</option>
+      <option value="">Select Department</option>
       <option>Cardiology</option>
       <option>Orthopedics</option>
       <option>Neurology</option>
@@ -63,21 +47,23 @@
 
 <!-- STEP 2 -->
 <section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8 form-section">
-  <h2 class="font-semibold text-lg">OT & Time</h2>
+  <h2 class="font-semibold text-lg">OT, Time & Staff</h2>
 
   <div class="grid md:grid-cols-3 gap-4">
     <input type="date" class="border px-4 py-2 rounded"/>
+
     <select class="border px-4 py-2 rounded">
-      <option>Select OT Room</option>
+      <option value="">Select OT Room</option>
       <option>OT-1</option>
       <option>OT-2</option>
       <option>OT-3</option>
     </select>
-    <select class="border px-4 py-2 rounded">
-      <option>Duration</option>
-      <option>1 hour</option>
-      <option>2 hours</option>
+
+    <!-- OT STAFF -->
+    <select id="otStaffSelect" multiple
+      class="border px-4 py-2 rounded md:col-span-3 h-32">
     </select>
+
     <input type="time" class="border px-4 py-2 rounded"/>
     <input type="time" class="border px-4 py-2 rounded"/>
   </div>
@@ -93,16 +79,11 @@
   <h2 class="font-semibold text-lg">Doctors</h2>
 
   <div class="grid md:grid-cols-2 gap-4">
-    <select class="border px-4 py-2 rounded">
-      <option>Select Surgeon</option>
-      <option>Dr. Sharma</option>
-      <option>Dr. Patel</option>
+    <select id="surgeonSelect" class="border px-4 py-2 rounded">
+      <option value="">Loading surgeons…</option>
     </select>
-    <select class="border px-4 py-2 rounded">
-      <option>Select Anesthesiologist</option>
-      <option>Dr. Rao</option>
-      <option>Dr. Mehta</option>
-    </select>
+    <input type="text" placeholder="Anesthesiologist (optional)"
+      class="border px-4 py-2 rounded"/>
   </div>
 
   <div class="flex justify-end gap-3">
@@ -115,7 +96,7 @@
 <section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8 form-section">
   <h2 class="font-semibold text-lg">Review</h2>
 
-  <div class="bg-slate-50 p-4 rounded text-sm"></div>
+  <div class="bg-slate-100 p-4 rounded text-sm"></div>
 
   <div class="flex justify-end gap-3">
     <button type="button" class="px-6 py-2 border rounded">Back</button>
