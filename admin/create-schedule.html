@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <!-- <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script> -->
   <script type="module" defer src="/js/admin/createSchedule.js"></script>
 </head>
 
@@ -28,16 +28,16 @@
   <h2 class="font-semibold text-lg">Patient & Procedure</h2>
 
   <div class="grid md:grid-cols-2 gap-4">
-    <input type="text" placeholder="Patient Name" class="border px-4 py-2 rounded"/>
-    <input type="text" placeholder="Patient ID" class="border px-4 py-2 rounded"/>
-    <select class="border px-4 py-2 rounded">
+    <input id="patientIdInput" type="text" placeholder="Patient ID" class="border px-4 py-2 rounded" />
+    <input id="patientNameInput" type="text" placeholder="Patient Name" class="border px-4 py-2 rounded"/>
+    <select id="departmentSelect" class="border px-4 py-2 rounded">
       <option value="">Select Department</option>
       <option>Cardiology</option>
       <option>Orthopedics</option>
       <option>Neurology</option>
     </select>
-    <input type="text" placeholder="Procedure" class="border px-4 py-2 rounded"/>
-    <textarea placeholder="Notes" class="border px-4 py-2 rounded md:col-span-2"></textarea>
+    <input id="procedureInput" type="text" placeholder="Procedure" class="border px-4 py-2 rounded"/>
+    <textarea id="notesInput" placeholder="Notes" class="border px-4 py-2 rounded md:col-span-2"></textarea>
   </div>
 
   <div class="flex justify-end">
@@ -59,10 +59,7 @@
       <option>OT-3</option>
     </select>
 
-    <!-- OT STAFF -->
-    <select id="otStaffSelect" multiple
-      class="border px-4 py-2 rounded md:col-span-3 h-32">
-    </select>
+    <select id="otStaffSelect" multiple class="border px-4 py-2 rounded md:col-span-3 h-32"></select>
 
     <input type="time" class="border px-4 py-2 rounded"/>
     <input type="time" class="border px-4 py-2 rounded"/>
@@ -82,8 +79,7 @@
     <select id="surgeonSelect" class="border px-4 py-2 rounded">
       <option value="">Loading surgeons…</option>
     </select>
-    <input type="text" placeholder="Anesthesiologist (optional)"
-      class="border px-4 py-2 rounded"/>
+    <input type="text" placeholder="Anesthesiologist (optional)" class="border px-4 py-2 rounded"/>
   </div>
 
   <div class="flex justify-end gap-3">
