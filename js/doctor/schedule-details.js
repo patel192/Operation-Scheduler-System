@@ -4,7 +4,7 @@ import {
   getDoc,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 // ------------------
 // URL PARAM
 // ------------------
@@ -94,8 +94,6 @@ async function loadSchedule() {
   }
 }
 
-loadSchedule();
-
 // ------------------
 // ACTIONS
 // ------------------
@@ -108,4 +106,14 @@ btnCompleted.addEventListener("click", async () => {
   });
 
   loadSchedule();
+});
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
+
+  // ✅ Auto-update statuses ONCE
+  await autoUpdateScheduleStatus();
+
+  // ✅ Then load this schedule
+  await loadSchedule();
 });

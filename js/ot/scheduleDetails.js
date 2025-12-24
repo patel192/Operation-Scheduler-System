@@ -7,7 +7,7 @@ import {
   query,
   where
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 /* ---------- GET SCHEDULE ID ---------- */
 const params = new URLSearchParams(window.location.search);
 const scheduleId = params.get("id");
@@ -19,8 +19,8 @@ if (!scheduleId) {
 /* ---------- AUTH CHECK ---------- */
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
-
-  loadScheduleDetails(scheduleId);
+  await autoUpdateScheduleStatus();
+  await loadScheduleDetails(scheduleId);
 });
 
 /* ---------- LOAD DETAILS ---------- */

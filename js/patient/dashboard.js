@@ -1,5 +1,5 @@
 
-import { db } from "../firebase.js";
+import { db,auth } from "../firebase.js";
 import {
   collection,
   query,
@@ -7,7 +7,7 @@ import {
   orderBy,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 /* ================= ELEMENTS ================= */
 const totalCountEl = document.getElementById("totalCount");
 const upcomingCountEl = document.getElementById("upcomingCount");
@@ -89,4 +89,12 @@ function renderNextAppointment(s) {
   `;
 }
 
-loadDashboard();
+
+auth.onAuthStateChanged(async (user) => {
+  if(!user) return;
+
+  await autoUpdateScheduleStatus();
+
+  await loadDashboard();
+
+})

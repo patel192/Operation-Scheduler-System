@@ -5,12 +5,12 @@ import {
   where,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import {autoUpdateScheduleStatus} from "../utils/autoUpdateScheduleStatus.js";
 /* ---------- WAIT FOR AUTH ---------- */
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
-
-  loadOtStaffSchedules(user.uid);
+  await autoUpdateScheduleStatus();
+  await loadOtStaffSchedules(user.uid);
 });
 
 /* ---------- LOAD SCHEDULES ---------- */

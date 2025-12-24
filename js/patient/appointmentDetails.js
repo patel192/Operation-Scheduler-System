@@ -3,7 +3,7 @@ import {
   doc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 /* ================= HELPERS ================= */
 function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
@@ -83,4 +83,11 @@ async function loadDetails() {
   detailsSection.classList.remove("hidden");
 }
 
-loadDetails();
+(async () => {
+  // ✅ Sync statuses once
+  await autoUpdateScheduleStatus();
+
+  // ✅ Then load appointment details
+  await loadDetails();
+})();
+

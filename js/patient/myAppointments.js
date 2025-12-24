@@ -6,7 +6,7 @@ import {
   getDocs,
   orderBy,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 /* ================= ELEMENTS ================= */
 const patientIdSection = document.getElementById("patientIdSection");
 const appointmentsSection = document.getElementById("appointmentsSection");
@@ -22,11 +22,18 @@ const savedPatientId = localStorage.getItem("patientId");
 
 if (savedPatientId) {
   patientIdInput.value = savedPatientId;
-  loadAppointments(savedPatientId);
+
+  (async () => {
+    // ✅ sync statuses once
+    await autoUpdateScheduleStatus();
+
+    // ✅ then load appointments
+    await loadAppointments(savedPatientId);
+  })();
 }
 
 /* ================= EVENTS ================= */
-loadBtn.onclick = () => {
+loadBtn.onclick = async () => {
   const patientId = patientIdInput.value.trim();
 
   if (!patientId) {
@@ -35,8 +42,13 @@ loadBtn.onclick = () => {
   }
 
   localStorage.setItem("patientId", patientId);
+
+  // ✅ sync statuses once per load
+  await autoUpdateScheduleStatus();
+
   loadAppointments(patientId);
 };
+
 
 changeIdBtn.onclick = () => {
   localStorage.removeItem("patientId");
@@ -65,7 +77,7 @@ async function loadAppointments(patientId) {
     return;
   }
 
-  snap.forEach(docSnap => {
+  snap.forEach((docSnap) => {
     const s = docSnap.data();
     const id = docSnap.id;
 
@@ -82,9 +94,15 @@ async function loadAppointments(patientId) {
           <p class="font-semibold">${s.procedure}</p>
           <p class="text-sm text-slate-500">
             ${start.toLocaleDateString()} •
-            ${start.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+            ${start.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
             –
-            ${end.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+            ${end.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </p>
           <p class="text-sm text-slate-500">
             OT Room: ${s.otRoom} • Dr. ${s.surgeonName}
@@ -99,8 +117,7 @@ async function loadAppointments(patientId) {
     `;
 
     card.onclick = () => {
-      window.location.href =
-        `/patient/appointment-details.html?id=${id}`;
+      window.location.href = `/patient/appointment-details.html?id=${id}`;
     };
 
     appointmentsList.appendChild(card);

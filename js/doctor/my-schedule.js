@@ -6,7 +6,7 @@ import {
   orderBy,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import {autoUpdateScheduleStatus} from "../utils/autoUpdateScheduleStatus.js"
 // ------------------
 // ELEMENTS
 // ------------------
@@ -117,6 +117,13 @@ filterDate.addEventListener("change", loadMySchedules);
 filterStatus.addEventListener("change", loadMySchedules);
 
 // INITIAL LOAD
-auth.onAuthStateChanged(user => {
-  if (user) loadMySchedules();
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
+
+  // ✅ AUTO UPDATE STATUS (ONCE)
+  await autoUpdateScheduleStatus();
+
+  // ✅ THEN LOAD DOCTOR SCHEDULES
+  await loadMySchedules();
 });
+

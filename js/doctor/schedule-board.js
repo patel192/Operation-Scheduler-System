@@ -6,7 +6,7 @@ import {
   orderBy,
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 const scheduleList = document.getElementById("scheduleList");
 const emptyState = document.getElementById("emptyState");
 const filterDate = document.getElementById("filterDate");
@@ -97,6 +97,9 @@ filterDate.addEventListener("change", loadSchedules);
 filterStatus.addEventListener("change", loadSchedules);
 
 // INITIAL LOAD
-auth.onAuthStateChanged((user) => {
-  if (user) loadSchedules();
-});
+auth.onAuthStateChanged(async (user)=> {
+  if(!user) return;
+  await autoUpdateScheduleStatus();
+
+  await loadSchedules();
+})
