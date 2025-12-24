@@ -1,160 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Patient • Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard • Patient</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --primary: #0A6CFF;
-      --bg: #F8FAFC;
-      --text: #1E293B;
-      --muted: #64748B;
-    }
-  </style>
-
-  <!-- Patient Navbar -->
-  <script type="module" defer src="/js/layout/loadPatientNavbar.js"></script>
-  <!-- Auth Guard -->
-  <script type="module" defer src="/middleware/auth-guard.js"></script>
-
+<script type="module" src="/js/layout/loadPatientNavbar.js"></script>
+  <!-- Dashboard Script -->
+  <script type="module" defer src="/js/patient/dashboard.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
-  <main class="max-w-7xl mx-auto px-4 py-10">
+<!-- Patient Navbar (reuse your navbar here) -->
 
-    <!-- ===== WELCOME ===== -->
-    <section class="mb-8">
-      <h1 class="text-2xl font-bold">Welcome 👋</h1>
-      <p class="text-sm text-[--muted] mt-1">
-        Here’s a quick overview of your appointments and medical records
-      </p>
-    </section>
+<main class="max-w-6xl mx-auto px-4 py-8">
 
-    <!-- ===== STATS ===== -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+  <!-- HEADER -->
+  <section class="mb-6">
+    <h1 class="text-2xl font-bold">Dashboard</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Overview of your operation schedule
+    </p>
+  </section>
 
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-sm text-[--muted]">Upcoming Appointments</p>
-        <h3 class="text-2xl font-bold mt-1">2</h3>
-      </div>
+  <!-- STATS -->
+  <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-sm text-[--muted]">Completed Procedures</p>
-        <h3 class="text-2xl font-bold mt-1">5</h3>
-      </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-slate-500">Total Appointments</p>
+      <p id="totalCount" class="text-2xl font-bold mt-1">–</p>
+    </div>
 
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-sm text-[--muted]">Reports Available</p>
-        <h3 class="text-2xl font-bold mt-1">4</h3>
-      </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-slate-500">Upcoming</p>
+      <p id="upcomingCount" class="text-2xl font-bold text-blue-600 mt-1">–</p>
+    </div>
 
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-sm text-[--muted]">Current Status</p>
-        <h3 class="text-lg font-bold mt-2 text-green-600">
-          Stable
-        </h3>
-      </div>
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-slate-500">Ongoing</p>
+      <p id="ongoingCount" class="text-2xl font-bold text-yellow-600 mt-1">–</p>
+    </div>
 
-    </section>
+    <div class="bg-white p-5 rounded-xl shadow">
+      <p class="text-sm text-slate-500">Completed</p>
+      <p id="completedCount" class="text-2xl font-bold text-green-600 mt-1">–</p>
+    </div>
 
-    <!-- ===== NEXT APPOINTMENT ===== -->
-    <section class="bg-white rounded-xl shadow p-6 mb-10">
+  </section>
 
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold">Next Appointment</h2>
-        <a href="/patient/my-appointments.html" class="text-sm font-semibold text-[--primary]">
-          View All
-        </a>
-      </div>
+  <!-- NEXT APPOINTMENT -->
+  <section class="bg-white p-6 rounded-xl shadow mb-8">
 
-      <div class="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between hover:bg-slate-50">
-        <div>
-          <p class="font-semibold">Heart Bypass Surgery</p>
-          <p class="text-sm text-[--muted]">Doctor: Dr. Amit Sharma</p>
-          <p class="text-sm text-[--muted]">OT-1 • 15 Sep 2025 • 10:00 AM</p>
-        </div>
-
-        <span class="mt-3 md:mt-0 px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-semibold">
-          Upcoming
-        </span>
-      </div>
-
-    </section>
-
-    <!-- ===== RECENT REPORTS ===== -->
-    <section class="bg-white rounded-xl shadow p-6 mb-10">
-
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold">Recent Reports</h2>
-        <a href="/patient/reports.html" class="text-sm font-semibold text-[--primary]">
-          View All
-        </a>
-      </div>
-
-      <div class="space-y-3">
-
-        <div class="flex justify-between items-center border rounded-xl p-4 hover:bg-slate-50">
-          <div>
-            <p class="font-semibold">Angiography Report</p>
-            <p class="text-sm text-[--muted]">12 Sep 2025</p>
-          </div>
-          <span class="text-sm text-[--primary] font-semibold cursor-pointer">
-            Download
-          </span>
-        </div>
-
-        <div class="flex justify-between items-center border rounded-xl p-4 hover:bg-slate-50">
-          <div>
-            <p class="font-semibold">Blood Test Results</p>
-            <p class="text-sm text-[--muted]">10 Sep 2025</p>
-          </div>
-          <span class="text-sm text-[--primary] font-semibold cursor-pointer">
-            Download
-          </span>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- ===== QUICK ACTIONS ===== -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold">Next Appointment</h2>
       <a href="/patient/my-appointments.html"
-        class="bg-white rounded-xl shadow p-5 hover:border hover:border-blue-200 transition">
-        <h3 class="font-semibold mb-1">My Appointments</h3>
-        <p class="text-sm text-[--muted]">
-          View and track upcoming surgeries
-        </p>
+        class="text-sm text-blue-600 font-semibold">
+        View All
       </a>
+    </div>
 
-      <a href="/patient/reports.html"
-        class="bg-white rounded-xl shadow p-5 hover:border hover:border-blue-200 transition">
-        <h3 class="font-semibold mb-1">Medical Reports</h3>
-        <p class="text-sm text-[--muted]">
-          Download lab & surgery reports
-        </p>
-      </a>
+    <div id="nextAppointment" class="text-slate-500">
+      Loading…
+    </div>
 
-      <a href="/patient/profile.html"
-        class="bg-white rounded-xl shadow p-5 hover:border hover:border-blue-200 transition">
-        <h3 class="font-semibold mb-1">Profile</h3>
-        <p class="text-sm text-[--muted]">
-          Update personal & contact details
-        </p>
-      </a>
+  </section>
 
-    </section>
-
-  </main>
+</main>
 
 </body>
-
 </html>
