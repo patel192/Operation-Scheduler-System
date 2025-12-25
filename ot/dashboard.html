@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OT Schedule Board</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OT Dashboard</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,100 +26,112 @@
 
 <main class="max-w-7xl mx-auto px-4 py-8">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <section class="mb-8">
-    <h1 class="text-2xl font-bold">OT Schedule Board</h1>
+    <h1 class="text-2xl font-bold">OT Dashboard</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Live overview of all scheduled operations
+      Today’s operation readiness & OT overview
     </p>
   </section>
 
-  <!-- FILTERS -->
-  <section class="bg-white rounded-xl shadow p-4 mb-6">
-    <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+  <!-- ================= STATS ================= -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
-      <div class="flex gap-3">
-        <select class="border rounded-lg px-3 py-2 text-sm">
-          <option>All OT Rooms</option>
-          <option>OT-1</option>
-          <option>OT-2</option>
-          <option>OT-3</option>
-        </select>
-
-        <select class="border rounded-lg px-3 py-2 text-sm">
-          <option>All Status</option>
-          <option>Scheduled</option>
-          <option>Ready</option>
-          <option>In Progress</option>
-          <option>Completed</option>
-        </select>
-      </div>
-
-      <span class="text-sm text-[--muted]">
-        Today: <strong>6 Surgeries</strong>
-      </span>
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <p class="text-sm text-[--muted]">Surgeries Today</p>
+      <h3 class="text-3xl font-bold mt-1">6</h3>
     </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <p class="text-sm text-[--muted]">OT Rooms Active</p>
+      <h3 class="text-3xl font-bold mt-1">3</h3>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <p class="text-sm text-[--muted]">Live Operations</p>
+      <h3 class="text-3xl font-bold mt-1 text-green-600">1</h3>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <p class="text-sm text-[--muted]">Pending Checklists</p>
+      <h3 class="text-3xl font-bold mt-1 text-red-600">2</h3>
+    </div>
+
   </section>
 
-  <!-- SCHEDULE LIST -->
-  <section class="space-y-4">
+  <!-- ================= OT STATUS ================= -->
+  <section class="grid md:grid-cols-3 gap-6 mb-8">
 
-    <!-- ITEM -->
-    <div class="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <p class="font-semibold text-lg">Heart Bypass Surgery</p>
-        <p class="text-sm text-[--muted]">Patient: Ramesh Kumar</p>
-        <p class="text-sm text-[--muted]">Doctor: Dr. Sharma</p>
-        <p class="text-sm text-[--muted]">OT-1 • 10:00 AM</p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
-          Scheduled
-        </span>
-        <a href="/ot/checklist.html"
-           class="text-sm font-semibold text-[--primary]">
-          View Checklist
-        </a>
-      </div>
+    <!-- OT CARD -->
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+      <h3 class="font-semibold">OT-1</h3>
+      <p class="text-sm text-[--muted] mt-1">Cardiology</p>
+      <span class="inline-block mt-3 px-3 py-1 rounded-full text-xs bg-green-100 text-green-700 font-semibold">
+        Ready
+      </span>
     </div>
 
-    <!-- ITEM -->
-    <div class="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <p class="font-semibold text-lg">Knee Replacement</p>
-        <p class="text-sm text-[--muted]">Patient: Anjali Mehta</p>
-        <p class="text-sm text-[--muted]">Doctor: Dr. Patel</p>
-        <p class="text-sm text-[--muted]">OT-2 • 1:30 PM</p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
-          Ready
-        </span>
-        <a href="/ot/checklist.html"
-           class="text-sm font-semibold text-[--primary]">
-          View Checklist
-        </a>
-      </div>
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+      <h3 class="font-semibold">OT-2</h3>
+      <p class="text-sm text-[--muted] mt-1">Orthopedics</p>
+      <span class="inline-block mt-3 px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-semibold">
+        In Use
+      </span>
     </div>
 
-    <!-- ITEM -->
-    <div class="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <p class="font-semibold text-lg">Appendectomy</p>
-        <p class="text-sm text-[--muted]">Patient: Rohit Verma</p>
-        <p class="text-sm text-[--muted]">Doctor: Dr. Khan</p>
-        <p class="text-sm text-[--muted]">OT-3 • 3:00 PM</p>
-      </div>
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-yellow-500">
+      <h3 class="font-semibold">OT-3</h3>
+      <p class="text-sm text-[--muted] mt-1">General Surgery</p>
+      <span class="inline-block mt-3 px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700 font-semibold">
+        Preparing
+      </span>
+    </div>
 
-      <div class="flex items-center gap-3">
-        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
-          In Progress
-        </span>
-        <span class="text-sm font-semibold text-green-600">
-          Live
-        </span>
+  </section>
+
+  <!-- ================= ALERTS & QUICK ACTIONS ================= -->
+  <section class="grid md:grid-cols-2 gap-6">
+
+    <!-- ALERTS -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h3 class="font-semibold mb-4">Alerts</h3>
+
+      <ul class="space-y-3 text-sm">
+        <li class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+          OT-3 checklist pending
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+          Equipment check due in OT-2
+        </li>
+      </ul>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h3 class="font-semibold mb-4">Quick Actions</h3>
+
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <a href="/ot/schedule-board.html"
+           class="rounded-lg border px-4 py-3 text-center font-semibold hover:bg-slate-50">
+          View Schedule Board
+        </a>
+
+        <a href="/ot/checklist.html"
+           class="rounded-lg border px-4 py-3 text-center font-semibold hover:bg-slate-50">
+          Open Checklist
+        </a>
+
+        <a href="/ot/ot-rooms.html"
+           class="rounded-lg border px-4 py-3 text-center font-semibold hover:bg-slate-50">
+          OT Rooms
+        </a>
+
+        <a href="/ot/profile.html"
+           class="rounded-lg border px-4 py-3 text-center font-semibold hover:bg-slate-50">
+          My Profile
+        </a>
       </div>
     </div>
 

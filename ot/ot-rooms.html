@@ -26,103 +26,115 @@
 
 <main class="max-w-7xl mx-auto px-4 py-8">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <section class="mb-8">
     <h1 class="text-2xl font-bold">OT Rooms</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Monitor operating theatre availability and status
+      Live monitoring of operating theatre availability
     </p>
   </section>
 
-  <!-- SUMMARY -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white p-4 rounded-xl shadow">
+  <!-- ================= SUMMARY ================= -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+
+    <div class="bg-white p-5 rounded-2xl shadow">
       <p class="text-sm text-[--muted]">Total OT Rooms</p>
-      <h3 class="text-2xl font-bold mt-1">5</h3>
+      <h3 class="text-3xl font-bold mt-1">5</h3>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow">
+    <div class="bg-white p-5 rounded-2xl shadow">
       <p class="text-sm text-[--muted]">Available</p>
-      <h3 class="text-2xl font-bold mt-1 text-green-600">2</h3>
+      <h3 class="text-3xl font-bold mt-1 text-green-600">2</h3>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow">
+    <div class="bg-white p-5 rounded-2xl shadow">
       <p class="text-sm text-[--muted]">In Use</p>
-      <h3 class="text-2xl font-bold mt-1 text-blue-600">2</h3>
+      <h3 class="text-3xl font-bold mt-1 text-blue-600">2</h3>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow">
+    <div class="bg-white p-5 rounded-2xl shadow">
       <p class="text-sm text-[--muted]">Cleaning</p>
-      <h3 class="text-2xl font-bold mt-1 text-orange-600">1</h3>
+      <h3 class="text-3xl font-bold mt-1 text-orange-600">1</h3>
     </div>
+
   </section>
 
-  <!-- OT ROOM CARDS -->
+  <!-- ================= OT ROOMS GRID ================= -->
   <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-    <!-- OT ROOM -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-green-500">
-      <div class="flex justify-between items-center mb-3">
+    <!-- ===== OT CARD ===== -->
+    <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-green-500 hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-3">
         <h3 class="font-semibold text-lg">OT-1</h3>
-        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
           Available
         </span>
       </div>
 
-      <p class="text-sm text-[--muted]">Last Surgery: 8:30 AM</p>
-      <p class="text-sm text-[--muted]">Next Scheduled: 11:00 AM</p>
+      <div class="space-y-1 text-sm text-[--muted]">
+        <p>Last Surgery: <strong class="text-[--text]">08:30 AM</strong></p>
+        <p>Next Scheduled: <strong class="text-[--text]">11:00 AM</strong></p>
+      </div>
     </div>
 
-    <!-- OT ROOM -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-blue-500">
-      <div class="flex justify-between items-center mb-3">
+    <!-- ===== OT CARD ===== -->
+    <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-blue-500 hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-3">
         <h3 class="font-semibold text-lg">OT-2</h3>
-        <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
           In Use
         </span>
       </div>
 
-      <p class="text-sm text-[--muted]">Procedure: Heart Bypass</p>
-      <p class="text-sm text-[--muted]">Doctor: Dr. Sharma</p>
+      <div class="space-y-1 text-sm text-[--muted]">
+        <p>Procedure: <strong class="text-[--text]">Heart Bypass</strong></p>
+        <p>Doctor: <strong class="text-[--text]">Dr. Sharma</strong></p>
+      </div>
     </div>
 
-    <!-- OT ROOM -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-orange-500">
-      <div class="flex justify-between items-center mb-3">
+    <!-- ===== OT CARD ===== -->
+    <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-orange-500 hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-3">
         <h3 class="font-semibold text-lg">OT-3</h3>
-        <span class="px-3 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
           Cleaning
         </span>
       </div>
 
-      <p class="text-sm text-[--muted]">Completed at: 2:15 PM</p>
-      <p class="text-sm text-[--muted]">Ready by: 3:00 PM</p>
+      <div class="space-y-1 text-sm text-[--muted]">
+        <p>Completed At: <strong class="text-[--text]">02:15 PM</strong></p>
+        <p>Ready By: <strong class="text-[--text]">03:00 PM</strong></p>
+      </div>
     </div>
 
-    <!-- OT ROOM -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-blue-500">
-      <div class="flex justify-between items-center mb-3">
+    <!-- ===== OT CARD ===== -->
+    <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-blue-500 hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-3">
         <h3 class="font-semibold text-lg">OT-4</h3>
-        <span class="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
           In Use
         </span>
       </div>
 
-      <p class="text-sm text-[--muted]">Procedure: Knee Replacement</p>
-      <p class="text-sm text-[--muted]">Doctor: Dr. Patel</p>
+      <div class="space-y-1 text-sm text-[--muted]">
+        <p>Procedure: <strong class="text-[--text]">Knee Replacement</strong></p>
+        <p>Doctor: <strong class="text-[--text]">Dr. Patel</strong></p>
+      </div>
     </div>
 
-    <!-- OT ROOM -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-green-500">
-      <div class="flex justify-between items-center mb-3">
+    <!-- ===== OT CARD ===== -->
+    <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-green-500 hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-3">
         <h3 class="font-semibold text-lg">OT-5</h3>
-        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
           Available
         </span>
       </div>
 
-      <p class="text-sm text-[--muted]">Idle</p>
-      <p class="text-sm text-[--muted]">Ready for scheduling</p>
+      <div class="space-y-1 text-sm text-[--muted]">
+        <p>Idle</p>
+        <p class="text-green-600 font-semibold">Ready for scheduling</p>
+      </div>
     </div>
 
   </section>

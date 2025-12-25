@@ -1,74 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Schedule Board</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OT Staff • Schedule Details</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Guards + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
+  <script type="module" src="/js/ot/scheduleDetails.js"></script>
+
   <style>
     :root {
-      --primary: #0A6CFF;
-      --bg: #F8FAFC;
-      --text: #1E293B;
-      --muted: #64748B;
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
     }
   </style>
-
-  <!-- Auth Guard + Navbar -->
-  <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadOtNavbar.js"></script>
-  <script type="module" defer src="/js/ot/scheduleBoard.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
+<main class="max-w-6xl mx-auto px-4 py-8">
 
-    <!-- PAGE HEADER -->
-    <section class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <div>
-        <h1 class="text-2xl font-bold">Schedule Board</h1>
-        <p class="text-sm text-[--muted]">Operation theatre scheduling overview</p>
-      </div>
+  <!-- ================= HEADER ================= -->
+  <section class="mb-6">
+    <h1 class="text-2xl font-bold">OT Schedule Details</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Operation theatre readiness & assignment overview
+    </p>
+  </section>
 
-      <div class="flex gap-2">
-        <button class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
-          Today
-        </button>
-        <button class="px-4 py-2 rounded-lg bg-slate-100 text-sm font-semibold hover:bg-slate-200">
-          Week
-        </button>
-      </div>
-    </section>
-
-    <!-- TIME SCALE -->
-    <div class="overflow-x-auto">
-      <div class="min-w-[900px]">
-
-        <!-- TIME HEADER -->
-        <div class="grid grid-cols-[100px_repeat(6,1fr)] gap-2 text-xs font-semibold text-slate-500 mb-3">
-          <div></div>
-          <div>08:00</div>
-          <div>10:00</div>
-          <div>12:00</div>
-          <div>14:00</div>
-          <div>16:00</div>
-          <div>18:00</div>
-        </div>
-
-        <!-- SCHEDULE ROWS (DYNAMIC) -->
-        <div id="scheduleRows" class="space-y-4"></div>
-
-
-      </div>
+  <!-- ================= STATUS BAR ================= -->
+  <section class="bg-white rounded-2xl shadow p-5 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <p class="text-sm text-[--muted]">Current Status</p>
+      <span id="statusBadge"
+        class="inline-block mt-1 px-4 py-1 rounded-full text-sm font-semibold">
+        —
+      </span>
     </div>
 
-  </main>
+    <p class="text-sm text-[--muted]">
+      Ensure OT readiness before scheduled time
+    </p>
+  </section>
+
+  <!-- ================= BASIC INFO ================= -->
+  <section class="bg-white rounded-2xl shadow p-6 mb-8">
+    <h3 class="font-semibold mb-4">Operation Details</h3>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-sm">
+
+      <div>
+        <p class="text-[--muted]">Procedure</p>
+        <p id="procedure" class="font-semibold">—</p>
+      </div>
+
+      <div>
+        <p class="text-[--muted]">OT Room</p>
+        <p id="otRoom" class="font-semibold">—</p>
+      </div>
+
+      <div>
+        <p class="text-[--muted]">Scheduled Time</p>
+        <p id="timeRange" class="font-semibold">—</p>
+      </div>
+
+      <div>
+        <p class="text-[--muted]">Doctor</p>
+        <p id="doctor" class="font-semibold">—</p>
+      </div>
+
+      <div>
+        <p class="text-[--muted]">Patient</p>
+        <p id="patient" class="font-semibold">—</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= STAFF ================= -->
+  <section class="bg-white rounded-2xl shadow p-6 mb-8">
+    <h3 class="font-semibold mb-4">Assigned OT Staff</h3>
+
+    <ul id="staffList" class="flex flex-wrap gap-3 text-sm">
+      <!-- JS injects staff here -->
+    </ul>
+  </section>
+
+  <!-- ================= NOTES ================= -->
+  <section class="bg-white rounded-2xl shadow p-6">
+    <h3 class="font-semibold mb-3">OT Notes</h3>
+
+    <p
+      id="notes"
+      class="text-sm bg-slate-50 rounded-lg p-4 text-[--muted]">
+      —
+    </p>
+  </section>
+
+</main>
 
 </body>
-
 </html>

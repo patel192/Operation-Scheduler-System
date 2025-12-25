@@ -24,66 +24,80 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-8">
+<main class="max-w-7xl mx-auto px-4 py-8 pb-28">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <section class="mb-8">
     <h1 class="text-2xl font-bold">Pre-Operation Checklist</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Ensure all requirements are completed before surgery begins
+      Complete all steps before allowing surgery to begin
     </p>
   </section>
 
-  <!-- SURGERY INFO -->
-  <section class="bg-white rounded-xl shadow p-6 mb-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+  <!-- ================= SURGERY SUMMARY ================= -->
+  <section class="bg-white rounded-2xl shadow p-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+
       <div>
         <p class="text-[--muted]">Procedure</p>
         <p class="font-semibold">Heart Bypass Surgery</p>
       </div>
+
       <div>
         <p class="text-[--muted]">Patient</p>
         <p class="font-semibold">Ramesh Kumar</p>
       </div>
+
       <div>
         <p class="text-[--muted]">OT Room</p>
-        <p class="font-semibold">OT-1 • 10:00 AM</p>
+        <p class="font-semibold">OT-1</p>
       </div>
+
+      <div>
+        <p class="text-[--muted]">Scheduled Time</p>
+        <p class="font-semibold">10:00 AM</p>
+      </div>
+
     </div>
   </section>
 
-  <!-- CHECKLIST -->
-  <section class="bg-white rounded-xl shadow p-6">
+  <!-- ================= CHECKLIST ================= -->
+  <section class="bg-white rounded-2xl shadow p-6">
 
-    <h2 class="text-lg font-bold mb-4">Checklist Items</h2>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-bold">Checklist Items</h2>
+      <span class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-semibold">
+        Pending
+      </span>
+    </div>
 
     <div class="space-y-4">
 
       <!-- ITEM -->
-      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
-        <input type="checkbox" class="mt-1 accent-blue-600" />
+      <label class="flex gap-4 p-4 rounded-xl border hover:bg-slate-50 cursor-pointer transition">
+        <input type="checkbox" class="mt-1 accent-blue-600 w-4 h-4" />
         <div>
           <p class="font-semibold">Patient Consent Verified</p>
           <p class="text-sm text-[--muted]">
-            Signed consent form available and verified
+            Signed consent form is available and approved
           </p>
         </div>
       </label>
 
       <!-- ITEM -->
-      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
-        <input type="checkbox" class="mt-1 accent-blue-600" />
+      <label class="flex gap-4 p-4 rounded-xl border hover:bg-slate-50 cursor-pointer transition">
+        <input type="checkbox" class="mt-1 accent-blue-600 w-4 h-4" />
         <div>
           <p class="font-semibold">Pre-Op Vitals Checked</p>
           <p class="text-sm text-[--muted]">
-            Blood pressure, oxygen level, and pulse recorded
+            BP, pulse, oxygen level recorded
           </p>
         </div>
       </label>
 
       <!-- ITEM -->
-      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
-        <input type="checkbox" class="mt-1 accent-blue-600" />
+      <label class="flex gap-4 p-4 rounded-xl border hover:bg-slate-50 cursor-pointer transition">
+        <input type="checkbox" class="mt-1 accent-blue-600 w-4 h-4" />
         <div>
           <p class="font-semibold">Anesthesia Ready</p>
           <p class="text-sm text-[--muted]">
@@ -93,8 +107,8 @@
       </label>
 
       <!-- ITEM -->
-      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
-        <input type="checkbox" class="mt-1 accent-blue-600" />
+      <label class="flex gap-4 p-4 rounded-xl border hover:bg-slate-50 cursor-pointer transition">
+        <input type="checkbox" class="mt-1 accent-blue-600 w-4 h-4" />
         <div>
           <p class="font-semibold">Surgical Instruments Prepared</p>
           <p class="text-sm text-[--muted]">
@@ -104,8 +118,8 @@
       </label>
 
       <!-- ITEM -->
-      <label class="flex items-start gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
-        <input type="checkbox" class="mt-1 accent-blue-600" />
+      <label class="flex gap-4 p-4 rounded-xl border hover:bg-slate-50 cursor-pointer transition">
+        <input type="checkbox" class="mt-1 accent-blue-600 w-4 h-4" />
         <div>
           <p class="font-semibold">OT Room Sanitized</p>
           <p class="text-sm text-[--muted]">
@@ -115,18 +129,23 @@
       </label>
 
     </div>
-
-    <!-- ACTION -->
-    <div class="mt-6 flex justify-end">
-      <button
-        class="px-6 py-3 rounded-xl bg-[--primary] text-white font-bold hover:bg-blue-700 transition">
-        Mark Ready for Surgery
-      </button>
-    </div>
-
   </section>
 
 </main>
+
+<!-- ================= STICKY ACTION BAR ================= -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <p class="text-sm text-[--muted]">
+      All checklist items must be completed before surgery
+    </p>
+
+    <button
+      class="px-6 py-3 rounded-xl bg-[--primary] text-white font-bold hover:bg-blue-700 transition">
+      Mark Ready for Surgery
+    </button>
+  </div>
+</div>
 
 </body>
 </html>
