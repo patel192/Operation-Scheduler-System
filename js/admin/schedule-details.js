@@ -10,25 +10,25 @@ const params = new URLSearchParams(window.location.search);
 const scheduleId = params.get("id");
 
 if (!scheduleId) {
-  alert("Invalid Schedule.");
+  alert("Invalid schedule");
   window.location.href = "/admin/schedule-board.html";
 }
 
-// DOM ELEMENTS
+/* ---------------- ELEMENTS ---------------- */
 const patientNameEl = document.getElementById("patientName");
 const procedureEl = document.getElementById("procedure");
 const otRoomEl = document.getElementById("otRoom");
 const timeRangeEl = document.getElementById("timeRange");
 const surgeonEl = document.getElementById("surgeon");
 const anesthEl = document.getElementById("anesthesiologist");
-const statusBadgeEl = document.getElementById("statusBadge");
 const notesEl = document.getElementById("notes");
+const statusBadgeEl = document.getElementById("statusBadge");
 
 const btnOngoing = document.getElementById("markOngoing");
 const btnCompleted = document.getElementById("markCompleted");
 const btnCancel = document.getElementById("cancelSchedule");
 
-// HELPERS
+/* ---------------- HELPERS ---------------- */
 function formatTime(ts) {
   return ts.toDate().toLocaleTimeString([], {
     hour: "2-digit",
@@ -42,58 +42,57 @@ function statusClass(status) {
   return "bg-blue-100 text-blue-700";
 }
 
-// LOAD DATA
+/* ---------------- LOAD ---------------- */
 async function loadSchedule() {
   const ref = doc(db, "schedules", scheduleId);
   const snap = await getDoc(ref);
+
   if (!snap.exists()) {
-    alert("Schedule not found.");
+    alert("Schedule not found");
     window.location.href = "/admin/schedule-board.html";
     return;
   }
 
   const d = snap.data();
-  console.log(d);
 
   patientNameEl.textContent = d.patientName || "-";
   procedureEl.textContent = d.procedure || "-";
   otRoomEl.textContent = d.otRoom || "-";
-  surgeonEl.textContent = d.surgeon || "-";
+  surgeonEl.textContent = d.surgeonName || "-";
   anesthEl.textContent = d.anesthesiologist || "-";
-  notesEl.textContent = d.notes || "No notes";
+  notesEl.textContent = d.notes || "No notes provided";
 
-  timeRangeEl.textContent = `${formatTime(d.startTime)} - ${formatTime(
-    d.endTime
-  )}`;
+  timeRangeEl.textContent =
+    `${formatTime(d.startTime)} – ${formatTime(d.endTime)}`;
 
   statusBadgeEl.textContent = d.status || "Upcoming";
-  statusBadgeEl.className = `inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusClass(
-    d.status
-  )}`;
+  statusBadgeEl.className =
+    `inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusClass(d.status)}`;
+
+  // Button logic
+  btnOngoing.disabled = d.status !== "Upcoming";
+  btnCompleted.disabled = d.status === "Completed";
+
+  btnOngoing.classList.toggle("opacity-50", btnOngoing.disabled);
+  btnCompleted.classList.toggle("opacity-50", btnCompleted.disabled);
 }
 
-// ACTIONS
-btnOngoing.addEventListener("click", async () => {
-  await updateDoc(doc(db, "schedules", scheduleId), {
-    status: "Ongoing",
-  });
+/* ---------------- ACTIONS ---------------- */
+btnOngoing.onclick = async () => {
+  await updateDoc(doc(db, "schedules", scheduleId), { status: "Ongoing" });
   loadSchedule();
-});
+};
 
-btnCompleted.addEventListener("click", async () => {
-  await updateDoc(doc(db, "schedules", scheduleId), {
-    status: "Completed",
-  });
+btnCompleted.onclick = async () => {
+  await updateDoc(doc(db, "schedules", scheduleId), { status: "Completed" });
   loadSchedule();
-});
+};
 
-btnCancel.addEventListener("click", async () => {
-  const ok = confirm("Are you sure you want to cancel this schedule?");
-  if (!ok) return;
-
+btnCancel.onclick = async () => {
+  if (!confirm("Cancel this schedule?")) return;
   await deleteDoc(doc(db, "schedules", scheduleId));
   window.location.href = "/admin/schedule-board.html";
-});
+};
 
-// INIT
+/* ---------------- INIT ---------------- */
 loadSchedule();

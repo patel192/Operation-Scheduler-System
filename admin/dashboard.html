@@ -9,117 +9,186 @@
 
   <style>
     :root {
-      --primary:#0A6CFF;
+      --primary:#2563eb;
       --bg:#F8FAFC;
-      --text:#1E293B;
+      --text:#0f172a;
       --muted:#64748B;
     }
   </style>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-<script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<!-- ================= MAIN ================= -->
-<main class="max-w-7xl mx-auto px-4 py-8 space-y-10">
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-<!-- ===== HERO ===== -->
-<section class="flex flex-col md:flex-row justify-between gap-6">
-  <div>
-    <h1 class="text-2xl font-bold">Welcome, Admin</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Hospital operations overview — Today
-    </p>
-  </div>
-
-  <div class="bg-white rounded-xl shadow p-4 text-sm">
-    <p class="font-semibold">System Status</p>
-    <p class="text-green-600 mt-1">All systems operational</p>
-  </div>
-</section>
-
-<!-- ===== KPI GRID ===== -->
-<section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-  <div class="bg-white p-5 rounded-xl shadow">
-    <p class="text-sm text-[--muted]">Surgeries Today</p>
-    <h2 class="text-3xl font-bold mt-1">18</h2>
-  </div>
-
-  <div class="bg-white p-5 rounded-xl shadow">
-    <p class="text-sm text-[--muted]">OT Utilization</p>
-    <h2 class="text-3xl font-bold mt-1">82%</h2>
-  </div>
-
-  <div class="bg-white p-5 rounded-xl shadow">
-    <p class="text-sm text-[--muted]">Doctors On Duty</p>
-    <h2 class="text-3xl font-bold mt-1">27</h2>
-  </div>
-
-  <div class="bg-white p-5 rounded-xl shadow">
-    <p class="text-sm text-[--muted]">Pending Approvals</p>
-    <h2 class="text-3xl font-bold mt-1 text-red-500">3</h2>
-  </div>
-
-</section>
-
-<!-- ===== CHARTS PLACEHOLDER ===== -->
-<section class="grid md:grid-cols-2 gap-6">
-
-  <div class="bg-white p-6 rounded-xl shadow">
-    <h3 class="font-semibold mb-2">OT Utilization Trend</h3>
-    <div class="h-40 bg-slate-100 rounded-lg flex items-center justify-center text-sm text-[--muted]">
-      Chart Placeholder
+  <!-- ================= HEADER ================= -->
+  <section class="flex flex-col md:flex-row justify-between gap-6">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">
+        Admin Dashboard
+      </h1>
+      <p class="text-sm text-[--muted] mt-1">
+        Hospital operations overview — Today
+      </p>
     </div>
-  </div>
 
-  <div class="bg-white p-6 rounded-xl shadow">
-    <h3 class="font-semibold mb-2">Surgeries by Department</h3>
-    <div class="h-40 bg-slate-100 rounded-lg flex items-center justify-center text-sm text-[--muted]">
-      Chart Placeholder
+    <div
+      class="bg-white rounded-xl shadow-sm border px-5 py-3 text-sm flex flex-col justify-center">
+      <p class="font-semibold">System Status</p>
+      <p class="text-green-600 mt-1 flex items-center gap-1">
+        ● All systems operational
+      </p>
     </div>
-  </div>
+  </section>
 
-</section>
+  <!-- ================= KPI CARDS ================= -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
 
-<!-- ===== TODAY OPERATIONS ===== -->
-<section>
-  <h2 class="font-semibold mb-4">Today’s OT Schedule</h2>
+    <div class="kpi-card">
+      <p class="kpi-label">Surgeries Today</p>
+      <h2 class="kpi-value">18</h2>
+    </div>
 
-  <div class="bg-white rounded-xl shadow overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left">
-        <tr>
-          <th class="p-4">OT</th>
-          <th class="p-4">Doctor</th>
-          <th class="p-4">Procedure</th>
-          <th class="p-4">Time</th>
-          <th class="p-4">Status</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y">
-        <tr>
-          <td class="p-4">OT-1</td>
-          <td class="p-4">Dr. Sharma</td>
-          <td class="p-4">Bypass</td>
-          <td class="p-4">10:00–12:00</td>
-          <td class="p-4 text-green-600">Ongoing</td>
-        </tr>
-        <tr>
-          <td class="p-4">OT-3</td>
-          <td class="p-4">Dr. Patel</td>
-          <td class="p-4">Knee Replacement</td>
-          <td class="p-4">12:30–14:00</td>
-          <td class="p-4 text-yellow-600">Upcoming</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+    <div class="kpi-card">
+      <p class="kpi-label">OT Utilization</p>
+      <h2 class="kpi-value">82%</h2>
+    </div>
+
+    <div class="kpi-card">
+      <p class="kpi-label">Doctors On Duty</p>
+      <h2 class="kpi-value">27</h2>
+    </div>
+
+    <div class="kpi-card border-red-100 bg-red-50">
+      <p class="kpi-label">Pending Approvals</p>
+      <h2 class="kpi-value text-red-600">3</h2>
+    </div>
+
+  </section>
+
+  <!-- ================= ANALYTICS ================= -->
+  <section class="grid md:grid-cols-2 gap-6">
+
+    <div class="analytics-card">
+      <h3 class="analytics-title">OT Utilization Trend</h3>
+      <div class="chart-placeholder">
+        Chart Placeholder
+      </div>
+    </div>
+
+    <div class="analytics-card">
+      <h3 class="analytics-title">Surgeries by Department</h3>
+      <div class="chart-placeholder">
+        Chart Placeholder
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= TODAY SCHEDULE ================= -->
+  <section>
+    <h2 class="font-semibold text-lg mb-4">
+      Today’s OT Schedule
+    </h2>
+
+    <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-[--muted]">
+          <tr>
+            <th class="p-4 font-semibold">OT</th>
+            <th class="p-4 font-semibold">Doctor</th>
+            <th class="p-4 font-semibold">Procedure</th>
+            <th class="p-4 font-semibold">Time</th>
+            <th class="p-4 font-semibold">Status</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y">
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold">OT-1</td>
+            <td class="p-4">Dr. Sharma</td>
+            <td class="p-4">Bypass</td>
+            <td class="p-4">10:00 – 12:00</td>
+            <td class="p-4">
+              <span class="status-pill bg-green-100 text-green-700">
+                Ongoing
+              </span>
+            </td>
+          </tr>
+
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold">OT-3</td>
+            <td class="p-4">Dr. Patel</td>
+            <td class="p-4">Knee Replacement</td>
+            <td class="p-4">12:30 – 14:00</td>
+            <td class="p-4">
+              <span class="status-pill bg-yellow-100 text-yellow-700">
+                Upcoming
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
 </main>
+
+<!-- ================= UI HELPERS ================= -->
+<style>
+  .kpi-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  .kpi-label {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+  }
+
+  .analytics-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  .analytics-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .chart-placeholder {
+    height: 10rem;
+    background: #f1f5f9;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  .status-pill {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+</style>
 
 </body>
 </html>

@@ -19,30 +19,11 @@
 
   <!-- Auth Guard -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<!-- ================= NAVBAR ================= -->
-<header class="sticky top-0 bg-white border-b z-50">
-  <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-
-    <div class="font-bold text-lg text-[--primary]">
-      Operation Scheduler
-    </div>
-
-    <nav class="hidden md:flex gap-6 text-sm font-semibold">
-      <a href="/admin/dashboard.html" class="text-[--muted] hover:text-[--primary]">Dashboard</a>
-      <a href="/admin/schedules.html" class="text-[--muted] hover:text-[--primary]">Schedules</a>
-      <a href="/admin/doctors.html" class="text-[--muted] hover:text-[--primary]">Doctors</a>
-      <a href="/admin/departments.html" class="text-[--muted] hover:text-[--primary]">Departments</a>
-      <a href="/admin/ot-rooms.html" class="text-[--primary]">OT Rooms</a>
-    </nav>
-
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/user.png"
-         class="w-8 h-8 rounded-full"/>
-  </div>
-</header>
 
 <!-- ================= MAIN ================= -->
 <main class="max-w-7xl mx-auto px-4 py-10">
