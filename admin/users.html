@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin • Users</title>
+  <title>Admin • User Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -17,11 +17,13 @@
     }
   </style>
 
-  <!-- Auth Guard -->
+  <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-
-  <!-- Admin Navbar -->
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/users.js"></script>
+
+  <!-- Page Script -->
+  <script type="module" defer src="/js/admin/users.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
@@ -30,26 +32,25 @@
 
   <!-- HEADER -->
   <section class="mb-6">
-    <h1 class="text-2xl font-bold">Users Management</h1>
+    <h1 class="text-2xl font-bold">User Management</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Manage doctors, OT staff, admins, and patients
+      Manage doctors, OT staff, patients, and admins
     </p>
   </section>
 
-  <!-- CONTROLS -->
+  <!-- FILTERS -->
   <section class="bg-white p-4 rounded-xl shadow mb-6">
     <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
 
-      <!-- SEARCH -->
       <input
+        id="searchInput"
         type="text"
         placeholder="Search by name or email"
-        class="w-full md:w-1/2 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-[--primary]"
+        class="border rounded-lg px-4 py-2 text-sm w-full md:w-64"
       />
 
-      <!-- FILTERS -->
       <div class="flex gap-3">
-        <select class="border rounded-lg px-3 py-2 text-sm">
+        <select id="roleFilter" class="border rounded-lg px-3 py-2 text-sm">
           <option value="">All Roles</option>
           <option>Admin</option>
           <option>Doctor</option>
@@ -57,10 +58,10 @@
           <option>Patient</option>
         </select>
 
-        <select class="border rounded-lg px-3 py-2 text-sm">
+        <select id="statusFilter" class="border rounded-lg px-3 py-2 text-sm">
           <option value="">All Status</option>
-          <option>Active</option>
-          <option>Disabled</option>
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
         </select>
       </div>
 
@@ -72,73 +73,25 @@
     <table class="w-full text-sm">
       <thead class="bg-slate-50 border-b">
         <tr>
-          <th class="px-4 py-3 text-left">Name</th>
+          <th class="px-4 py-3 text-left">User</th>
           <th class="px-4 py-3 text-left">Email</th>
           <th class="px-4 py-3 text-left">Role</th>
-          <th class="px-4 py-3 text-left">Department</th>
-          <th class="px-4 py-3 text-left">Last Login</th>
           <th class="px-4 py-3 text-left">Status</th>
           <th class="px-4 py-3 text-right">Action</th>
         </tr>
       </thead>
 
-      <tbody class="divide-y">
-
-        <!-- ROW -->
-        <tr class="hover:bg-slate-50">
-          <td class="px-4 py-3 font-semibold">Dr. Anil Sharma</td>
-          <td class="px-4 py-3">anil@hospital.com</td>
-          <td class="px-4 py-3">
-            <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
-              Doctor
-            </span>
-          </td>
-          <td class="px-4 py-3">Cardiology</td>
-          <td class="px-4 py-3">Today</td>
-          <td class="px-4 py-3">
-            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-              Active
-            </span>
-          </td>
-          <td class="px-4 py-3 text-right space-x-2">
-            <button class="text-[--primary] font-semibold hover:underline">
-              Edit
-            </button>
-            <button class="text-red-600 font-semibold hover:underline">
-              Disable
-            </button>
-          </td>
-        </tr>
-
-        <!-- ROW -->
-        <tr class="hover:bg-slate-50">
-          <td class="px-4 py-3 font-semibold">OT Staff – Ravi</td>
-          <td class="px-4 py-3">ravi@hospital.com</td>
-          <td class="px-4 py-3">
-            <span class="px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-700">
-              OT Staff
-            </span>
-          </td>
-          <td class="px-4 py-3">Surgery</td>
-          <td class="px-4 py-3">Yesterday</td>
-          <td class="px-4 py-3">
-            <span class="px-2 py-1 rounded-full text-xs bg-slate-200 text-slate-700">
-              Disabled
-            </span>
-          </td>
-          <td class="px-4 py-3 text-right space-x-2">
-            <button class="text-[--primary] font-semibold hover:underline">
-              Edit
-            </button>
-            <button class="text-green-600 font-semibold hover:underline">
-              Enable
-            </button>
-          </td>
-        </tr>
-
+      <tbody id="usersTable" class="divide-y">
+        <!-- JS injects rows -->
       </tbody>
     </table>
   </section>
+
+  <!-- EMPTY STATE -->
+  <div id="emptyState"
+    class="hidden text-center py-10 text-[--muted]">
+    No users found.
+  </div>
 
 </main>
 
