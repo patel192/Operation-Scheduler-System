@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create Schedule — Admin</title>
+  <title>Create Schedule · Admin</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -14,89 +14,144 @@
 
 <body class="bg-slate-50 min-h-screen text-slate-800">
 
-<main class="max-w-4xl mx-auto px-4 py-10">
+<main class="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
-<section class="mb-8">
+<!-- PAGE HEADER -->
+<section>
   <h1 class="text-2xl font-bold">Create Operation Schedule</h1>
   <p class="text-sm text-slate-500 mt-1">
     Plan surgeries with conflict-free OT, doctor, and staff allocation
   </p>
 </section>
 
-<!-- STEP 1 -->
-<section class="bg-white p-6 rounded-xl shadow space-y-6 form-section">
-  <h2 class="font-semibold text-lg">Patient & Procedure</h2>
+<!-- ================= STEP 1 ================= -->
+<section class="bg-white p-8 rounded-2xl shadow-sm space-y-6 form-section">
+  <div class="flex items-center gap-3">
+    <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">1</span>
+    <h2 class="font-semibold text-lg">Patient & Procedure</h2>
+  </div>
 
-  <div class="grid md:grid-cols-2 gap-4">
-    <input id="patientIdInput" type="text" placeholder="Patient ID" class="border px-4 py-2 rounded" />
-    <input id="patientNameInput" type="text" placeholder="Patient Name" class="border px-4 py-2 rounded"/>
-    <select id="departmentSelect" class="border px-4 py-2 rounded">
-      <option value="">Select Department</option>
-      <option>Cardiology</option>
-      <option>Orthopedics</option>
-      <option>Neurology</option>
-    </select>
-    <input id="procedureInput" type="text" placeholder="Procedure" class="border px-4 py-2 rounded"/>
-    <textarea id="notesInput" placeholder="Notes" class="border px-4 py-2 rounded md:col-span-2"></textarea>
+  <div class="grid md:grid-cols-2 gap-4 text-sm">
+
+    <div>
+      <label class="block text-slate-600 mb-1">Patient ID</label>
+      <input id="patientIdInput" type="text"
+        placeholder="Optional"
+        class="border px-4 py-2 rounded-lg w-full"/>
+    </div>
+
+    <div>
+      <label class="block text-slate-600 mb-1">Patient Name</label>
+      <input id="patientNameInput" type="text"
+        placeholder="Patient Full Name"
+        class="border px-4 py-2 rounded-lg w-full"/>
+    </div>
+
+    <div>
+      <label class="block text-slate-600 mb-1">Department</label>
+      <select id="departmentSelect" class="border px-4 py-2 rounded-lg w-full">
+        <option value="">Select Department</option>
+        <option>Cardiology</option>
+        <option>Orthopedics</option>
+        <option>Neurology</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-slate-600 mb-1">Procedure *</label>
+      <input id="procedureInput" type="text"
+        placeholder="Surgical Procedure"
+        class="border px-4 py-2 rounded-lg w-full"/>
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="block text-slate-600 mb-1">Clinical Notes</label>
+      <textarea id="notesInput"
+        placeholder="Optional notes"
+        class="border px-4 py-2 rounded-lg w-full"></textarea>
+    </div>
+
   </div>
 
   <div class="flex justify-end">
-    <button type="button" class="px-6 py-2 bg-blue-600 text-white rounded">Next</button>
+    <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold">
+      Next →
+    </button>
   </div>
 </section>
 
-<!-- STEP 2 -->
-<section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8 form-section">
-  <h2 class="font-semibold text-lg">OT, Time & Staff</h2>
+<!-- ================= STEP 2 ================= -->
+<section class="bg-white p-8 rounded-2xl shadow-sm space-y-6 form-section">
+  <div class="flex items-center gap-3">
+    <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">2</span>
+    <h2 class="font-semibold text-lg">OT, Time & Staff</h2>
+  </div>
 
-  <div class="grid md:grid-cols-3 gap-4">
-    <input type="date" class="border px-4 py-2 rounded"/>
+  <div class="grid md:grid-cols-3 gap-4 text-sm">
+    <input type="date" class="border px-4 py-2 rounded-lg"/>
 
-    <select class="border px-4 py-2 rounded">
+    <select class="border px-4 py-2 rounded-lg">
       <option value="">Select OT Room</option>
       <option>OT-1</option>
       <option>OT-2</option>
       <option>OT-3</option>
     </select>
 
-    <select id="otStaffSelect" multiple class="border px-4 py-2 rounded md:col-span-3 h-32"></select>
+    <div class="md:col-span-3">
+      <label class="block text-slate-600 mb-1">OT Staff</label>
+      <select id="otStaffSelect" multiple
+        class="border px-4 py-2 rounded-lg w-full h-32"></select>
+    </div>
 
-    <input type="time" class="border px-4 py-2 rounded"/>
-    <input type="time" class="border px-4 py-2 rounded"/>
+    <input type="time" class="border px-4 py-2 rounded-lg"/>
+    <input type="time" class="border px-4 py-2 rounded-lg"/>
   </div>
 
-  <div class="flex justify-end gap-3">
-    <button type="button" class="px-6 py-2 border rounded">Back</button>
-    <button type="button" class="px-6 py-2 bg-blue-600 text-white rounded">Next</button>
+  <div class="flex justify-between">
+    <button class="px-6 py-2 rounded-lg border">← Back</button>
+    <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold">
+      Next →
+    </button>
   </div>
 </section>
 
-<!-- STEP 3 -->
-<section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8 form-section">
-  <h2 class="font-semibold text-lg">Doctors</h2>
+<!-- ================= STEP 3 ================= -->
+<section class="bg-white p-8 rounded-2xl shadow-sm space-y-6 form-section">
+  <div class="flex items-center gap-3">
+    <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">3</span>
+    <h2 class="font-semibold text-lg">Doctors</h2>
+  </div>
 
-  <div class="grid md:grid-cols-2 gap-4">
-    <select id="surgeonSelect" class="border px-4 py-2 rounded">
+  <div class="grid md:grid-cols-2 gap-4 text-sm">
+    <select id="surgeonSelect" class="border px-4 py-2 rounded-lg">
       <option value="">Loading surgeons…</option>
     </select>
-    <input type="text" placeholder="Anesthesiologist (optional)" class="border px-4 py-2 rounded"/>
+
+    <input type="text"
+      placeholder="Anesthesiologist (optional)"
+      class="border px-4 py-2 rounded-lg"/>
   </div>
 
-  <div class="flex justify-end gap-3">
-    <button type="button" class="px-6 py-2 border rounded">Back</button>
-    <button type="button" class="px-6 py-2 bg-blue-600 text-white rounded">Next</button>
+  <div class="flex justify-between">
+    <button class="px-6 py-2 rounded-lg border">← Back</button>
+    <button class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold">
+      Next →
+    </button>
   </div>
 </section>
 
-<!-- STEP 4 -->
-<section class="bg-white p-6 rounded-xl shadow space-y-6 mt-8 form-section">
-  <h2 class="font-semibold text-lg">Review</h2>
+<!-- ================= STEP 4 ================= -->
+<section class="bg-white p-8 rounded-2xl shadow-sm space-y-6 form-section">
+  <div class="flex items-center gap-3">
+    <span class="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 text-green-700 font-bold">4</span>
+    <h2 class="font-semibold text-lg">Review & Confirm</h2>
+  </div>
 
-  <div class="bg-slate-100 p-4 rounded text-sm"></div>
+  <div class="bg-slate-50 p-4 rounded-lg text-sm space-y-1"></div>
 
-  <div class="flex justify-end gap-3">
-    <button type="button" class="px-6 py-2 border rounded">Back</button>
-    <button type="button" class="px-6 py-2 bg-green-600 text-white rounded">
+  <div class="flex justify-between">
+    <button class="px-6 py-2 rounded-lg border">← Back</button>
+    <button class="px-6 py-2 rounded-lg bg-green-600 text-white font-semibold">
       Confirm Schedule
     </button>
   </div>

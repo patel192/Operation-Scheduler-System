@@ -10,99 +10,66 @@
 
   <style>
     :root {
-      --primary: #0A6CFF;
-      --bg: #F8FAFC;
-      --text: #1E293B;
-      --muted: #64748B;
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
     }
   </style>
+
+  <!-- Auth + Navbar + Logic -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/my-schedule.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-  <!-- Doctor Navbar -->
-  <script type="module" src="/js/layout/loadDoctorNavbar.js"></script>
-  <script type="module" src="/middleware/auth-guard.js"></script>
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
 
-  <!-- ================= MAIN ================= -->
-  <main class="max-w-7xl mx-auto px-4 py-6">
-
-    <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">My Schedule</h1>
-        <p class="text-sm text-[--muted]">
-          View your upcoming surgeries and OT assignments
-        </p>
-      </div>
-
-      <!-- Filters -->
-      <div class="flex gap-2">
-        <input
-          type="date"
-          class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[--primary]"
-        />
-        <select
-          class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[--primary]">
-          <option>All Status</option>
-          <option>Scheduled</option>
-          <option>In Progress</option>
-          <option>Completed</option>
-        </select>
-      </div>
+  <!-- HEADER -->
+  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">My Schedule</h1>
+      <p class="text-sm text-[--muted] mt-1">
+        Your assigned surgeries and OT schedules
+      </p>
     </div>
 
-    <!-- ================= SCHEDULE LIST ================= -->
-    <div class="grid gap-4">
+    <!-- FILTERS -->
+    <div class="flex flex-wrap gap-2">
+      <input
+        id="filterDate"
+        type="date"
+        class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[--primary]"
+      />
 
-      <!-- Schedule Card -->
-      <div class="bg-white rounded-xl shadow-sm border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h3 class="font-semibold text-lg text-[--primary]">
-            Knee Replacement Surgery
-          </h3>
-          <p class="text-sm text-[--muted] mt-1">
-            Patient: John Doe • OT Room 2 • Orthopedics
-          </p>
-          <p class="text-sm text-[--muted]">
-            Date: 18 Dec 2025 • Time: 10:30 AM – 12:30 PM
-          </p>
-        </div>
-
-        <span class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
-          Scheduled
-        </span>
-      </div>
-
-      <!-- Schedule Card -->
-      <div class="bg-white rounded-xl shadow-sm border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h3 class="font-semibold text-lg text-[--primary]">
-            Cardiac Bypass
-          </h3>
-          <p class="text-sm text-[--muted] mt-1">
-            Patient: Alice Smith • OT Room 1 • Cardiology
-          </p>
-          <p class="text-sm text-[--muted]">
-            Date: 19 Dec 2025 • Time: 09:00 AM – 01:00 PM
-          </p>
-        </div>
-
-        <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 font-semibold">
-          In Progress
-        </span>
-      </div>
-
-      <!-- Empty State (keep for logic later) -->
-      <!--
-      <div class="text-center py-12 text-[--muted]">
-        No schedules found.
-      </div>
-      -->
-
+      <select
+        id="filterStatus"
+        class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[--primary]">
+        <option value="">All Status</option>
+        <option value="Upcoming">Upcoming</option>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Completed">Completed</option>
+      </select>
     </div>
+  </section>
 
-  </main>
+  <!-- EMPTY STATE -->
+  <div
+    id="emptyState"
+    class="hidden bg-white rounded-xl shadow p-10 text-center text-[--muted]">
+    No schedules found for the selected filters.
+  </div>
+
+  <!-- SCHEDULE LIST -->
+  <div
+    id="scheduleList"
+    class="grid gap-4">
+    <!-- Cards injected by JS -->
+  </div>
+
+</main>
 
 </body>
 </html>

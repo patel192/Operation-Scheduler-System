@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Doctors — Admin</title>
+  <title>Doctors · Admin</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -16,103 +16,108 @@
     }
   </style>
 
-  <!-- Auth Guard -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
-<!-- ================= MAIN ================= -->
-<main class="max-w-7xl mx-auto px-4 py-10">
 
-<!-- ===== HEADER ===== -->
-<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-  <div>
-    <h1 class="text-2xl font-bold">Doctors</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Manage doctors, specialties, availability and status
-    </p>
-  </div>
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <a href="/admin/add-doctor.html"
-     class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[--primary] text-white font-semibold">
-    + Add Doctor
-  </a>
-</section>
+  <!-- HEADER -->
+  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">Doctors</h1>
+      <p class="text-sm text-[--muted] mt-1">
+        Manage doctors, specialties, availability and status
+      </p>
+    </div>
 
-<!-- ===== FILTERS ===== -->
-<section class="bg-white p-4 rounded-xl shadow mb-6 grid md:grid-cols-4 gap-3 text-sm">
+    <a href="/admin/add-doctor.html"
+      class="inline-flex items-center gap-2 px-5 py-2 rounded-xl
+             bg-[--primary] text-white font-semibold hover:opacity-90">
+      + Add Doctor
+    </a>
+  </section>
 
-  <input type="text" placeholder="Search by name"
-         class="border rounded-lg px-3 py-2"/>
+  <!-- FILTERS -->
+  <section class="bg-white p-5 rounded-2xl shadow-sm grid md:grid-cols-4 gap-4 text-sm">
 
-  <select class="border rounded-lg px-3 py-2">
-    <option>All Departments</option>
-    <option>Cardiology</option>
-    <option>Orthopedics</option>
-    <option>Neurology</option>
-  </select>
+    <input
+      type="text"
+      placeholder="Search by doctor name"
+      class="border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
 
-  <select class="border rounded-lg px-3 py-2">
-    <option>Status</option>
-    <option>Active</option>
-    <option>On Leave</option>
-    <option>Inactive</option>
-  </select>
+    <select class="border rounded-xl px-4 py-2">
+      <option>All Departments</option>
+      <option>Cardiology</option>
+      <option>Orthopedics</option>
+      <option>Neurology</option>
+    </select>
 
-  <button class="rounded-lg bg-slate-100 font-semibold">
-    Apply
-  </button>
+    <select class="border rounded-xl px-4 py-2">
+      <option>Status</option>
+      <option>Active</option>
+      <option>On Leave</option>
+      <option>Inactive</option>
+    </select>
 
-</section>
+    <button
+      class="rounded-xl bg-slate-100 font-semibold hover:bg-slate-200 transition">
+      Apply Filters
+    </button>
 
-<!-- ===== DOCTORS TABLE ===== -->
-<section class="bg-white rounded-xl shadow overflow-x-auto">
+  </section>
 
-<table class="w-full text-sm">
-  <thead class="bg-slate-50 text-left">
-    <tr>
-      <th class="px-4 py-3">Doctor</th>
-      <th class="px-4 py-3">Department</th>
-      <th class="px-4 py-3">Specialty</th>
-      <th class="px-4 py-3">Availability</th>
-      <th class="px-4 py-3">Status</th>
-      <th class="px-4 py-3">Actions</th>
-    </tr>
-  </thead>
+  <!-- TABLE -->
+  <section class="bg-white rounded-2xl shadow-sm overflow-hidden">
 
-  <tbody class="divide-y">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-left">
+        <tr>
+          <th class="px-6 py-4">Doctor</th>
+          <th class="px-6 py-4">Department</th>
+          <th class="px-6 py-4">Specialty</th>
+          <th class="px-6 py-4">Availability</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
 
-    <!-- ROW -->
-    <tr class="hover:bg-slate-50">
-      <td class="px-4 py-3 font-semibold flex items-center gap-3">
-        <img src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png"
-             class="w-8 h-8 rounded-full"/>
-        Dr. Rahul Mehta
-      </td>
-      <td class="px-4 py-3">Cardiology</td>
-      <td class="px-4 py-3">Heart Surgery</td>
-      <td class="px-4 py-3">Mon–Fri</td>
-      <td class="px-4 py-3">
-        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-          Active
-        </span>
-      </td>
-      <td class="px-4 py-3 flex gap-3">
-        <a href="#" class="text-[--primary] font-semibold">View</a>
-        <a href="#" class="text-yellow-600 font-semibold">Edit</a>
-        <a href="#" class="text-red-600 font-semibold">Disable</a>
-      </td>
-    </tr>
+      <tbody class="divide-y">
 
-    <!-- MORE ROWS LATER -->
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-6 py-4 font-semibold flex items-center gap-3">
+            <img
+              src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png"
+              class="w-9 h-9 rounded-full bg-slate-100 p-1"/>
+            Dr. Rahul Mehta
+          </td>
+          <td class="px-6 py-4">Cardiology</td>
+          <td class="px-6 py-4">Heart Surgery</td>
+          <td class="px-6 py-4">Mon–Fri</td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-semibold
+                         bg-green-100 text-green-700">
+              Active
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex justify-end gap-3 font-semibold">
+              <a href="#" class="text-[--primary] hover:underline">View</a>
+              <a href="#" class="text-yellow-600 hover:underline">Edit</a>
+              <a href="#" class="text-red-600 hover:underline">Disable</a>
+            </div>
+          </td>
+        </tr>
 
-  </tbody>
-</table>
+        <!-- More rows later -->
 
-</section>
+      </tbody>
+    </table>
+
+  </section>
 
 </main>
-
 </body>
 </html>
