@@ -7,63 +7,84 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-<script type="module" src="/js/layout/loadPatientNavbar.js"></script>
+
+  <!-- Navbar -->
+  <script type="module" src="/js/layout/loadPatientNavbar.js"></script>
+
   <!-- Dashboard Script -->
   <script type="module" defer src="/js/patient/dashboard.js"></script>
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen">
-
-<!-- Patient Navbar (reuse your navbar here) -->
+<body class="bg-[--bg] text-[--text] min-h-screen">
 
 <main class="max-w-6xl mx-auto px-4 py-8">
 
   <!-- HEADER -->
-  <section class="mb-6">
-    <h1 class="text-2xl font-bold">Dashboard</h1>
-    <p class="text-sm text-slate-500 mt-1">
-      Overview of your operation schedule
+  <section class="mb-8">
+    <h1 class="text-2xl font-bold">Welcome 👋</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Here’s an overview of your treatment and appointments
     </p>
   </section>
 
   <!-- STATS -->
-  <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
 
-    <div class="bg-white p-5 rounded-xl shadow">
-      <p class="text-sm text-slate-500">Total Appointments</p>
-      <p id="totalCount" class="text-2xl font-bold mt-1">–</p>
+    <div class="bg-white p-5 rounded-2xl shadow flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+        📅
+      </div>
+      <div>
+        <p class="text-sm text-[--muted]">Total Appointments</p>
+        <p id="totalCount" class="text-2xl font-bold">–</p>
+      </div>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-      <p class="text-sm text-slate-500">Upcoming</p>
-      <p id="upcomingCount" class="text-2xl font-bold text-blue-600 mt-1">–</p>
+    <div class="bg-white p-5 rounded-2xl shadow flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+        ⏳
+      </div>
+      <div>
+        <p class="text-sm text-[--muted]">Upcoming</p>
+        <p id="upcomingCount" class="text-2xl font-bold text-blue-600">–</p>
+      </div>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-      <p class="text-sm text-slate-500">Ongoing</p>
-      <p id="ongoingCount" class="text-2xl font-bold text-yellow-600 mt-1">–</p>
+    <div class="bg-white p-5 rounded-2xl shadow flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+        🩺
+      </div>
+      <div>
+        <p class="text-sm text-[--muted]">Ongoing</p>
+        <p id="ongoingCount" class="text-2xl font-bold text-yellow-600">–</p>
+      </div>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow">
-      <p class="text-sm text-slate-500">Completed</p>
-      <p id="completedCount" class="text-2xl font-bold text-green-600 mt-1">–</p>
+    <div class="bg-white p-5 rounded-2xl shadow flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+        ✅
+      </div>
+      <div>
+        <p class="text-sm text-[--muted]">Completed</p>
+        <p id="completedCount" class="text-2xl font-bold text-green-600">–</p>
+      </div>
     </div>
 
   </section>
 
   <!-- NEXT APPOINTMENT -->
-  <section class="bg-white p-6 rounded-xl shadow mb-8">
+  <section class="bg-white p-6 rounded-2xl shadow">
 
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold">Next Appointment</h2>
+      <h2 class="text-lg font-bold">Next Appointment</h2>
       <a href="/patient/my-appointments.html"
-        class="text-sm text-blue-600 font-semibold">
+         class="text-sm text-[--primary] font-semibold hover:underline">
         View All
       </a>
     </div>
 
-    <div id="nextAppointment" class="text-slate-500">
-      Loading…
+    <div id="nextAppointment">
+      <p class="text-sm text-[--muted]">Loading…</p>
     </div>
 
   </section>

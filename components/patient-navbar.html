@@ -1,38 +1,49 @@
-<header class="sticky top-0 bg-white border-b z-50">
+<!-- PATIENT NAVBAR -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b">
   <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
 
-    <!-- LOGO -->
+    <!-- BRAND -->
     <div class="flex items-center gap-2">
       <span class="font-bold text-lg text-blue-600">
         Operation Scheduler
       </span>
-      <span class="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">
+      <span
+        class="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-semibold">
         Patient
       </span>
     </div>
 
     <!-- DESKTOP NAV -->
-    <nav class="hidden md:flex gap-6 text-sm font-semibold">
-      <a href="/patient/dashboard.html" data-nav class="nav-link">Dashboard</a>
-      <a href="/patient/my-appointments.html" data-nav class="nav-link">My Appointments</a>
-      <a href="/patient/reports.html" data-nav class="nav-link">Reports</a>
-      <a href="/patient/profile.html" data-nav class="nav-link">Profile</a>
+    <nav class="hidden md:flex gap-8 text-sm font-semibold">
+      <a href="/patient/dashboard.html" data-nav class="nav-link">
+        Dashboard
+      </a>
+      <a href="/patient/my-appointments.html" data-nav class="nav-link">
+        My Appointments
+      </a>
+      <a href="/patient/reports.html" data-nav class="nav-link">
+        Reports
+      </a>
+      <a href="/patient/profile.html" data-nav class="nav-link">
+        Profile
+      </a>
     </nav>
 
-    <!-- RIGHT ACTIONS -->
+    <!-- RIGHT -->
     <div class="flex items-center gap-3">
-      <span class="hidden md:inline text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
+      <span
+        class="hidden md:inline text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
         Active
       </span>
 
       <img
         src="https://img.icons8.com/ios-filled/50/0A6CFF/user.png"
-        class="w-8 h-8 rounded-full"
+        class="w-8 h-8 rounded-full border bg-blue-50"
         alt="Patient Avatar"
       />
 
       <!-- MOBILE MENU BUTTON -->
-      <button id="menuBtn" class="md:hidden">
+      <button id="menuBtn" class="md:hidden p-1 rounded-lg hover:bg-slate-100">
         <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" stroke-width="2"
           viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -43,14 +54,24 @@
   </div>
 
   <!-- MOBILE NAV -->
-  <div id="mobileMenu" class="hidden md:hidden border-t bg-white px-4 py-3 space-y-2">
-    <a href="/patient/dashboard.html" data-nav class="block nav-link">Dashboard</a>
-    <a href="/patient/my-appointments.html" data-nav class="block nav-link">My Appointments</a>
-    <a href="/patient/reports.html" data-nav class="block nav-link">Reports</a>
-    <a href="/patient/profile.html" data-nav class="block nav-link">Profile</a>
+  <div id="mobileMenu"
+    class="hidden md:hidden border-t bg-white px-4 py-4 space-y-3 text-sm font-semibold">
 
-    <button id="logoutBtnMobile"
-      class="w-full mt-3 py-2 rounded-lg bg-red-50 text-red-600 font-semibold">
+    <a href="/patient/dashboard.html" data-nav class="block nav-link">
+      Dashboard
+    </a>
+    <a href="/patient/my-appointments.html" data-nav class="block nav-link">
+      My Appointments
+    </a>
+    <a href="/patient/reports.html" data-nav class="block nav-link">
+      Reports
+    </a>
+    <a href="/patient/profile.html" data-nav class="block nav-link">
+      Profile
+    </a>
+
+    <button
+      class="w-full mt-4 py-2 rounded-lg bg-red-50 text-red-600 font-semibold hover:bg-red-100 transition">
       Logout
     </button>
   </div>
@@ -61,6 +82,7 @@
     color: #475569;
     position: relative;
     padding-bottom: 4px;
+    transition: color 0.2s ease;
   }
 
   .nav-link:hover {
