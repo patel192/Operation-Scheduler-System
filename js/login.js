@@ -2,12 +2,10 @@
 // IMPORTS
 // ================================
 import { auth, db, googleProvider } from "./firebase.js";
-
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
 import {
   doc,
   getDoc,
@@ -16,7 +14,6 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-
 // ================================
 // ELEMENTS
 // ================================
@@ -24,12 +21,44 @@ const loginForm = document.getElementById("login-form");
 const emailInput = document.getElementById("email-input");
 const passwordInput = document.getElementById("password-input");
 const loginBtn = document.getElementById("login-btn");
-
 const googleBtn = document.getElementById("googleBtn");
 
+// ================================
+// ENSURE FIRESTORE USER
+// ================================
+async function ensureUserDoc(user) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: user.uid,
+      displayName: user.displayName || "",
+      email: user.email,
+      phone: user.phoneNumber || "",
+      profilePic: user.photoURL || "",
+      department: "",
+      role: "",
+      roles: [],
+      status: "active",
+      createdBy: user.uid,
+      metaData: {
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+      },
+    });
+    return null;
+  }
+
+  await updateDoc(ref, {
+    "metaData.lastLogin": serverTimestamp(),
+  });
+
+  return snap.data();
+}
 
 // ================================
-// NORMAL LOGIN
+// EMAIL LOGIN
 // ================================
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -47,40 +76,16 @@ loginForm.addEventListener("submit", async (e) => {
 
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
-    const user = result.user;
-
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      alert("User data not found.");
-      return;
-    }
-
-    const userData = userSnap.data();
-
-    await updateDoc(userRef, {
-      "metaData.lastLogin": serverTimestamp(),
-    });
-
-    // ROLE-BASED REDIRECTION
-    redirectUser(userData.role);
-
+    const userData = await ensureUserDoc(result.user);
+    redirectUser(userData?.role);
   } catch (err) {
-    console.error("Login Error:", err);
-    let msg = "Login failed.";
-
-    if (err.code === "auth/user-not-found") msg = "No user found.";
-    if (err.code === "auth/wrong-password") msg = "Incorrect password.";
-    if (err.code === "auth/invalid-email") msg = "Invalid email.";
-
-    alert(msg);
+    console.error(err);
+    alert("Invalid credentials.");
   } finally {
     loginBtn.disabled = false;
     loginBtn.textContent = "Login";
   }
 });
-
 
 // ================================
 // GOOGLE LOGIN
@@ -88,86 +93,35 @@ loginForm.addEventListener("submit", async (e) => {
 googleBtn.addEventListener("click", async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    const uid = user.uid;
+    const userData = await ensureUserDoc(result.user);
 
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
-
-    // ⭐ NEW GOOGLE USER → Send to register to complete steps
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        uid,
-        displayName: user.displayName,
-        email: user.email,
-        phone: user.phoneNumber || "",
-        profilePic: user.photoURL || "",
-        department: "",
-        role: "",
-        roles: [],
-        status: "active",
-        createdBy: uid,
-        metaData: {
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-        },
-      });
-
+    if (!userData?.role) {
       window.location.href = "/register.html?google=1";
       return;
     }
 
-    // ⭐ EXISTING USER → Update login time
-    await updateDoc(userRef, {
-      "metaData.lastLogin": serverTimestamp(),
-    });
-
-    const data = userSnap.data();
-
-    // ⭐ USER EXISTS BUT HAS NO ROLE → Continue registration
-    if (!data.role || data.role.trim() === "") {
-      window.location.href = "/register.html?google=1";
-      return;
-    }
-
-    // ⭐ ROLE FOUND → Redirect properly
-    redirectUser(data.role);
-    console.log("LOGIN ROLE =", `"${data.role}"`);
-
-
+    redirectUser(userData.role);
   } catch (err) {
-    console.error("Google Login Error:", err);
-    alert("Google Sign-In failed.");
+    console.error(err);
+    alert("Google Sign-in failed");
   }
 });
 
-
 // ================================
-// REDIRECT USER BY ROLE
+// REDIRECT
 // ================================
 function redirectUser(role) {
   if (!role) {
-    // User authenticated but profile incomplete
     window.location.href = "/register.html?step=role";
     return;
   }
 
-  const ROLE_ROUTES = {
+  const map = {
     Admin: "/admin/dashboard.html",
     Doctor: "/doctor/dashboard.html",
     "OT Staff": "/ot/dashboard.html",
     Patient: "/patient/dashboard.html",
   };
 
-  const target = ROLE_ROUTES[role];
-
-  if (!target) {
-    // Unknown / corrupted role
-    console.error("Unknown role:", role);
-    window.location.href = "/login.html";
-    return;
-  }
-
-  window.location.href = target;
+  window.location.href = map[role] || "/login.html";
 }
-

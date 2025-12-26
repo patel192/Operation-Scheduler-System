@@ -2,14 +2,12 @@
 // IMPORTS
 // ================================
 import { googleProvider, auth, db } from "./firebase.js";
-
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
   sendEmailVerification,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
 import {
   doc,
   setDoc,
@@ -19,25 +17,24 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // ================================
-// STEP ELEMENTS
+// ELEMENTS
 // ================================
 const step1 = document.getElementById("step1");
 const step2 = document.getElementById("step2");
 const step3 = document.getElementById("step3");
-
 const next1 = document.getElementById("next1");
 const next2 = document.getElementById("next2");
 const back2 = document.getElementById("back2");
 const back3 = document.getElementById("back3");
 const submitAccount = document.getElementById("submitAccount");
-
 const stepLabel = document.getElementById("stepLabel");
 const googleBtn = document.getElementById("googleSignUp");
 
 // ================================
-// STATE VARIABLES
+// STATE
 // ================================
-let isGoogleSignup = false;
+const isGoogleSignup =
+  new URLSearchParams(window.location.search).get("google") === "1";
 
 let userData = {
   displayName: "",
@@ -47,225 +44,143 @@ let userData = {
   department: "",
   role: "",
   roles: [],
-  profilePic: "",
-  status: "active",
-  createdBy: "self",
-  metaData: {},
 };
 
 // ================================
-// STEP 1 → STEP 2
+// STEP NAVIGATION
 // ================================
-next1.addEventListener("click", () => {
-  const displayName = document.getElementById("fullName").value.trim();
+next1.onclick = () => {
+  const name = document.getElementById("fullName").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  if (!displayName || !email || !password) {
-    alert("Please fill all fields.");
+  if (!name || !email || (!isGoogleSignup && !password)) {
+    alert("Fill all fields");
     return;
   }
 
-  userData.displayName = displayName;
-  userData.email = email;
-  userData.password = password;
-
+  Object.assign(userData, { displayName: name, email, password });
   step1.classList.add("hidden");
   step2.classList.remove("hidden");
-  stepLabel.textContent = "Step 2 of 3";
-});
+};
 
-// ================================
-// STEP 2 → STEP 3
-// ================================
-next2.addEventListener("click", () => {
+next2.onclick = () => {
   const phone = document.getElementById("phone").value.trim();
-  const department = document.getElementById("department").value;
+  const dept = document.getElementById("department").value;
 
-  if (!phone || !department) {
-    alert("Please enter phone number & department.");
+  if (!phone || !dept) {
+    alert("Fill all fields");
     return;
   }
 
-  userData.phone = phone;
-  userData.department = department;
-
+  Object.assign(userData, { phone, department: dept });
   step2.classList.add("hidden");
   step3.classList.remove("hidden");
-  stepLabel.textContent = "Step 3 of 3";
-});
+};
 
-// ================================
-// BACK BUTTONS
-// ================================
-back2.addEventListener("click", () => {
+back2.onclick = () => {
   step2.classList.add("hidden");
   step1.classList.remove("hidden");
-  stepLabel.textContent = "Step 1 of 3";
-});
+};
 
-back3.addEventListener("click", () => {
+back3.onclick = () => {
   step3.classList.add("hidden");
   step2.classList.remove("hidden");
-  stepLabel.textContent = "Step 2 of 3";
-});
+};
 
 // ================================
 // ROLE SELECTION
 // ================================
-const roleCards = document.querySelectorAll(".roleCard");
-let selectedRole = null;
-
-roleCards.forEach((card) => {
-  card.addEventListener("click", () => {
-    roleCards.forEach((c) =>
-      c.classList.remove("border-blue-500", "bg-blue-100")
-    );
+document.querySelectorAll(".roleCard").forEach((card) => {
+  card.onclick = () => {
+    document
+      .querySelectorAll(".roleCard")
+      .forEach((c) => c.classList.remove("border-blue-500", "bg-blue-100"));
 
     card.classList.add("border-blue-500", "bg-blue-100");
-
-    selectedRole = card.dataset.role;
-
-    userData.role = selectedRole;
-    userData.roles = [selectedRole];
-
-    console.log("Selected Role:", selectedRole);
-  });
+    userData.role = card.dataset.role;
+    userData.roles = [userData.role];
+  };
 });
 
 // ================================
-// FINAL SUBMISSION (NORMAL + GOOGLE)
+// SUBMIT
 // ================================
-submitAccount.addEventListener("click", async () => {
-  if (!selectedRole) {
-    alert("Please select a role.");
+submitAccount.onclick = async () => {
+  if (!userData.role) {
+    alert("Select role");
     return;
   }
 
   try {
-    let uid;
-
+    // GOOGLE USER → ONLY UPDATE FIRESTORE
     if (isGoogleSignup) {
       const user = auth.currentUser;
-      uid = user.uid;
 
-      const saveUser = {
-        uid,
-        displayName: user.displayName,
-        email: user.email,
-        phone: userData.phone || "",
-        department: userData.department || "",
+      await updateDoc(doc(db, "users", user.uid), {
+        phone: userData.phone,
+        department: userData.department,
         role: userData.role,
         roles: [userData.role],
-        profilePic: user.photoURL || "",
-        status: "active",
-        createdBy: uid,
-        emailVerified: true,   // GOOGLE is already verified
-        metaData: {
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-        },
-      };
+        "metaData.lastLogin": serverTimestamp(),
+      });
 
-      await setDoc(doc(db, "users", uid), saveUser);
-
-      window.location.href = "login.html";
+      window.location.href = "/login.html";
       return;
     }
 
-    const userCredential = await createUserWithEmailAndPassword(
+    // EMAIL USER → CREATE AUTH + FIRESTORE
+    const cred = await createUserWithEmailAndPassword(
       auth,
       userData.email,
       userData.password
     );
 
-    uid = userCredential.user.uid;
-
-    await updateProfile(userCredential.user, {
+    await updateProfile(cred.user, {
       displayName: userData.displayName,
     });
 
-    //  SEND EMAIL VERIFICATION
-    await sendEmailVerification(userCredential.user);
+    await sendEmailVerification(cred.user);
 
-    const saveUser = {
-      uid,
+    await setDoc(doc(db, "users", cred.user.uid), {
+      uid: cred.user.uid,
       displayName: userData.displayName,
       email: userData.email,
       phone: userData.phone,
       department: userData.department,
       role: userData.role,
       roles: [userData.role],
-      profilePic: "",
       status: "active",
-      createdBy: uid,
-      emailVerified: false, // user must verify
+      emailVerified: false,
       metaData: {
         createdAt: serverTimestamp(),
         lastLogin: serverTimestamp(),
       },
-    };
+    });
 
-    await setDoc(doc(db, "users", uid), saveUser);
-
-    // 🔵 REDIRECT TO VERIFY EMAIL PAGE
-    window.location.href = "verify-email.html";
-
+    window.location.href = "/verify-email.html";
   } catch (err) {
     console.error(err);
     alert(err.message);
   }
-});
+};
 
 // ================================
-// GOOGLE SIGN-UP
+// GOOGLE SIGNUP BUTTON
 // ================================
-googleBtn.addEventListener("click", async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
+googleBtn.onclick = async () => {
+  const result = await signInWithPopup(auth, googleProvider);
+  const ref = doc(db, "users", result.user.uid);
+  const snap = await getDoc(ref);
 
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    // NEW GOOGLE USER → move to Step 3
-    if (!userSnap.exists()) {
-      isGoogleSignup = true;
-
-      userData.displayName = user.displayName;
-      userData.email = user.email;
-      userData.profilePic = user.photoURL || "";
-
-      step1.classList.add("hidden");
-      step2.classList.add("hidden");
-      step3.classList.remove("hidden");
-      stepLabel.textContent = "Step 3 of 3";
-
-      return;
-    }
-
-    // EXISTING GOOGLE USER
-    await updateDoc(userRef, {
-      "metaData.lastLogin": serverTimestamp(),
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: result.user.uid,
+      email: result.user.email,
+      role: "",
+      metaData: { createdAt: serverTimestamp() },
     });
-
-    const data = userSnap.data();
-
-    if (!data.role) {
-      step1.classList.add("hidden");
-      step2.classList.add("hidden");
-      step3.classList.remove("hidden");
-      stepLabel.textContent = "Step 3 of 3";
-      return;
-    }
-
-    if (data.role === "Admin") {
-      window.location.href = "/admin/dashboard.html";
-    } else {
-      window.location.href = "/user/dashboard.html";
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Google SignUp Failed. Try Again.");
   }
-});
+
+  window.location.href = "/register.html?google=1";
+};
