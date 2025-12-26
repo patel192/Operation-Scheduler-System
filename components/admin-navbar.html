@@ -4,8 +4,7 @@
 
       <!-- Brand -->
       <div class="flex items-center gap-3">
-        <div
-          class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600
                  text-white flex items-center justify-center font-bold shadow">
           OS
         </div>
@@ -22,42 +21,74 @@
 
       <!-- Desktop Nav -->
       <div class="hidden md:flex items-center gap-7 text-sm font-medium">
+
         <a data-nav href="/admin/dashboard.html" class="nav-pill">Dashboard</a>
         <a data-nav href="/admin/schedule-board.html" class="nav-pill">Schedules</a>
         <a data-nav href="/admin/departments.html" class="nav-pill">Departments</a>
         <a data-nav href="/admin/doctors.html" class="nav-pill">Doctors</a>
         <a data-nav href="/admin/ot-rooms.html" class="nav-pill">OT Rooms</a>
         <a data-nav href="/admin/resources.html" class="nav-pill">Resources</a>
-        <a data-nav href="/admin/users.html" class="nav-pill">Users</a>
+
+        <!-- USERS MENU -->
+        <div class="relative group">
+
+          <!-- Trigger -->
+          <div class="nav-pill cursor-pointer select-none">
+            Users
+          </div>
+
+          <!-- Dropdown -->
+          <div class="absolute left-0 top-full mt-2 w-52
+           bg-white rounded-xl shadow-lg
+           border border-slate-200
+           opacity-0 invisible
+           group-hover:opacity-100 group-hover:visible
+           transition-all duration-150
+           z-50">
+
+            <a href="/admin/users.html" class="block px-4 py-2 text-sm hover:bg-slate-50 rounded-t-xl">
+              All Users
+            </a>
+
+            <a href="/admin/approvals.html"
+              class="flex items-center justify-between px-4 py-2 text-sm hover:bg-slate-50 rounded-b-xl">
+
+              Pending Approvals
+
+              <span class="ml-2 text-xs px-2 py-0.5 rounded-full
+               bg-red-100 text-red-700 font-semibold">
+                New
+              </span>
+            </a>
+          </div>
+        </div>
+
+
       </div>
 
       <!-- Right -->
       <div class="hidden md:flex items-center gap-3">
-        <span
-          class="text-xs px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-semibold">
+        <span class="text-xs px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-semibold">
           Admin
         </span>
 
-        <button
-          id="logoutBtn"
-          class="text-sm px-4 py-2 rounded-lg bg-red-500/90 text-white
+        <button id="logoutBtn" class="text-sm px-4 py-2 rounded-lg bg-red-500/90 text-white
                  hover:bg-red-600 transition">
           Logout
         </button>
       </div>
 
       <!-- Mobile -->
-      <button id="menuBtn"
-        class="md:hidden text-slate-700 text-2xl focus:outline-none">
+      <button id="menuBtn" class="md:hidden text-slate-700 text-2xl focus:outline-none">
         ☰
       </button>
     </div>
   </div>
 
   <!-- Mobile Menu -->
-  <div id="mobileMenu"
-    class="hidden md:hidden bg-white border-t shadow-sm">
+  <div id="mobileMenu" class="hidden md:hidden bg-white border-t shadow-sm">
     <div class="px-4 py-4 space-y-5 text-sm">
+
       <a href="/admin/dashboard.html" class="mobile-pill">Dashboard</a>
       <a href="/admin/schedule-board.html" class="mobile-pill">Schedules</a>
       <a href="/admin/departments.html" class="mobile-pill">Departments</a>
@@ -65,9 +96,18 @@
       <a href="/admin/ot-rooms.html" class="mobile-pill">OT Rooms</a>
       <a href="/admin/resources.html" class="mobile-pill">Resources</a>
 
-      <button
-        id="logoutBtnMobile"
-        class="w-full mt-4 py-2 rounded-lg bg-red-500 text-white">
+      <!-- 🔴 USERS -->
+      <a href="/admin/users.html" class="mobile-pill">Users</a>
+
+      <a href="/admin/approvals.html" class="mobile-pill flex items-center justify-between">
+        Pending Approvals
+        <span class="text-xs px-2 py-0.5 rounded-full
+                 bg-red-100 text-red-700 font-semibold">
+          New
+        </span>
+      </a>
+
+      <button id="logoutBtnMobile" class="w-full mt-4 py-2 rounded-lg bg-red-500 text-white">
         Logout
       </button>
     </div>
