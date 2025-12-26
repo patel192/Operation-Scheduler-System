@@ -25,13 +25,13 @@ const loginBtn = document.getElementById("login-btn");
 const googleBtn = document.getElementById("googleBtn");
 
 // ================================
-// ENSURE FIRESTORE USER
+// ENSURE FIRESTORE USER DOC
 // ================================
 async function ensureUserDoc(user) {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
-  // 🆕 AUTO-CREATE USER DOC IF MISSING
+  // 🆕 FIRST LOGIN → CREATE USER DOC (PENDING)
   if (!snap.exists()) {
     await setDoc(ref, {
       uid: user.uid,
@@ -42,23 +42,32 @@ async function ensureUserDoc(user) {
       department: "",
       role: "",
       roles: [],
-      status: "active",
+      status: "pending",        // 🔴 pending by default
+      approved: false,          // 🔴 admin must approve
       createdBy: user.uid,
       metaData: {
         createdAt: serverTimestamp(),
         lastLogin: serverTimestamp(),
       },
     });
-    return null;
+
+    return "__PENDING__";
   }
 
   const data = snap.data();
 
-  // 🚫 BLOCK DISABLED USERS
+  // 🚫 DISABLED USER
   if (data.status === "disabled") {
     await signOut(auth);
     alert("Your account has been disabled by admin.");
     return "__BLOCKED__";
+  }
+
+  // ⏳ NOT APPROVED YET
+  if (data.approved === false || data.status === "pending") {
+    await signOut(auth);
+    alert("Your account is awaiting admin approval.");
+    return "__PENDING__";
   }
 
   // ✅ UPDATE LAST LOGIN
@@ -70,7 +79,7 @@ async function ensureUserDoc(user) {
 }
 
 // ================================
-// EMAIL LOGIN
+// EMAIL + PASSWORD LOGIN
 // ================================
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -90,10 +99,13 @@ loginForm.addEventListener("submit", async (e) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const userData = await ensureUserDoc(result.user);
 
-    // 🚫 BLOCKED USER
-    if (userData === "__BLOCKED__") return;
+    if (
+      userData === "__BLOCKED__" ||
+      userData === "__PENDING__"
+    ) return;
 
-    redirectUser(userData?.role);
+    redirectUser(userData.role);
+
   } catch (err) {
     console.error("Login Error:", err);
     alert("Invalid email or password.");
@@ -111,8 +123,10 @@ googleBtn.addEventListener("click", async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const userData = await ensureUserDoc(result.user);
 
-    // 🚫 BLOCKED USER
-    if (userData === "__BLOCKED__") return;
+    if (
+      userData === "__BLOCKED__" ||
+      userData === "__PENDING__"
+    ) return;
 
     if (!userData?.role) {
       window.location.href = "/register.html?google=1";
@@ -120,6 +134,7 @@ googleBtn.addEventListener("click", async () => {
     }
 
     redirectUser(userData.role);
+
   } catch (err) {
     console.error("Google Login Error:", err);
     alert("Google Sign-In failed.");
@@ -127,7 +142,7 @@ googleBtn.addEventListener("click", async () => {
 });
 
 // ================================
-// REDIRECT USER BY ROLE
+// ROLE REDIRECT
 // ================================
 function redirectUser(role) {
   if (!role) {
@@ -142,6 +157,5 @@ function redirectUser(role) {
     Patient: "/patient/dashboard.html",
   };
 
-  const target = ROLE_ROUTES[role];
-  window.location.href = target || "/login.html";
+  window.location.href = ROLE_ROUTES[role] || "/login.html";
 }

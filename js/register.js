@@ -150,7 +150,8 @@ submitAccount.onclick = async () => {
       department: userData.department,
       role: userData.role,
       roles: [userData.role],
-      status: "active",
+      status: "pending",
+      approved:false,
       emailVerified: false,
       metaData: {
         createdAt: serverTimestamp(),
