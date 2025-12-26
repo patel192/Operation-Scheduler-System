@@ -29,7 +29,7 @@ async function loadUsers() {
     return;
   }
 
-  allUsers = snap.docs.map(d => ({
+  allUsers = snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),
   }));
@@ -46,13 +46,16 @@ function renderUsers(users) {
     return;
   }
 
-  users.forEach(u => {
+  users.forEach((u) => {
+    const isSelf = auth.currentUser?.uid === u.id;
+
     const tr = document.createElement("tr");
     tr.className = "hover:bg-slate-50";
 
     tr.innerHTML = `
       <td class="px-4 py-3 font-semibold">
         ${u.displayName || "—"}
+        ${isSelf ? `<span class="text-xs text-blue-600 ml-1">(You)</span>` : ""}
       </td>
 
       <td class="px-4 py-3">
@@ -62,7 +65,8 @@ function renderUsers(users) {
       <td class="px-4 py-3">
         <select
           data-id="${u.id}"
-          class="roleSelect border rounded px-2 py-1 text-xs">
+          class="roleSelect border rounded px-2 py-1 text-xs"
+          ${isSelf ? "disabled" : ""}>
           ${renderRoleOptions(u.role)}
         </select>
       </td>
@@ -70,16 +74,22 @@ function renderUsers(users) {
       <td class="px-4 py-3">
         <select
           data-id="${u.id}"
-          class="statusSelect border rounded px-2 py-1 text-xs">
-          <option value="active" ${u.status === "active" ? "selected" : ""}>Active</option>
-          <option value="disabled" ${u.status === "disabled" ? "selected" : ""}>Disabled</option>
+          class="statusSelect border rounded px-2 py-1 text-xs"
+          ${isSelf ? "disabled" : ""}>
+          <option value="active" ${u.status === "active" ? "selected" : ""}>
+            Active
+          </option>
+          <option value="disabled" ${u.status === "disabled" ? "selected" : ""}>
+            Disabled
+          </option>
         </select>
       </td>
 
       <td class="px-4 py-3 text-right">
         <button
           data-id="${u.id}"
-          class="saveBtn text-sm font-semibold text-[--primary] hover:underline">
+          class="saveBtn text-sm font-semibold text-[--primary] hover:underline opacity-50 cursor-not-allowed"
+          disabled>
           Save
         </button>
       </td>
@@ -95,28 +105,49 @@ function renderUsers(users) {
 function renderRoleOptions(current) {
   const roles = ["Admin", "Doctor", "OT Staff", "Patient"];
   return roles
-    .map(r =>
-      `<option ${r === current ? "selected" : ""}>${r}</option>`
-    )
+    .map((r) => `<option ${r === current ? "selected" : ""}>${r}</option>`)
     .join("");
 }
 
 /* ================= EVENTS ================= */
 function attachEvents() {
-  document.querySelectorAll(".saveBtn").forEach(btn => {
-    btn.onclick = async () => {
-      const id = btn.dataset.id;
+  document.querySelectorAll("tr").forEach((row) => {
+    const roleSelect = row.querySelector(".roleSelect");
+    const statusSelect = row.querySelector(".statusSelect");
+    const saveBtn = row.querySelector(".saveBtn");
 
-      const role = document.querySelector(`.roleSelect[data-id="${id}"]`).value;
-      const status = document.querySelector(`.statusSelect[data-id="${id}"]`).value;
+    if (!roleSelect || !statusSelect || !saveBtn) return;
+
+    const enableSave = () => {
+      saveBtn.disabled = false;
+      saveBtn.classList.remove("opacity-50", "cursor-not-allowed");
+    };
+
+    roleSelect.addEventListener("change", enableSave);
+    statusSelect.addEventListener("change", enableSave);
+
+    saveBtn.addEventListener("click", async () => {
+      const id = saveBtn.dataset.id;
+      const role = roleSelect.value;
+      const status = statusSelect.value;
 
       await updateDoc(doc(db, "users", id), {
         role,
         status,
       });
 
-      alert("User updated");
-    };
+      // ✅ update local cache
+      const user = allUsers.find((u) => u.id === id);
+      if (user) {
+        user.role = role;
+        user.status = status;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.classList.add("opacity-50", "cursor-not-allowed");
+
+      alert("User updated successfully");
+    });
   });
 }
 
@@ -129,18 +160,19 @@ function applyFilters() {
   const status = statusFilter.value;
 
   if (q) {
-    filtered = filtered.filter(u =>
-      (u.displayName || "").toLowerCase().includes(q) ||
-      (u.email || "").toLowerCase().includes(q)
+    filtered = filtered.filter(
+      (u) =>
+        (u.displayName || "").toLowerCase().includes(q) ||
+        (u.email || "").toLowerCase().includes(q)
     );
   }
 
   if (role) {
-    filtered = filtered.filter(u => u.role === role);
+    filtered = filtered.filter((u) => u.role === role);
   }
 
   if (status) {
-    filtered = filtered.filter(u => u.status === status);
+    filtered = filtered.filter((u) => u.status === status);
   }
 
   renderUsers(filtered);
@@ -151,7 +183,7 @@ roleFilter.addEventListener("change", applyFilters);
 statusFilter.addEventListener("change", applyFilters);
 
 /* ================= INIT ================= */
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged((user) => {
   if (!user) return;
   loadUsers();
 });

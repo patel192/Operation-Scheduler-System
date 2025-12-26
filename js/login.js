@@ -5,6 +5,7 @@ import { auth, db, googleProvider } from "./firebase.js";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {
   doc,
@@ -30,6 +31,7 @@ async function ensureUserDoc(user) {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
+  // 🆕 AUTO-CREATE USER DOC IF MISSING
   if (!snap.exists()) {
     await setDoc(ref, {
       uid: user.uid,
@@ -50,11 +52,21 @@ async function ensureUserDoc(user) {
     return null;
   }
 
+  const data = snap.data();
+
+  // 🚫 BLOCK DISABLED USERS
+  if (data.status === "disabled") {
+    await signOut(auth);
+    alert("Your account has been disabled by admin.");
+    return "__BLOCKED__";
+  }
+
+  // ✅ UPDATE LAST LOGIN
   await updateDoc(ref, {
     "metaData.lastLogin": serverTimestamp(),
   });
 
-  return snap.data();
+  return data;
 }
 
 // ================================
@@ -77,10 +89,14 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const userData = await ensureUserDoc(result.user);
+
+    // 🚫 BLOCKED USER
+    if (userData === "__BLOCKED__") return;
+
     redirectUser(userData?.role);
   } catch (err) {
-    console.error(err);
-    alert("Invalid credentials.");
+    console.error("Login Error:", err);
+    alert("Invalid email or password.");
   } finally {
     loginBtn.disabled = false;
     loginBtn.textContent = "Login";
@@ -95,6 +111,9 @@ googleBtn.addEventListener("click", async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const userData = await ensureUserDoc(result.user);
 
+    // 🚫 BLOCKED USER
+    if (userData === "__BLOCKED__") return;
+
     if (!userData?.role) {
       window.location.href = "/register.html?google=1";
       return;
@@ -102,13 +121,13 @@ googleBtn.addEventListener("click", async () => {
 
     redirectUser(userData.role);
   } catch (err) {
-    console.error(err);
-    alert("Google Sign-in failed");
+    console.error("Google Login Error:", err);
+    alert("Google Sign-In failed.");
   }
 });
 
 // ================================
-// REDIRECT
+// REDIRECT USER BY ROLE
 // ================================
 function redirectUser(role) {
   if (!role) {
@@ -116,12 +135,13 @@ function redirectUser(role) {
     return;
   }
 
-  const map = {
+  const ROLE_ROUTES = {
     Admin: "/admin/dashboard.html",
     Doctor: "/doctor/dashboard.html",
     "OT Staff": "/ot/dashboard.html",
     Patient: "/patient/dashboard.html",
   };
 
-  window.location.href = map[role] || "/login.html";
+  const target = ROLE_ROUTES[role];
+  window.location.href = target || "/login.html";
 }
