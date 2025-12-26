@@ -42,8 +42,8 @@ async function ensureUserDoc(user) {
       department: "",
       role: "",
       roles: [],
-      status: "pending",        // 🔴 pending by default
-      approved: false,          // 🔴 admin must approve
+      status: "pending",
+      approved: false,
       createdBy: user.uid,
       metaData: {
         createdAt: serverTimestamp(),
@@ -63,9 +63,8 @@ async function ensureUserDoc(user) {
     return "__BLOCKED__";
   }
 
-  // ⏳ NOT APPROVED YET
-  if (data.approved === false || data.status === "pending") {
-    await signOut(auth);
+  // ⏳ NOT APPROVED YET → DO NOT SIGN OUT
+  if (data.approved !== true || data.status === "pending") {
     alert("Your account is awaiting admin approval.");
     return "__PENDING__";
   }
@@ -99,10 +98,13 @@ loginForm.addEventListener("submit", async (e) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const userData = await ensureUserDoc(result.user);
 
-    if (
-      userData === "__BLOCKED__" ||
-      userData === "__PENDING__"
-    ) return;
+    if (userData === "__BLOCKED__") return;
+
+    // ⏳ PENDING → SEND TO WAITING PAGE
+    if (userData === "__PENDING__") {
+      window.location.replace("/pending-approval.html");
+      return;
+    }
 
     redirectUser(userData.role);
 
@@ -123,10 +125,12 @@ googleBtn.addEventListener("click", async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const userData = await ensureUserDoc(result.user);
 
-    if (
-      userData === "__BLOCKED__" ||
-      userData === "__PENDING__"
-    ) return;
+    if (userData === "__BLOCKED__") return;
+
+    if (userData === "__PENDING__") {
+      window.location.replace("/pending-approval.html");
+      return;
+    }
 
     if (!userData?.role) {
       window.location.href = "/register.html?google=1";

@@ -20,7 +20,7 @@ console.log("✅ AUTH GUARD LOADED");
 
 /* ================= AUTH GUARD ================= */
 onAuthStateChanged(auth, async (user) => {
-  // 🚫 NOT LOGGED IN
+  /* 🚫 NOT LOGGED IN */
   if (!user) {
     window.location.href = "/login.html";
     return;
@@ -29,16 +29,17 @@ onAuthStateChanged(auth, async (user) => {
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
 
-  // 🚫 USER DOC MISSING
+  /* 🚫 USER DOC MISSING */
   if (!snap.exists()) {
     window.location.href = "/register.html?step=profile";
     return;
   }
 
   const data = snap.data();
-  const { role, status } = data;
+  const { role, status, approved } = data;
+  const currentPath = window.location.pathname;
 
-  // 🚫 BLOCK DISABLED USERS
+  /* 🚫 BLOCK DISABLED USERS */
   if (status === "disabled") {
     await signOut(auth);
     alert("Your account has been disabled by admin.");
@@ -46,20 +47,28 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // 🚫 ROLE NOT SET
+  /* ⏳ USER NOT APPROVED YET */
+  if (approved === false) {
+    // Allow only pending-approval page
+    if (!currentPath.includes("pending-approval.html")) {
+      window.location.href = "/pending-approval.html";
+    }
+    return;
+  }
+
+  /* 🚫 ROLE NOT SET */
   if (!role || !ROLE_ROUTES[role]) {
     window.location.href = "/register.html?step=role";
     return;
   }
 
   const allowedBasePath = ROLE_ROUTES[role];
-  const currentPath = window.location.pathname;
 
-  // ✅ ALLOW ACCESS INSIDE ROLE FOLDER
+  /* ✅ ALLOW ACCESS INSIDE ROLE FOLDER */
   if (currentPath.startsWith(allowedBasePath)) {
     return;
   }
 
-  // 🚫 PREVENT CROSS-ROLE ACCESS
+  /* 🚫 PREVENT CROSS-ROLE ACCESS */
   window.location.href = `${allowedBasePath}dashboard.html`;
 });
