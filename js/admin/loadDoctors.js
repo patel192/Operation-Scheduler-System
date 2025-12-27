@@ -8,19 +8,33 @@ import {
 
 export async function loadDoctors(selectEl) {
   selectEl.innerHTML = `<option value="">Select Surgeon</option>`;
+  selectEl.disabled = true;
 
   const q = query(
     collection(db, "users"),
-    where("role", "==", "Doctor")
+    where("role", "==", "Doctor"),
+    where("approved", "==", true),
+    where("status", "==", "active"),
+    where("availability", "==", "available")
   );
 
   const snapshot = await getDocs(q);
 
-  snapshot.forEach(doc => {
-    const d = doc.data();
+  if (snapshot.empty) {
     const opt = document.createElement("option");
-    opt.value = doc.id;
-    opt.textContent = d.displayName || d.name;
+    opt.disabled = true;
+    opt.textContent = "No available doctors";
+    selectEl.appendChild(opt);
+    return;
+  }
+
+  snapshot.forEach((docSnap) => {
+    const d = docSnap.data();
+    const opt = document.createElement("option");
+    opt.value = docSnap.id;
+    opt.textContent = d.displayName || d.name || "Unnamed Doctor";
     selectEl.appendChild(opt);
   });
+
+  selectEl.disabled = false;
 }
