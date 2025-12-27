@@ -4,6 +4,8 @@ import {
   addDoc,
   Timestamp,
   serverTimestamp,
+  updateDoc,
+  doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { loadOtStaff } from "./loadOtStaff.js";
@@ -87,7 +89,7 @@ next2.onclick = () => {
   showStep(2);
 };
 
-/* ================= STEP 3 (GENERATE ID HERE) ================= */
+/* ================= STEP 3 ================= */
 const [back3, next3] = steps[2].querySelectorAll("button");
 back3.onclick = () => showStep(1);
 
@@ -101,10 +103,8 @@ next3.onclick = () => {
   scheduleDraft.surgeonName =
     surgeonSelect.options[surgeonSelect.selectedIndex].textContent;
 
-  // ✅ GUARANTEE PATIENT ID EXISTS BEFORE REVIEW
   if (!scheduleDraft.patientId) {
     scheduleDraft.patientId = generatePatientId();
-    console.log("Generated Patient ID:", scheduleDraft.patientId);
   }
 
   steps[3].querySelector(".bg-slate-100").innerHTML = `
@@ -133,6 +133,7 @@ confirm.onclick = async () => {
       return;
     }
 
+    /* ✅ CREATE SCHEDULE */
     await addDoc(collection(db, "schedules"), {
       ...scheduleDraft,
       startTime: Timestamp.fromDate(start),
@@ -141,6 +142,18 @@ confirm.onclick = async () => {
       createdBy: auth.currentUser.uid,
       createdAt: serverTimestamp(),
     });
+
+    /* 🔒 MARK DOCTOR AS BUSY */
+    await updateDoc(doc(db, "users", scheduleDraft.surgeonId), {
+      availability: "busy",
+    });
+
+    /* 🔒 MARK OT STAFF AS BUSY */
+    for (const staffId of scheduleDraft.otStaffIds) {
+      await updateDoc(doc(db, "users", staffId), {
+        availability: "busy",
+      });
+    }
 
     alert("Schedule created successfully");
     window.location.href = "/admin/schedule-board.html";

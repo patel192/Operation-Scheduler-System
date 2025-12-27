@@ -146,6 +146,7 @@ function renderExtraControls(u) {
         data-id="${u.id}">
         <option value="available" ${u.availability === "available" ? "selected" : ""}>Available</option>
         <option value="on-leave" ${u.availability === "on-leave" ? "selected" : ""}>On Leave</option>
+        <option value="busy" ${u.availability === "busy" ? "selected" : ""}>Busy</option>
       </select>
     `;
   }
