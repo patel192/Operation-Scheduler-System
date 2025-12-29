@@ -2,72 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin • Pending Approvals</title>
+  <title>Admin · Pending Approvals</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+      --radius:18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+
+    .action-btn {
+      padding: 6px 14px;
+      font-size: .75rem;
+      font-weight: 600;
+      border-radius: 999px;
+      transition: all .15s ease;
+    }
+
+    .approve {
+      background: #DCFCE7;
+      color: #166534;
+    }
+
+    .approve:hover {
+      background: #BBF7D0;
+    }
+
+    .reject {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    .reject:hover {
+      background: #FECACA;
     }
   </style>
 
-  <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
-
-  <!-- Page Logic (next step) -->
   <script type="module" defer src="/js/admin/approvals.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-8">
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-8">
 
-  <!-- HEADER -->
-  <section class="mb-6">
-    <h1 class="text-2xl font-bold">Pending User Approvals</h1>
+  <!-- ===== HEADER ===== -->
+  <section class="card p-6">
+    <h1 class="text-3xl font-bold">Pending User Approvals</h1>
     <p class="text-sm text-[--muted] mt-1">
       Review and approve newly registered users
     </p>
   </section>
 
-  <!-- INFO BANNER -->
-  <section class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+  <!-- ===== INFO BANNER ===== -->
+  <section class="card bg-yellow-50 border-yellow-200 p-4">
     <p class="text-sm text-yellow-800">
-      Users listed here cannot access the system until approved by an admin.
+      Users listed here cannot access the system until approved by an administrator.
     </p>
   </section>
 
-  <!-- TABLE -->
-  <section class="bg-white rounded-xl shadow overflow-x-auto">
+  <!-- ===== TABLE ===== -->
+  <section class="card overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
+      <h2 class="font-semibold text-lg">Approval Queue</h2>
+      <span class="text-sm text-[--muted]">Awaiting action</span>
+    </div>
+
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 border-b">
+      <thead class="bg-slate-50 text-left text-[--muted]">
         <tr>
-          <th class="px-4 py-3 text-left">User</th>
-          <th class="px-4 py-3 text-left">Email</th>
-          <th class="px-4 py-3 text-left">Requested Role</th>
-          <th class="px-4 py-3 text-right">Actions</th>
+          <th class="px-6 py-4 font-semibold">User</th>
+          <th class="px-6 py-4 font-semibold">Email</th>
+          <th class="px-6 py-4 font-semibold">Requested Role</th>
+          <th class="px-6 py-4 font-semibold text-right">Actions</th>
         </tr>
       </thead>
 
       <tbody id="pendingUsersTable" class="divide-y">
-        <!-- JS will inject rows -->
+        <!-- JS injects rows -->
       </tbody>
     </table>
+
   </section>
 
   <!-- EMPTY STATE -->
   <div
     id="emptyState"
-    class="hidden text-center py-10 text-[--muted]"
+    class="hidden card text-center py-14 text-[--muted]"
   >
-    No pending approval requests 🎉
+    🎉 No pending approval requests
   </div>
 
 </main>

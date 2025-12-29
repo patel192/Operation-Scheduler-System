@@ -2,22 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin • User Management</title>
+  <title>Admin · User Management</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+      --radius:18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+
+    .filter-input {
+      border-radius: 14px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      font-size: .875rem;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(10,108,255,.15);
+    }
+
+    .action-link {
+      font-weight: 600;
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
     }
   </style>
 
-  <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/users.js"></script>
@@ -25,69 +54,74 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-8">
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <!-- HEADER -->
-  <section class="mb-6">
-    <h1 class="text-2xl font-bold">User Management</h1>
+  <!-- ===== HERO HEADER ===== -->
+  <section class="card p-6">
+    <h1 class="text-3xl font-bold">User Management</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Manage doctors, OT staff, patients, and admins
+      Control access, roles, and operational permissions
     </p>
   </section>
 
-  <!-- FILTERS -->
-  <section class="bg-white p-4 rounded-xl shadow mb-6">
-    <div class="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+  <!-- ===== FILTER BAR ===== -->
+  <section class="card p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
 
-      <input
-        id="searchInput"
-        type="text"
-        placeholder="Search by name or email"
-        class="border rounded-lg px-4 py-2 text-sm w-full md:w-64"
-      />
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Search by name or email"
+      class="filter-input w-full md:w-72"
+    />
 
-      <div class="flex gap-3">
-        <select id="roleFilter" class="border rounded-lg px-3 py-2 text-sm">
-          <option value="">All Roles</option>
-          <option>Admin</option>
-          <option>Doctor</option>
-          <option>OT Staff</option>
-          <option>Patient</option>
-        </select>
+    <div class="flex gap-3">
+      <select id="roleFilter" class="filter-input bg-white">
+        <option value="">All Roles</option>
+        <option>Admin</option>
+        <option>Doctor</option>
+        <option>OT Staff</option>
+        <option>Patient</option>
+      </select>
 
-        <select id="statusFilter" class="border rounded-lg px-3 py-2 text-sm">
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="disabled">Disabled</option>
-        </select>
-      </div>
-
+      <select id="statusFilter" class="filter-input bg-white">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="disabled">Disabled</option>
+      </select>
     </div>
+
   </section>
 
-  <!-- USERS TABLE -->
-  <section class="bg-white rounded-xl shadow overflow-x-auto">
+  <!-- ===== USERS TABLE ===== -->
+  <section class="card overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
+      <h2 class="font-semibold text-lg">Users Directory</h2>
+      <span class="text-sm text-[--muted]">Administrative access</span>
+    </div>
+
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 border-b">
+      <thead class="bg-slate-50 text-left text-[--muted]">
         <tr>
-          <th class="px-4 py-3 text-left">User</th>
-          <th class="px-4 py-3 text-left">Email</th>
-          <th class="px-4 py-3 text-left">Role</th>
-          <th class="px-4 py-3 text-left">Status</th>
-          <th class="px-4 py-3 text-left">Extra</th>
-          <th class="px-4 py-3 text-right">Action</th>
+          <th class="px-6 py-4 font-semibold">User</th>
+          <th class="px-6 py-4 font-semibold">Email</th>
+          <th class="px-6 py-4 font-semibold">Role</th>
+          <th class="px-6 py-4 font-semibold">Status</th>
+          <th class="px-6 py-4 font-semibold">Extra</th>
+          <th class="px-6 py-4 font-semibold text-right">Actions</th>
         </tr>
       </thead>
 
       <tbody id="usersTable" class="divide-y">
-        <!-- JS injects rows -->
+        <!-- injected by JS -->
       </tbody>
     </table>
+
   </section>
 
   <!-- EMPTY STATE -->
   <div id="emptyState"
-    class="hidden text-center py-10 text-[--muted]">
+    class="hidden card text-center py-12 text-[--muted]">
     No users found.
   </div>
 

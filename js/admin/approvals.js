@@ -1,6 +1,3 @@
-// ================================
-// IMPORTS
-// ================================
 import { auth, db } from "../firebase.js";
 import {
   collection,
@@ -11,15 +8,11 @@ import {
   where,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-// ================================
-// ELEMENTS
-// ================================
+/* ELEMENTS */
 const tableBody = document.getElementById("pendingUsersTable");
 const emptyState = document.getElementById("emptyState");
 
-// ================================
-// LOAD PENDING USERS
-// ================================
+/* LOAD */
 async function loadPendingUsers() {
   tableBody.innerHTML = "";
   emptyState.classList.add("hidden");
@@ -38,40 +31,37 @@ async function loadPendingUsers() {
   }
 
   snap.forEach((docSnap) => {
-    const u = { id: docSnap.id, ...docSnap.data() };
-    renderRow(u);
+    renderRow({ id: docSnap.id, ...docSnap.data() });
   });
 }
 
-// ================================
-// RENDER ROW
-// ================================
+/* RENDER ROW */
 function renderRow(u) {
   const tr = document.createElement("tr");
-  tr.className = "hover:bg-slate-50";
+  tr.className = "hover:bg-slate-50 transition";
 
   tr.innerHTML = `
-    <td class="px-4 py-3 font-semibold">
+    <td class="px-6 py-4 font-semibold">
       ${u.displayName || "—"}
     </td>
 
-    <td class="px-4 py-3">
+    <td class="px-6 py-4">
       ${u.email || "—"}
     </td>
 
-    <td class="px-4 py-3">
+    <td class="px-6 py-4">
       ${u.role || "Not selected"}
     </td>
 
-    <td class="px-4 py-3 text-right space-x-2">
+    <td class="px-6 py-4 text-right space-x-3">
       <button
-        class="approveBtn px-3 py-1 text-xs font-semibold rounded bg-green-100 text-green-700 hover:bg-green-200"
+        class="approve action-btn approve"
         data-id="${u.id}">
         Approve
       </button>
 
       <button
-        class="rejectBtn px-3 py-1 text-xs font-semibold rounded bg-red-100 text-red-700 hover:bg-red-200"
+        class="reject action-btn reject"
         data-id="${u.id}">
         Reject
       </button>
@@ -79,18 +69,14 @@ function renderRow(u) {
   `;
 
   tableBody.appendChild(tr);
-
   attachRowEvents(tr, u.id);
 }
 
-// ================================
-// EVENTS
-// ================================
+/* EVENTS */
 function attachRowEvents(row, userId) {
-  const approveBtn = row.querySelector(".approveBtn");
-  const rejectBtn = row.querySelector(".rejectBtn");
+  const approveBtn = row.querySelector(".approve");
+  const rejectBtn = row.querySelector(".reject");
 
-  // ✅ APPROVE USER
   approveBtn.onclick = async () => {
     if (!confirm("Approve this user?")) return;
 
@@ -103,7 +89,6 @@ function attachRowEvents(row, userId) {
     checkEmpty();
   };
 
-  // ❌ REJECT USER
   rejectBtn.onclick = async () => {
     if (!confirm("Reject and disable this user?")) return;
 
@@ -117,19 +102,14 @@ function attachRowEvents(row, userId) {
   };
 }
 
-// ================================
-// EMPTY STATE CHECK
-// ================================
+/* EMPTY CHECK */
 function checkEmpty() {
   if (!tableBody.children.length) {
     emptyState.classList.remove("hidden");
   }
 }
 
-// ================================
-// INIT
-// ================================
+/* INIT */
 auth.onAuthStateChanged((user) => {
-  if (!user) return;
-  loadPendingUsers();
+  if (user) loadPendingUsers();
 });

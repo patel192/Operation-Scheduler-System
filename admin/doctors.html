@@ -11,8 +11,40 @@
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+      --radius:18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+
+    .filter-input {
+      border-radius: 14px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(10,108,255,.15);
+    }
+
+    .action-link {
+      font-weight: 600;
+      transition: color .15s ease;
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
     }
   </style>
 
@@ -24,38 +56,38 @@
 
 <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <!-- HEADER -->
-  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- ===== HERO HEADER ===== -->
+  <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold">Doctors</h1>
+      <h1 class="text-3xl font-bold">Doctors</h1>
       <p class="text-sm text-[--muted] mt-1">
         Manage doctors, specialties, availability and status
       </p>
     </div>
 
     <a href="/admin/add-doctor.html"
-      class="inline-flex items-center gap-2 px-5 py-2 rounded-xl
+      class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
              bg-[--primary] text-white font-semibold hover:opacity-90">
       + Add Doctor
     </a>
   </section>
 
-  <!-- FILTERS -->
-  <section class="bg-white p-5 rounded-2xl shadow-sm grid md:grid-cols-4 gap-4 text-sm">
+  <!-- ===== FILTER BAR ===== -->
+  <section class="card p-5 grid md:grid-cols-4 gap-4 text-sm">
 
     <input
       type="text"
       placeholder="Search by doctor name"
-      class="border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+      class="filter-input"/>
 
-    <select class="border rounded-xl px-4 py-2">
+    <select class="filter-input bg-white">
       <option>All Departments</option>
       <option>Cardiology</option>
       <option>Orthopedics</option>
       <option>Neurology</option>
     </select>
 
-    <select class="border rounded-xl px-4 py-2">
+    <select class="filter-input bg-white">
       <option>Status</option>
       <option>Active</option>
       <option>On Leave</option>
@@ -69,18 +101,23 @@
 
   </section>
 
-  <!-- TABLE -->
-  <section class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <!-- ===== TABLE ===== -->
+  <section class="card overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
+      <h2 class="font-semibold text-lg">Doctor Directory</h2>
+      <span class="text-sm text-[--muted]">Administrative view</span>
+    </div>
 
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left">
+      <thead class="bg-slate-50 text-left text-[--muted]">
         <tr>
-          <th class="px-6 py-4">Doctor</th>
-          <th class="px-6 py-4">Department</th>
-          <th class="px-6 py-4">Specialty</th>
-          <th class="px-6 py-4">Availability</th>
-          <th class="px-6 py-4">Status</th>
-          <th class="px-6 py-4 text-right">Actions</th>
+          <th class="px-6 py-4 font-semibold">Doctor</th>
+          <th class="px-6 py-4 font-semibold">Department</th>
+          <th class="px-6 py-4 font-semibold">Specialty</th>
+          <th class="px-6 py-4 font-semibold">Availability</th>
+          <th class="px-6 py-4 font-semibold">Status</th>
+          <th class="px-6 py-4 font-semibold text-right">Actions</th>
         </tr>
       </thead>
 
@@ -88,30 +125,38 @@
 
         <tr class="hover:bg-slate-50 transition">
           <td class="px-6 py-4 font-semibold flex items-center gap-3">
-            <img
-              src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png"
-              class="w-9 h-9 rounded-full bg-slate-100 p-1"/>
-            Dr. Rahul Mehta
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+              RM
+            </div>
+            <div>
+              <div>Dr. Rahul Mehta</div>
+              <div class="text-xs text-[--muted]">ID: DOC-1023</div>
+            </div>
           </td>
+
           <td class="px-6 py-4">Cardiology</td>
           <td class="px-6 py-4">Heart Surgery</td>
-          <td class="px-6 py-4">Mon–Fri</td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+              Mon–Fri
+            </span>
+          </td>
           <td class="px-6 py-4">
             <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-green-100 text-green-700">
+                         bg-emerald-100 text-emerald-700">
               Active
             </span>
           </td>
           <td class="px-6 py-4">
-            <div class="flex justify-end gap-3 font-semibold">
-              <a href="#" class="text-[--primary] hover:underline">View</a>
-              <a href="#" class="text-yellow-600 hover:underline">Edit</a>
-              <a href="#" class="text-red-600 hover:underline">Disable</a>
+            <div class="flex justify-end gap-4">
+              <a href="#" class="action-link text-[--primary]">View</a>
+              <a href="#" class="action-link text-amber-600">Edit</a>
+              <a href="#" class="action-link text-red-600">Disable</a>
             </div>
           </td>
         </tr>
 
-        <!-- More rows later -->
+        <!-- more rows -->
 
       </tbody>
     </table>
@@ -119,5 +164,6 @@
   </section>
 
 </main>
+
 </body>
 </html>

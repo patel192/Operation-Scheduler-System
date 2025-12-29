@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>OT Rooms · Admin</title>
 
@@ -11,8 +11,27 @@
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+      --radius:18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+
+    .action-link {
+      font-weight: 600;
+      transition: color .15s ease;
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
     }
   </style>
 
@@ -24,103 +43,140 @@
 
 <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <!-- HEADER -->
-  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- ===== HERO HEADER ===== -->
+  <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold">Operation Theatres</h1>
+      <h1 class="text-3xl font-bold">Operation Theatres</h1>
       <p class="text-sm text-[--muted] mt-1">
         Manage OT rooms, capacity, equipment and availability
       </p>
     </div>
 
     <a href="/admin/add-ot-room.html"
-      class="inline-flex items-center gap-2 px-5 py-2 rounded-xl
+      class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
              bg-[--primary] text-white font-semibold hover:opacity-90">
       + Add OT Room
     </a>
   </section>
 
-  <!-- SUMMARY -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+  <!-- ===== KPI STRIP ===== -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">Total OT Rooms</p>
-      <h3 class="text-3xl font-bold mt-1">8</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        Total OT Rooms
+      </p>
+      <h3 class="text-3xl font-bold mt-2">8</h3>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">Available</p>
-      <h3 class="text-3xl font-bold mt-1 text-green-600">5</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        Available
+      </p>
+      <h3 class="text-3xl font-bold mt-2 text-emerald-600">5</h3>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">In Use</p>
-      <h3 class="text-3xl font-bold mt-1 text-blue-600">2</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        In Use
+      </p>
+      <h3 class="text-3xl font-bold mt-2 text-blue-600">2</h3>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">Maintenance</p>
-      <h3 class="text-3xl font-bold mt-1 text-red-600">1</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        Maintenance
+      </p>
+      <h3 class="text-3xl font-bold mt-2 text-red-600">1</h3>
     </div>
 
   </section>
 
-  <!-- TABLE -->
-  <section class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <!-- ===== TABLE ===== -->
+  <section class="card overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
+      <h2 class="font-semibold text-lg">OT Room Directory</h2>
+      <span class="text-sm text-[--muted]">Operational overview</span>
+    </div>
 
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left">
+      <thead class="bg-slate-50 text-left text-[--muted]">
         <tr>
-          <th class="px-6 py-4">OT Name</th>
-          <th class="px-6 py-4">Department</th>
-          <th class="px-6 py-4">Capacity</th>
-          <th class="px-6 py-4">Equipment</th>
-          <th class="px-6 py-4">Status</th>
-          <th class="px-6 py-4 text-right">Actions</th>
+          <th class="px-6 py-4 font-semibold">OT Room</th>
+          <th class="px-6 py-4 font-semibold">Department</th>
+          <th class="px-6 py-4 font-semibold">Capacity</th>
+          <th class="px-6 py-4 font-semibold">Equipment</th>
+          <th class="px-6 py-4 font-semibold">Status</th>
+          <th class="px-6 py-4 font-semibold text-right">Actions</th>
         </tr>
       </thead>
 
       <tbody class="divide-y">
 
         <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-semibold">OT-1</td>
+          <td class="px-6 py-4 font-semibold">
+            <div>OT-1</div>
+            <div class="text-xs text-[--muted]">Primary Cardiac OT</div>
+          </td>
+
           <td class="px-6 py-4">Cardiology</td>
-          <td class="px-6 py-4">Full</td>
+
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+              Full
+            </span>
+          </td>
+
           <td class="px-6 py-4 text-[--muted]">
             Ventilator, ECG, Monitor
           </td>
+
           <td class="px-6 py-4">
             <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-green-100 text-green-700">
+                         bg-emerald-100 text-emerald-700">
               Available
             </span>
           </td>
+
           <td class="px-6 py-4">
-            <div class="flex justify-end gap-3 font-semibold">
-              <a href="#" class="text-[--primary] hover:underline">View</a>
-              <a href="#" class="text-yellow-600 hover:underline">Edit</a>
-              <a href="#" class="text-red-600 hover:underline">Disable</a>
+            <div class="flex justify-end gap-4">
+              <a href="#" class="action-link text-[--primary]">View</a>
+              <a href="#" class="action-link text-amber-600">Edit</a>
+              <a href="#" class="action-link text-red-600">Disable</a>
             </div>
           </td>
         </tr>
 
         <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-semibold">OT-3</td>
+          <td class="px-6 py-4 font-semibold">
+            <div>OT-3</div>
+            <div class="text-xs text-[--muted]">Orthopedic Surgery OT</div>
+          </td>
+
           <td class="px-6 py-4">Orthopedics</td>
-          <td class="px-6 py-4">Partial</td>
+
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+              Partial
+            </span>
+          </td>
+
           <td class="px-6 py-4 text-[--muted]">
             X-Ray, Drill Unit
           </td>
+
           <td class="px-6 py-4">
             <span class="px-3 py-1 rounded-full text-xs font-semibold
                          bg-blue-100 text-blue-700">
               In Use
             </span>
           </td>
+
           <td class="px-6 py-4">
-            <div class="flex justify-end gap-3 font-semibold">
-              <a href="#" class="text-[--primary] hover:underline">View</a>
-              <a href="#" class="text-yellow-600 hover:underline">Edit</a>
+            <div class="flex justify-end gap-4">
+              <a href="#" class="action-link text-[--primary]">View</a>
+              <a href="#" class="action-link text-amber-600">Edit</a>
             </div>
           </td>
         </tr>
@@ -131,5 +187,6 @@
   </section>
 
 </main>
+
 </body>
 </html>
