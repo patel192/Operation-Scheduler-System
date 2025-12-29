@@ -180,6 +180,8 @@ googleBtn.onclick = async () => {
       email: result.user.email,
       role: "",
       metaData: { createdAt: serverTimestamp() },
+      approved:false,
+      status: "pending",
     });
   }
 
