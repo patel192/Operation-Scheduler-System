@@ -7,104 +7,125 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/schedule-details.js"></script>
+
   <style>
-    :root {
-      --primary:#2563eb;
-      --bg:#F8FAFC;
-      --text:#0f172a;
-      --muted:#64748B;
+    .action-btn {
+      transition: all .2s ease;
+    }
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,.08);
+    }
+
+    .info-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+
+    .value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 2px;
     }
   </style>
-
-  <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
-  <script type="module" defer src="/js/admin/schedule-details.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-slate-100 min-h-screen text-slate-800">
 
 <main class="max-w-5xl mx-auto px-4 py-10 space-y-8">
 
   <!-- HEADER -->
-  <section>
-    <h1 class="text-2xl font-bold">Schedule Details</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Complete operation scheduling overview
-    </p>
-  </section>
-
-  <!-- STATUS BAR -->
-  <section class="bg-white border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <p class="text-sm text-[--muted]">Current Status</p>
-      <span id="statusBadge"
-        class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold">
-        —
-      </span>
+      <h1 class="text-3xl font-bold">Schedule Details</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Complete operation lifecycle overview
+      </p>
     </div>
 
-    <div class="flex gap-2">
-      <button id="markOngoing"
-        class="px-4 py-2 rounded-lg bg-yellow-500 text-white text-sm font-semibold">
-        Mark Ongoing
-      </button>
-
-      <button id="markCompleted"
-        class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold">
-        Mark Completed
-      </button>
-
-      <button id="cancelSchedule"
-        class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold">
-        Cancel
-      </button>
-    </div>
+    <span id="statusBadge"
+      class="px-4 py-2 rounded-full text-sm font-semibold">
+      —
+    </span>
   </section>
 
-  <!-- DETAILS CARD -->
-  <section class="bg-white rounded-2xl shadow-sm border p-6 space-y-6">
+  <!-- ACTION BAR -->
+  <section class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3">
+    <button id="markOngoing"
+      class="action-btn px-4 py-2 rounded-xl bg-yellow-500 text-white text-sm font-semibold">
+      ▶ Mark Ongoing
+    </button>
 
-    <!-- BASIC INFO -->
-    <div class="grid md:grid-cols-2 gap-6 text-sm">
-      <div>
-        <p class="text-[--muted]">Patient</p>
-        <p id="patientName" class="font-semibold">—</p>
+    <button id="markCompleted"
+      class="action-btn px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold">
+      ✔ Mark Completed
+    </button>
+
+    <button id="cancelSchedule"
+      class="action-btn px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold ml-auto">
+      ✖ Cancel Schedule
+    </button>
+  </section>
+
+  <!-- MAIN DETAILS -->
+  <section class="grid lg:grid-cols-3 gap-6">
+
+    <!-- LEFT: CORE INFO -->
+    <div class="lg:col-span-2 info-card space-y-6">
+
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div>
+          <p class="label">Patient</p>
+          <p id="patientName" class="value">—</p>
+        </div>
+
+        <div>
+          <p class="label">Procedure</p>
+          <p id="procedure" class="value">—</p>
+        </div>
+
+        <div>
+          <p class="label">OT Room</p>
+          <p id="otRoom" class="value">—</p>
+        </div>
+
+        <div>
+          <p class="label">Time Window</p>
+          <p id="timeRange" class="value">—</p>
+        </div>
       </div>
 
-      <div>
-        <p class="text-[--muted]">Procedure</p>
-        <p id="procedure" class="font-semibold">—</p>
-      </div>
+      <div class="border-t pt-6 grid sm:grid-cols-2 gap-6">
+        <div>
+          <p class="label">Surgeon</p>
+          <p id="surgeon" class="value">—</p>
+        </div>
 
-      <div>
-        <p class="text-[--muted]">OT Room</p>
-        <p id="otRoom" class="font-semibold">—</p>
-      </div>
-
-      <div>
-        <p class="text-[--muted]">Date & Time</p>
-        <p id="timeRange" class="font-semibold">—</p>
+        <div>
+          <p class="label">Anesthesiologist</p>
+          <p id="anesthesiologist" class="value">—</p>
+        </div>
       </div>
     </div>
 
-    <!-- DOCTORS -->
-    <div class="grid md:grid-cols-2 gap-6 text-sm border-t pt-6">
-      <div>
-        <p class="text-[--muted]">Surgeon</p>
-        <p id="surgeon" class="font-semibold">—</p>
-      </div>
-
-      <div>
-        <p class="text-[--muted]">Anesthesiologist</p>
-        <p id="anesthesiologist" class="font-semibold">—</p>
-      </div>
-    </div>
-
-    <!-- NOTES -->
-    <div class="border-t pt-6">
-      <p class="text-[--muted] text-sm mb-2">Clinical Notes</p>
+    <!-- RIGHT: NOTES -->
+    <div class="info-card space-y-3">
+      <p class="label">Clinical Notes</p>
       <p id="notes"
-        class="text-sm bg-slate-50 border rounded-lg p-4">
+        class="text-sm bg-slate-50 border rounded-xl p-4 min-h-[120px]">
         —
       </p>
     </div>

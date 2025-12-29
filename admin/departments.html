@@ -11,8 +11,27 @@
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+      --radius:18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+
+    .action-link {
+      font-weight: 600;
+      transition: color .15s ease;
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
     }
   </style>
 
@@ -24,57 +43,72 @@
 
 <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <!-- HEADER -->
-  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- ===== HERO HEADER ===== -->
+  <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold">Departments</h1>
+      <h1 class="text-3xl font-bold">Departments</h1>
       <p class="text-sm text-[--muted] mt-1">
-        Manage hospital departments and surgical units
+        Manage hospital departments, heads, and OT allocations
       </p>
     </div>
 
     <a href="/admin/add-department.html"
-      class="inline-flex items-center gap-2 px-5 py-2 rounded-xl
+      class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
              bg-[--primary] text-white font-semibold hover:opacity-90">
       + Add Department
     </a>
   </section>
 
-  <!-- STATS -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">Total Departments</p>
-      <h3 class="text-3xl font-bold mt-1">12</h3>
+  <!-- ===== KPI STRIP ===== -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
+
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        Total Departments
+      </p>
+      <h3 class="text-3xl font-bold mt-2">12</h3>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">Active</p>
-      <h3 class="text-3xl font-bold mt-1 text-green-600">10</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        Active
+      </p>
+      <h3 class="text-3xl font-bold mt-2 text-emerald-600">10</h3>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">Doctors Assigned</p>
-      <h3 class="text-3xl font-bold mt-1">48</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        Doctors Assigned
+      </p>
+      <h3 class="text-3xl font-bold mt-2">48</h3>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm">
-      <p class="text-sm text-[--muted]">OT Rooms Linked</p>
-      <h3 class="text-3xl font-bold mt-1">8</h3>
+    <div class="card p-5">
+      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
+        OT Rooms Linked
+      </p>
+      <h3 class="text-3xl font-bold mt-2">8</h3>
     </div>
+
   </section>
 
-  <!-- TABLE -->
-  <section class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <!-- ===== TABLE ===== -->
+  <section class="card overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
+      <h2 class="font-semibold text-lg">Department List</h2>
+      <span class="text-sm text-[--muted]">Administrative view</span>
+    </div>
 
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left">
+      <thead class="bg-slate-50 text-left text-[--muted]">
         <tr>
-          <th class="px-6 py-4">Department</th>
-          <th class="px-6 py-4">Head</th>
-          <th class="px-6 py-4">Doctors</th>
-          <th class="px-6 py-4">OT Rooms</th>
-          <th class="px-6 py-4">Status</th>
-          <th class="px-6 py-4 text-right">Actions</th>
+          <th class="px-6 py-4 font-semibold">Department</th>
+          <th class="px-6 py-4 font-semibold">Head</th>
+          <th class="px-6 py-4 font-semibold">Doctors</th>
+          <th class="px-6 py-4 font-semibold">OT Rooms</th>
+          <th class="px-6 py-4 font-semibold">Status</th>
+          <th class="px-6 py-4 font-semibold text-right">Actions</th>
         </tr>
       </thead>
 
@@ -87,20 +121,20 @@
           <td class="px-6 py-4">OT-1, OT-2</td>
           <td class="px-6 py-4">
             <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-green-100 text-green-700">
+                         bg-emerald-100 text-emerald-700">
               Active
             </span>
           </td>
           <td class="px-6 py-4">
-            <div class="flex justify-end gap-3 text-sm font-semibold">
-              <a href="#" class="text-[--primary] hover:underline">View</a>
-              <a href="#" class="text-yellow-600 hover:underline">Edit</a>
-              <a href="#" class="text-red-600 hover:underline">Disable</a>
+            <div class="flex justify-end gap-4">
+              <a href="#" class="action-link text-[--primary]">View</a>
+              <a href="#" class="action-link text-amber-600">Edit</a>
+              <a href="#" class="action-link text-red-600">Disable</a>
             </div>
           </td>
         </tr>
 
-        <!-- More rows later -->
+        <!-- future rows -->
 
       </tbody>
     </table>
@@ -108,5 +142,6 @@
   </section>
 
 </main>
+
 </body>
 </html>
