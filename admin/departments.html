@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Departments · Admin</title>
 
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -35,8 +36,12 @@
     }
   </style>
 
+  <!-- Auth + Layout -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+
+  <!-- Page Logic -->
+  <script type="module" defer src="/js/admin/departments.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
@@ -66,28 +71,28 @@
       <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
         Total Departments
       </p>
-      <h3 class="text-3xl font-bold mt-2">12</h3>
+      <h3 id="kpiTotal" class="text-3xl font-bold mt-2">0</h3>
     </div>
 
     <div class="card p-5">
       <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
         Active
       </p>
-      <h3 class="text-3xl font-bold mt-2 text-emerald-600">10</h3>
+      <h3 id="kpiActive" class="text-3xl font-bold mt-2 text-emerald-600">0</h3>
     </div>
 
     <div class="card p-5">
       <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
         Doctors Assigned
       </p>
-      <h3 class="text-3xl font-bold mt-2">48</h3>
+      <h3 id="kpiDoctors" class="text-3xl font-bold mt-2">0</h3>
     </div>
 
     <div class="card p-5">
       <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
         OT Rooms Linked
       </p>
-      <h3 class="text-3xl font-bold mt-2">8</h3>
+      <h3 id="kpiOTs" class="text-3xl font-bold mt-2">0</h3>
     </div>
 
   </section>
@@ -104,7 +109,7 @@
       <thead class="bg-slate-50 text-left text-[--muted]">
         <tr>
           <th class="px-6 py-4 font-semibold">Department</th>
-          <th class="px-6 py-4 font-semibold">Head</th>
+          <th class="px-6 py-4 font-semibold">Head(s)</th>
           <th class="px-6 py-4 font-semibold">Doctors</th>
           <th class="px-6 py-4 font-semibold">OT Rooms</th>
           <th class="px-6 py-4 font-semibold">Status</th>
@@ -112,30 +117,8 @@
         </tr>
       </thead>
 
-      <tbody class="divide-y">
-
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-semibold">Cardiology</td>
-          <td class="px-6 py-4">Dr. A. Sharma</td>
-          <td class="px-6 py-4">8</td>
-          <td class="px-6 py-4">OT-1, OT-2</td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-emerald-100 text-emerald-700">
-              Active
-            </span>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex justify-end gap-4">
-              <a href="#" class="action-link text-[--primary]">View</a>
-              <a href="#" class="action-link text-amber-600">Edit</a>
-              <a href="#" class="action-link text-red-600">Disable</a>
-            </div>
-          </td>
-        </tr>
-
-        <!-- future rows -->
-
+      <tbody id="departmentTableBody" class="divide-y">
+        <!-- Dynamic rows injected by JS -->
       </tbody>
     </table>
 
