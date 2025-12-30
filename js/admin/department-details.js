@@ -9,6 +9,8 @@ import {
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
+import { loadDepartmentDoctors } from "../admin/loadDepartmentDoctors.js";
+
 /* ================= PARAM ================= */
 const params = new URLSearchParams(window.location.search);
 const deptId = params.get("id");
@@ -23,12 +25,22 @@ const deptNameEl = document.getElementById("deptName");
 const deptStatusEl = document.getElementById("deptStatus");
 const doctorCountEl = document.getElementById("doctorCount");
 const otRoomsEl = document.getElementById("otRooms");
-const toggleBtn = document.getElementById("toggleStatusBtn");
+const toggleStatusBtn = document.getElementById("toggleStatusBtn");
+
+const headDoctorSelect = document.getElementById("headDoctorSelect");
+const saveHeadBtn = document.getElementById("saveHead");
 
 const doctorsTable = document.getElementById("doctorsTable");
 const emptyDoctors = document.getElementById("emptyDoctors");
 
-/* ================= LOAD ================= */
+/* ================= HELPERS ================= */
+function statusBadge(status) {
+  return status === "active"
+    ? "bg-emerald-100 text-emerald-700"
+    : "bg-red-100 text-red-700";
+}
+
+/* ================= LOAD DEPARTMENT ================= */
 async function loadDepartment() {
   const ref = doc(db, "departments", deptId);
   const snap = await getDoc(ref);
@@ -42,37 +54,33 @@ async function loadDepartment() {
   const d = snap.data();
 
   deptNameEl.textContent = d.name;
-  doctorCountEl.textContent = d.doctorCount || 0;
-  otRoomsEl.textContent = (d.otRooms || []).join(", ") || "—";
-
   deptStatusEl.textContent = d.status;
   deptStatusEl.className =
-    `inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-      d.status === "active"
-        ? "bg-emerald-100 text-emerald-700"
-        : "bg-red-100 text-red-700"
-    }`;
+    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(d.status)}`;
 
-  toggleBtn.textContent =
-    d.status === "active" ? "Disable Department" : "Enable Department";
+  otRoomsEl.textContent = (d.otRooms || []).join(", ");
 
-  toggleBtn.className =
+  toggleStatusBtn.textContent =
+    d.status === "active" ? "Disable Department" : "Activate Department";
+
+  toggleStatusBtn.className =
     d.status === "active"
-      ? "px-4 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200"
-      : "px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold hover:bg-emerald-200";
+      ? "px-5 py-2 rounded-xl bg-red-100 text-red-700 font-semibold"
+      : "px-5 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold";
 
-  toggleBtn.onclick = async () => {
-    await updateDoc(ref, {
-      status: d.status === "active" ? "disabled" : "active",
-    });
-    loadDepartment();
-  };
+  /* ----- Department Head ----- */
+  await loadDepartmentDoctors(headDoctorSelect,d.name);
 
-  loadDoctors(d.name);
+  if (d.headDoctorId) {
+    headDoctorSelect.value = d.headDoctorId;
+  }
+
+  /* ----- Load Doctors ----- */
+  await loadDepartmentDoctorsList(d.name);
 }
 
-/* ================= LOAD DOCTORS ================= */
-async function loadDoctors(departmentName) {
+/* ================= DOCTORS LIST ================= */
+async function loadDepartmentDoctorsList(departmentName) {
   doctorsTable.innerHTML = "";
   emptyDoctors.classList.add("hidden");
 
@@ -84,6 +92,8 @@ async function loadDoctors(departmentName) {
 
   const snap = await getDocs(q);
 
+  doctorCountEl.textContent = snap.size;
+
   if (snap.empty) {
     emptyDoctors.classList.remove("hidden");
     return;
@@ -93,26 +103,40 @@ async function loadDoctors(departmentName) {
     const u = docSnap.data();
 
     const tr = document.createElement("tr");
-    tr.className = "hover:bg-slate-50";
-
     tr.innerHTML = `
       <td class="px-6 py-4 font-semibold">${u.displayName || "—"}</td>
       <td class="px-6 py-4">${u.email || "—"}</td>
-      <td class="px-6 py-4">
-        <span class="px-2 py-1 rounded-full text-xs font-semibold
-          ${
-            u.availability === "busy"
-              ? "bg-yellow-100 text-yellow-700"
-              : "bg-green-100 text-green-700"
-          }">
-          ${u.availability || "available"}
-        </span>
-      </td>
+      <td class="px-6 py-4 capitalize">${u.availability || "unknown"}</td>
     `;
 
     doctorsTable.appendChild(tr);
   });
 }
+
+/* ================= ACTIONS ================= */
+toggleStatusBtn.onclick = async () => {
+  const ref = doc(db, "departments", deptId);
+  const snap = await getDoc(ref);
+  const newStatus = snap.data().status === "active" ? "disabled" : "active";
+
+  await updateDoc(ref, { status: newStatus });
+  loadDepartment();
+};
+
+saveHeadBtn.onclick = async () => {
+  const ref = doc(db, "departments", deptId);
+
+  const headDoctorId = headDoctorSelect.value || null;
+  const headDoctorName =
+    headDoctorSelect.selectedOptions[0]?.textContent || null;
+
+  await updateDoc(ref, {
+    headDoctorId,
+    headDoctorName,
+  });
+
+  alert("Department head updated");
+};
 
 /* ================= INIT ================= */
 loadDepartment();

@@ -40,9 +40,10 @@
     </p>
   </section>
 
-  <!-- SUMMARY -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+  <!-- SUMMARY GRID -->
+  <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
+    <!-- STATUS -->
     <div class="bg-white rounded-2xl shadow p-5">
       <p class="text-xs text-[--muted] font-semibold">STATUS</p>
       <span
@@ -52,24 +53,43 @@
       </span>
     </div>
 
+    <!-- DOCTORS COUNT -->
     <div class="bg-white rounded-2xl shadow p-5">
       <p class="text-xs text-[--muted] font-semibold">DOCTORS</p>
       <h3 id="doctorCount" class="text-3xl font-bold mt-2">—</h3>
     </div>
 
+    <!-- OT ROOMS -->
     <div class="bg-white rounded-2xl shadow p-5">
       <p class="text-xs text-[--muted] font-semibold">OT ROOMS</p>
       <p id="otRooms" class="mt-2 font-semibold text-sm">—</p>
     </div>
 
+    <!-- STATUS TOGGLE -->
     <div class="bg-white rounded-2xl shadow p-5 flex items-center justify-center">
       <button
         id="toggleStatusBtn"
-        class="px-4 py-2 rounded-xl font-semibold">
+        class="px-5 py-2 rounded-xl font-semibold">
         —
       </button>
     </div>
 
+  </section>
+
+  <!-- DEPARTMENT HEAD -->
+  <section class="bg-white rounded-2xl shadow p-6 max-w-md">
+    <h3 class="font-semibold mb-4">Department Head</h3>
+
+    <select
+      id="headDoctorSelect"
+      class="w-full border rounded-xl px-4 py-2 text-sm">
+    </select>
+
+    <button
+      id="saveHead"
+      class="mt-4 px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold hover:opacity-90">
+      Save
+    </button>
   </section>
 
   <!-- DOCTORS LIST -->
