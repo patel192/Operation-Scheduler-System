@@ -7,7 +7,7 @@ import {
   updateDoc,
   doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import {syncAvailabilityForUser } from "../utils/syncAvailability.js";
 import { loadOtStaff } from "./loadOtStaff.js";
 import { loadDoctors } from "./loadDoctors.js";
 
@@ -26,12 +26,8 @@ await loadDoctors(surgeonSelect);
 
 /* ===== STEP CONTROL ===== */
 function showStep(i) {
-  steps.forEach((s, idx) =>
-    s.classList.toggle("hidden-step", idx !== i)
-  );
-  stepDots.forEach((d, idx) =>
-    d.classList.toggle("active", idx === i)
-  );
+  steps.forEach((s, idx) => s.classList.toggle("hidden-step", idx !== i));
+  stepDots.forEach((d, idx) => d.classList.toggle("active", idx === i));
 }
 showStep(0);
 
@@ -65,13 +61,12 @@ next2.onclick = () => {
   const [date, otRoom, , startTime, endTime] =
     steps[1].querySelectorAll("input,select");
 
-  const staffIds = [...otStaffSelect.selectedOptions].map(o => o.value);
+  const staffIds = [...otStaffSelect.selectedOptions].map((o) => o.value);
 
   if (!date.value || !otRoom.value || !startTime.value || !endTime.value)
     return alert("Date, OT and time required");
 
-  if (!staffIds.length)
-    return alert("Select OT staff");
+  if (!staffIds.length) return alert("Select OT staff");
 
   Object.assign(scheduleDraft, {
     date: date.value,
@@ -96,12 +91,14 @@ next3.onclick = () => {
   scheduleDraft.surgeonName =
     surgeonSelect.options[surgeonSelect.selectedIndex].textContent;
 
-  document.getElementById("rvPatient").textContent = scheduleDraft.patientName || "—";
+  document.getElementById("rvPatient").textContent =
+    scheduleDraft.patientName || "—";
   document.getElementById("rvPatientId").textContent = scheduleDraft.patientId;
   document.getElementById("rvProcedure").textContent = scheduleDraft.procedure;
   document.getElementById("rvOT").textContent = scheduleDraft.otRoom;
   document.getElementById("rvSurgeon").textContent = scheduleDraft.surgeonName;
-  document.getElementById("rvStaff").textContent = scheduleDraft.otStaffIds.length;
+  document.getElementById("rvStaff").textContent =
+    scheduleDraft.otStaffIds.length;
 
   showStep(3);
 };
@@ -118,7 +115,7 @@ confirm.onclick = async () => {
 
     if (start >= end) return alert("Invalid time range");
 
-    await addDoc(collection(db, "schedules"), {
+    const docRef = await addDoc(collection(db, "schedules"), {
       ...scheduleDraft,
       startTime: Timestamp.fromDate(start),
       endTime: Timestamp.fromDate(end),
@@ -127,17 +124,15 @@ confirm.onclick = async () => {
       createdAt: serverTimestamp(),
     });
 
-    await updateDoc(doc(db, "users", scheduleDraft.surgeonId), {
-      availability: "busy",
-    });
+    // ✅ SYNC AVAILABILITY (single source of truth)
+    await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");
 
-    for (const id of scheduleDraft.otStaffIds) {
-      await updateDoc(doc(db, "users", id), { availability: "busy" });
+    for (const staffId of scheduleDraft.otStaffIds) {
+      await syncAvailabilityForUser(staffId, "OT Staff");
     }
 
     alert("Schedule created successfully");
     window.location.href = "/admin/schedule-board.html";
-
   } catch (err) {
     console.error(err);
     alert("Error creating schedule");

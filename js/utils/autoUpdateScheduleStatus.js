@@ -5,7 +5,7 @@ import {
   updateDoc,
   doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import { syncAvailabilityForUser } from "./syncAvailability.js";
 /**
  * Automatically updates schedule status based on time
  *
@@ -50,12 +50,13 @@ export async function autoUpdateScheduleStatus() {
 
     /* ================= RELEASE RESOURCES (SAFE & IDENTITY-BASED) ================= */
     if (computedStatus === "Completed" || computedStatus === "Cancelled") {
-
       // 🧑‍⚕️ Free surgeon
       if (data.surgeonId) {
-        await updateDoc(doc(db, "users", data.surgeonId), {
-          availability: "available",
-        });
+        await syncAvailabilityForUser(data.surgeonId, "Doctor");
+
+        for (const id of data.otStaffIds || []) {
+          await syncAvailabilityForUser(id, "OT Staff");
+        }
       }
 
       // 👩‍⚕️ Free OT staff

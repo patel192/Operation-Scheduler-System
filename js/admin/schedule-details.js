@@ -3,8 +3,8 @@ import {
   doc,
   getDoc,
   updateDoc,
-  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
 
 const params = new URLSearchParams(window.location.search);
 const scheduleId = params.get("id");
@@ -14,7 +14,7 @@ if (!scheduleId) {
   window.location.href = "/admin/schedule-board.html";
 }
 
-/* ELEMENTS */
+/* ================= ELEMENTS ================= */
 const patientNameEl = document.getElementById("patientName");
 const procedureEl = document.getElementById("procedure");
 const otRoomEl = document.getElementById("otRoom");
@@ -28,7 +28,7 @@ const btnOngoing = document.getElementById("markOngoing");
 const btnCompleted = document.getElementById("markCompleted");
 const btnCancel = document.getElementById("cancelSchedule");
 
-/* HELPERS */
+/* ================= HELPERS ================= */
 function formatTime(ts) {
   return ts.toDate().toLocaleTimeString([], {
     hour: "2-digit",
@@ -43,7 +43,7 @@ function statusClass(status) {
   return "bg-blue-100 text-blue-700";
 }
 
-/* LOAD */
+/* ================= LOAD ================= */
 async function loadSchedule() {
   const ref = doc(db, "schedules", scheduleId);
   const snap = await getDoc(ref);
@@ -71,28 +71,57 @@ async function loadSchedule() {
     `px-4 py-2 rounded-full text-sm font-semibold ${statusClass(d.status)}`;
 
   btnOngoing.disabled = d.status !== "Upcoming";
-  btnCompleted.disabled = d.status === "Completed";
+  btnCompleted.disabled = d.status === "Completed" || d.status === "Cancelled";
 
   btnOngoing.classList.toggle("opacity-50", btnOngoing.disabled);
   btnCompleted.classList.toggle("opacity-50", btnCompleted.disabled);
 }
 
-/* ACTIONS */
+/* ================= ACTIONS ================= */
 btnOngoing.onclick = async () => {
-  await updateDoc(doc(db, "schedules", scheduleId), { status: "Ongoing" });
+  await updateDoc(doc(db, "schedules", scheduleId), {
+    status: "Ongoing",
+  });
   loadSchedule();
 };
 
 btnCompleted.onclick = async () => {
-  await updateDoc(doc(db, "schedules", scheduleId), { status: "Completed" });
+  await updateDoc(doc(db, "schedules", scheduleId), {
+    status: "Completed",
+  });
+
+  const snap = await getDoc(doc(db, "schedules", scheduleId));
+  const d = snap.data();
+
+  await syncAvailabilityForUser(d.surgeonId, "Doctor");
+
+  for (const id of d.otStaffIds || []) {
+    await syncAvailabilityForUser(id, "OT Staff");
+  }
+
   loadSchedule();
 };
 
+
 btnCancel.onclick = async () => {
   if (!confirm("Cancel this schedule?")) return;
-  await updateDoc(doc(db, "schedules", scheduleId), { status: "Cancelled" });
+
+  await updateDoc(doc(db, "schedules", scheduleId), {
+    status: "Cancelled",
+  });
+
+  const snap = await getDoc(doc(db, "schedules", scheduleId));
+  const d = snap.data();
+
+  await syncAvailabilityForUser(d.surgeonId, "Doctor");
+
+  for (const id of d.otStaffIds || []) {
+    await syncAvailabilityForUser(id, "OT Staff");
+  }
+
   window.location.href = "/admin/schedule-board.html";
 };
 
-/* INIT */
+
+/* ================= INIT ================= */
 loadSchedule();
