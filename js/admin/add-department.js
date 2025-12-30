@@ -57,6 +57,7 @@ saveBtn.addEventListener("click", async () => {
       otRooms,
       headDoctorId,
       headDoctorName,
+      doctorCount:0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });

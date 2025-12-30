@@ -24,7 +24,7 @@ async function loadDepartments() {
   let total = 0;
   let active = 0;
   let doctorSum = 0;
-  let otSet = new Set();
+  const otSet = new Set();
 
   snap.forEach((docSnap) => {
     const d = docSnap.data();
@@ -32,7 +32,9 @@ async function loadDepartments() {
 
     if (d.status === "active") active++;
 
-    doctorSum += d.doctorCount || 0;
+    const doctorCount = d.doctorCount || 0;
+    doctorSum += doctorCount;
+
     (d.otRooms || []).forEach((ot) => otSet.add(ot));
 
     const tr = document.createElement("tr");
@@ -42,11 +44,11 @@ async function loadDepartments() {
       <td class="px-6 py-4 font-semibold">${d.name}</td>
 
       <td class="px-6 py-4">
-        ${(d.headIds || []).length || "—"}
+        ${d.headDoctorName || "—"}
       </td>
 
       <td class="px-6 py-4">
-        ${d.doctorCount || 0}
+        ${doctorCount}
       </td>
 
       <td class="px-6 py-4">
@@ -66,8 +68,11 @@ async function loadDepartments() {
 
       <td class="px-6 py-4">
         <div class="flex justify-end gap-4">
-          <a href="/admin/department-details.html?id=${docSnap.id}"
-             class="action-link text-[--primary]">View</a>
+          <a
+            href="/admin/department-details.html?id=${docSnap.id}"
+            class="action-link text-[--primary]">
+            View
+          </a>
 
           <button
             data-id="${docSnap.id}"
@@ -82,7 +87,7 @@ async function loadDepartments() {
     tbody.appendChild(tr);
   });
 
-  /* ================= KPIs ================= */
+  /* ================= KPI UPDATE ================= */
   kpiTotal.textContent = total;
   kpiActive.textContent = active;
   kpiDoctors.textContent = doctorSum;
@@ -97,7 +102,6 @@ function bindToggleButtons() {
     btn.onclick = async () => {
       const id = btn.dataset.id;
       const current = btn.dataset.status;
-
       const nextStatus = current === "active" ? "disabled" : "active";
 
       const ok = confirm(
