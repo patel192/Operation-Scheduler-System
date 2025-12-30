@@ -11,9 +11,25 @@
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F8FAFC;
+      --bg:#F1F5F9;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(10px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(8px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
@@ -26,124 +42,146 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-10 fade-in">
 
   <!-- HEADER -->
   <section>
-    <h1 class="text-2xl font-bold">My Profile</h1>
-    <p class="text-sm text-[--muted] mt-1">
+    <h1 class="text-3xl font-bold">My Profile</h1>
+    <p class="text-sm text-[--muted] mt-2">
       Personal and medical information overview
     </p>
   </section>
 
   <!-- ================= PROFILE SUMMARY ================= -->
-  <section class="bg-white rounded-2xl shadow p-6 flex flex-col md:flex-row gap-6">
+  <section
+    class="glass border border-[--border] rounded-3xl shadow-lg
+           p-6 flex flex-col md:flex-row gap-8">
 
     <!-- AVATAR -->
-    <div class="flex flex-col items-center md:items-start gap-3">
-      <img
-        src="https://img.icons8.com/ios-filled/100/0A6CFF/user.png"
-        class="w-24 h-24 rounded-full border"
-        alt="Patient Avatar"
-      />
+    <div class="flex flex-col items-center gap-4 md:w-48">
 
-      <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700 font-semibold">
+      <div class="relative">
+        <img
+          src="https://img.icons8.com/ios-filled/100/0A6CFF/user.png"
+          class="w-28 h-28 rounded-full border border-[--border] bg-white p-2"
+          alt="Patient Avatar"
+        />
+      </div>
+
+      <span
+        class="px-3 py-1 rounded-full text-xs
+               bg-green-100 text-green-700 font-semibold">
         Active Patient
       </span>
 
       <button
         disabled
-        class="text-sm text-[--primary] font-semibold opacity-50 cursor-not-allowed">
+        class="text-sm font-semibold text-[--primary]
+               opacity-50 cursor-not-allowed">
         Change Photo (Coming Soon)
       </button>
     </div>
 
     <!-- BASIC DETAILS -->
-    <div class="flex-1 grid sm:grid-cols-2 gap-4 text-sm">
+    <div class="flex-1 grid sm:grid-cols-2 gap-6 text-sm">
 
       <div>
         <p class="text-[--muted]">Full Name</p>
-        <p class="font-semibold">Ramesh Kumar</p>
+        <p class="font-semibold text-base">Ramesh Kumar</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Patient ID</p>
-        <p class="font-semibold">PAT-2025-019</p>
+        <p class="font-semibold text-base">PAT-2025-019</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Email</p>
-        <p class="font-semibold">ramesh@gmail.com</p>
+        <p class="font-semibold text-base">ramesh@gmail.com</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Phone</p>
-        <p class="font-semibold">+91 98765 43210</p>
+        <p class="font-semibold text-base">+91 98765 43210</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Gender</p>
-        <p class="font-semibold">Male</p>
+        <p class="font-semibold text-base">Male</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Age</p>
-        <p class="font-semibold">52 Years</p>
+        <p class="font-semibold text-base">52 Years</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Blood Group</p>
-        <p class="font-semibold">B+</p>
+        <p class="font-semibold text-base">B+</p>
       </div>
 
     </div>
   </section>
 
-  <!-- ================= MEDICAL INFORMATION ================= -->
-  <section class="bg-white rounded-2xl shadow p-6">
+  <!-- ================= MEDICAL INFO ================= -->
+  <section
+    class="glass border border-[--border] rounded-3xl shadow p-6">
 
-    <h2 class="text-lg font-bold mb-4">Medical Information</h2>
+    <h2 class="text-lg font-bold mb-5">
+      Medical Information
+    </h2>
 
-    <div class="grid sm:grid-cols-2 gap-4 text-sm">
+    <div class="grid sm:grid-cols-2 gap-6 text-sm">
 
       <div>
         <p class="text-[--muted]">Known Conditions</p>
-        <p class="font-semibold">Hypertension</p>
+        <p class="font-semibold text-base">Hypertension</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Allergies</p>
-        <p class="font-semibold">None</p>
+        <p class="font-semibold text-base">None</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Emergency Contact</p>
-        <p class="font-semibold">Suresh Kumar • 98765 11111</p>
+        <p class="font-semibold text-base">
+          Suresh Kumar • 98765 11111
+        </p>
       </div>
 
       <div>
         <p class="text-[--muted]">Primary Doctor</p>
-        <p class="font-semibold">Dr. Amit Sharma</p>
+        <p class="font-semibold text-base">
+          Dr. Amit Sharma
+        </p>
       </div>
 
     </div>
   </section>
 
   <!-- ================= ACCOUNT ACTIONS ================= -->
-  <section class="bg-white rounded-2xl shadow p-6">
+  <section
+    class="glass border border-[--border] rounded-3xl shadow p-6">
 
-    <h2 class="text-lg font-bold mb-4">Account Settings</h2>
+    <h2 class="text-lg font-bold mb-5">
+      Account Settings
+    </h2>
 
     <div class="flex flex-col sm:flex-row gap-4">
 
       <button
         disabled
-        class="flex-1 py-3 rounded-xl bg-[--primary] text-white font-semibold opacity-50 cursor-not-allowed">
+        class="flex-1 py-3 rounded-xl bg-[--primary]
+               text-white font-semibold
+               opacity-50 cursor-not-allowed">
         Edit Profile (Coming Soon)
       </button>
 
       <button
-        class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition">
+        class="flex-1 py-3 rounded-xl bg-slate-100
+               text-slate-700 font-semibold
+               hover:bg-slate-200 transition">
         Change Password
       </button>
 

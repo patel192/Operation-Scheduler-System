@@ -3,12 +3,25 @@ import {
   doc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
-/* ================= HELPERS ================= */
-function getQueryParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
-}
 
+/* ================= QUERY ================= */
+const params = new URLSearchParams(window.location.search);
+const appointmentId = params.get("id");
+
+/* ================= ELEMENTS ================= */
+const loadingEl = document.getElementById("loading");
+const detailsSection = document.getElementById("detailsSection");
+
+const statusBadge = document.getElementById("statusBadge");
+const patientNameEl = document.getElementById("patientName");
+const patientIdEl = document.getElementById("patientId");
+const procedureEl = document.getElementById("procedure");
+const surgeonEl = document.getElementById("surgeon");
+const otRoomEl = document.getElementById("otRoom");
+const timeRangeEl = document.getElementById("timeRange");
+const notesEl = document.getElementById("notes");
+
+/* ================= HELPERS ================= */
 function statusClass(status) {
   switch (status) {
     case "Upcoming":
@@ -24,30 +37,22 @@ function statusClass(status) {
   }
 }
 
-/* ================= INIT ================= */
-const scheduleId = getQueryParam("id");
-
-if (!scheduleId) {
-  alert("Invalid appointment");
-  history.back();
+function formatTime(ts) {
+  return ts.toDate().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
-/* ================= ELEMENTS ================= */
-const loading = document.getElementById("loading");
-const detailsSection = document.getElementById("detailsSection");
+/* ================= LOAD ================= */
+async function loadAppointment() {
+  if (!appointmentId) {
+    alert("Invalid appointment");
+    history.back();
+    return;
+  }
 
-const patientNameEl = document.getElementById("patientName");
-const patientIdEl = document.getElementById("patientId");
-const procedureEl = document.getElementById("procedure");
-const surgeonEl = document.getElementById("surgeon");
-const otRoomEl = document.getElementById("otRoom");
-const statusBadgeEl = document.getElementById("statusBadge");
-const timeRangeEl = document.getElementById("timeRange");
-const notesEl = document.getElementById("notes");
-
-/* ================= LOAD DETAILS ================= */
-async function loadDetails() {
-  const ref = doc(db, "schedules", scheduleId);
+  const ref = doc(db, "schedules", appointmentId);
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
@@ -56,38 +61,26 @@ async function loadDetails() {
     return;
   }
 
-  const s = snap.data();
+  const d = snap.data();
 
-  patientNameEl.textContent = s.patientName || "-";
-  patientIdEl.textContent = s.patientId || "-";
-  procedureEl.textContent = s.procedure || "-";
-  surgeonEl.textContent = s.surgeonName || "-";
-  otRoomEl.textContent = s.otRoom || "-";
+  patientNameEl.textContent = d.patientName || "—";
+  patientIdEl.textContent = d.patientId || "—";
+  procedureEl.textContent = d.procedure || "—";
+  surgeonEl.textContent = d.surgeonName || "—";
+  otRoomEl.textContent = d.otRoom || "—";
+  notesEl.textContent = d.notes || "No additional notes provided";
 
-  const start = s.startTime.toDate();
-  const end = s.endTime.toDate();
+  timeRangeEl.textContent =
+    `${formatTime(d.startTime)} – ${formatTime(d.endTime)}`;
 
-  timeRangeEl.textContent = `
-    ${start.toLocaleDateString()} •
-    ${start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} –
-    ${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-  `;
+  statusBadge.textContent = d.status || "Upcoming";
+  statusBadge.className =
+    `inline-block px-4 py-1.5 rounded-full text-sm font-semibold
+     ${statusClass(d.status)}`;
 
-  statusBadgeEl.textContent = s.status;
-  statusBadgeEl.className =
-    `inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${statusClass(s.status)}`;
-
-  notesEl.textContent = s.notes || "No notes provided";
-
-  loading.classList.add("hidden");
+  loadingEl.classList.add("hidden");
   detailsSection.classList.remove("hidden");
 }
 
-(async () => {
-  // ✅ Sync statuses once
-  await autoUpdateScheduleStatus();
-
-  // ✅ Then load appointment details
-  await loadDetails();
-})();
-
+/* ================= INIT ================= */
+loadAppointment();

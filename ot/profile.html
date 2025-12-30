@@ -11,53 +11,75 @@
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F8FAFC;
+      --bg:#F1F5F9;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(8px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
   <!-- Auth Guard + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadOtNavbar.js"></script>
+  <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-5xl mx-auto px-4 py-8">
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-12 fade-in">
 
   <!-- ================= HEADER ================= -->
-  <section class="mb-8">
-    <h1 class="text-2xl font-bold">My Profile</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      View your role, availability and account settings
+  <section>
+    <h1 class="text-3xl font-bold">My Profile</h1>
+    <p class="text-sm text-[--muted] mt-2">
+      OT staff account, availability and access overview
     </p>
   </section>
 
   <!-- ================= PROFILE CARD ================= -->
-  <section class="bg-white rounded-2xl shadow p-6 mb-8">
+  <section class="glass border border-[--border] rounded-3xl shadow p-6">
 
-    <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+    <div class="flex flex-col sm:flex-row gap-8 items-center sm:items-start">
 
       <!-- AVATAR -->
       <div class="relative">
-        <img
-          src="https://img.icons8.com/ios-filled/100/0A6CFF/hospital.png"
-          alt="OT Staff"
-          class="w-24 h-24 rounded-full bg-blue-50 p-4 border"
-        />
-        <span class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
+        <div class="w-28 h-28 rounded-full bg-blue-50 flex items-center justify-center border">
+          <img
+            src="https://img.icons8.com/ios-filled/80/0A6CFF/hospital.png"
+            alt="OT Staff"
+          />
+        </div>
+
+        <!-- ONLINE DOT -->
+        <span
+          class="absolute bottom-2 right-2 w-4 h-4 bg-green-500
+                 border-2 border-white rounded-full">
+        </span>
       </div>
 
       <!-- INFO -->
-      <div class="flex-1 space-y-4">
+      <div class="flex-1 space-y-6">
 
         <div>
           <p class="text-sm text-[--muted]">Full Name</p>
-          <p class="font-semibold text-lg">Anita Sharma</p>
+          <p class="font-semibold text-xl">Anita Sharma</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm">
 
           <div>
             <p class="text-[--muted]">Role</p>
@@ -76,7 +98,8 @@
 
           <div>
             <p class="text-[--muted]">Account Status</p>
-            <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+            <span class="inline-block mt-1 px-3 py-1 rounded-full
+                         text-xs font-semibold bg-green-100 text-green-700">
               Active
             </span>
           </div>
@@ -89,39 +112,51 @@
   </section>
 
   <!-- ================= AVAILABILITY ================= -->
-  <section class="bg-white rounded-2xl shadow p-6 mb-8">
+  <section class="glass border border-[--border] rounded-3xl shadow p-6">
 
     <h2 class="text-lg font-bold mb-1">Availability Status</h2>
-    <p class="text-sm text-[--muted] mb-4">
-      This status is visible to admins and doctors
+    <p class="text-sm text-[--muted] mb-6">
+      This status updates automatically when you are assigned to surgeries
     </p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
 
       <!-- AVAILABLE -->
-      <label class="border rounded-xl p-4 cursor-pointer hover:bg-slate-50 transition">
-        <input type="radio" name="status" class="accent-blue-600" checked />
-        <p class="font-semibold mt-2">Available</p>
-        <p class="text-sm text-[--muted]">
+      <label class="group border border-[--border] rounded-2xl p-5 cursor-pointer
+                    hover:border-blue-400 hover:bg-blue-50 transition">
+        <input type="radio" name="status"
+               class="accent-blue-600" checked />
+        <p class="font-semibold mt-3 group-hover:text-[--primary]">
+          Available
+        </p>
+        <p class="text-sm text-[--muted] mt-1">
           Ready for OT duties
         </p>
       </label>
 
       <!-- BUSY -->
-      <label class="border rounded-xl p-4 cursor-pointer hover:bg-slate-50 transition">
-        <input type="radio" name="status" class="accent-blue-600" />
-        <p class="font-semibold mt-2">Busy</p>
-        <p class="text-sm text-[--muted]">
-          Currently assigned to surgery
+      <label class="group border border-[--border] rounded-2xl p-5 cursor-pointer
+                    hover:border-yellow-400 hover:bg-yellow-50 transition">
+        <input type="radio" name="status"
+               class="accent-blue-600" />
+        <p class="font-semibold mt-3 text-yellow-700">
+          Busy
+        </p>
+        <p class="text-sm text-[--muted] mt-1">
+          Currently assisting a surgery
         </p>
       </label>
 
       <!-- OFF DUTY -->
-      <label class="border rounded-xl p-4 cursor-pointer hover:bg-slate-50 transition">
-        <input type="radio" name="status" class="accent-blue-600" />
-        <p class="font-semibold mt-2">Off Duty</p>
-        <p class="text-sm text-[--muted]">
-          Not available today
+      <label class="group border border-[--border] rounded-2xl p-5 cursor-pointer
+                    hover:border-red-400 hover:bg-red-50 transition">
+        <input type="radio" name="status"
+               class="accent-blue-600" />
+        <p class="font-semibold mt-3 text-red-700">
+          Off Duty
+        </p>
+        <p class="text-sm text-[--muted] mt-1">
+          Not available for scheduling
         </p>
       </label>
 
@@ -130,7 +165,7 @@
   </section>
 
   <!-- ================= ACCOUNT ================= -->
-  <section class="bg-white rounded-2xl shadow p-6">
+  <section class="glass border border-[--border] rounded-3xl shadow p-6">
 
     <h2 class="text-lg font-bold mb-4">Account Actions</h2>
 
@@ -138,12 +173,14 @@
 
       <button
         disabled
-        class="flex-1 px-6 py-3 rounded-xl bg-slate-100 text-slate-500 font-semibold cursor-not-allowed">
+        class="flex-1 px-6 py-3 rounded-2xl bg-slate-100
+               text-slate-400 font-semibold cursor-not-allowed">
         Change Password (Coming Soon)
       </button>
 
       <button
-        class="flex-1 px-6 py-3 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200 transition">
+        class="flex-1 px-6 py-3 rounded-2xl bg-red-100
+               text-red-700 font-semibold hover:bg-red-200 transition">
         Logout
       </button>
 
