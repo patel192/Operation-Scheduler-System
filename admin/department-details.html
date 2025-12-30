@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Department Details · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/department-details.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+
+  <!-- HEADER -->
+  <section>
+    <a href="/admin/departments.html"
+       class="text-sm text-[--primary] font-semibold hover:underline">
+      ← Back to Departments
+    </a>
+
+    <h1 id="deptName" class="text-3xl font-bold mt-2">—</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Department overview & management
+    </p>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+    <div class="bg-white rounded-2xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">STATUS</p>
+      <span
+        id="deptStatus"
+        class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold">
+        —
+      </span>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">DOCTORS</p>
+      <h3 id="doctorCount" class="text-3xl font-bold mt-2">—</h3>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">OT ROOMS</p>
+      <p id="otRooms" class="mt-2 font-semibold text-sm">—</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow p-5 flex items-center justify-center">
+      <button
+        id="toggleStatusBtn"
+        class="px-4 py-2 rounded-xl font-semibold">
+        —
+      </button>
+    </div>
+
+  </section>
+
+  <!-- DOCTORS LIST -->
+  <section class="bg-white rounded-2xl shadow overflow-hidden">
+
+    <div class="px-6 py-4 border-b flex justify-between items-center">
+      <h2 class="font-semibold text-lg">Assigned Doctors</h2>
+      <span class="text-sm text-[--muted]">Auto-synced</span>
+    </div>
+
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-[--muted]">
+        <tr>
+          <th class="px-6 py-4 text-left">Doctor</th>
+          <th class="px-6 py-4 text-left">Email</th>
+          <th class="px-6 py-4 text-left">Availability</th>
+        </tr>
+      </thead>
+
+      <tbody id="doctorsTable" class="divide-y">
+        <!-- injected by JS -->
+      </tbody>
+    </table>
+
+    <div
+      id="emptyDoctors"
+      class="hidden p-8 text-center text-[--muted]">
+      No doctors assigned to this department.
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
