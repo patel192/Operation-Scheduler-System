@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Schedule Details — Doctor</title>
+  <title>Schedule Details · Doctor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
@@ -11,9 +11,25 @@
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F8FAFC;
+      --bg:#F1F5F9;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(8px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
@@ -25,44 +41,57 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-5xl mx-auto px-4 py-10 space-y-8">
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-8 fade-in">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <section>
     <a href="/doctor/my-schedule.html"
-       class="text-sm text-[--primary] font-semibold hover:underline">
+       class="text-sm font-semibold text-[--primary] hover:underline">
       ← Back to My Schedule
     </a>
 
-    <h1 class="text-2xl font-bold mt-2">Surgery Schedule Details</h1>
+    <h1 class="text-3xl font-bold mt-2">Surgery Schedule Details</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Complete information about the assigned operation
+      Complete overview of the assigned operation
     </p>
   </section>
 
-  <!-- STATUS BAR -->
-  <section class="bg-white rounded-xl shadow p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <!-- ================= STATUS CARD ================= -->
+  <section
+    class="glass rounded-2xl shadow border border-[--border]
+           p-6 flex flex-col sm:flex-row sm:items-center
+           sm:justify-between gap-4">
+
     <div>
       <p class="text-sm text-[--muted]">Current Status</p>
       <span
         id="statusBadge"
-        class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold">
+        class="inline-block mt-2 px-4 py-1.5 rounded-full
+               text-sm font-semibold">
         —
       </span>
     </div>
+
+    <button
+      id="markCompleted"
+      class="px-6 py-2.5 rounded-xl bg-green-600
+             text-white font-semibold hover:bg-green-700 transition">
+      Mark as Completed
+    </button>
+
   </section>
 
-  <!-- DETAILS GRID -->
+  <!-- ================= DETAILS GRID ================= -->
   <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <!-- PATIENT INFO -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="font-bold mb-4">Patient Information</h3>
+    <div class="glass rounded-2xl shadow border border-[--border] p-6">
+      <h3 class="font-bold text-lg mb-4">Patient Information</h3>
 
-      <div class="space-y-3 text-sm">
+      <div class="space-y-4 text-sm">
         <div>
           <p class="text-[--muted]">Patient Name</p>
-          <p id="patientName" class="font-semibold">—</p>
+          <p id="patientName" class="font-semibold text-base">—</p>
         </div>
 
         <div>
@@ -78,13 +107,13 @@
     </div>
 
     <!-- SURGERY INFO -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="font-bold mb-4">Surgery Information</h3>
+    <div class="glass rounded-2xl shadow border border-[--border] p-6">
+      <h3 class="font-bold text-lg mb-4">Surgery Information</h3>
 
-      <div class="space-y-3 text-sm">
+      <div class="space-y-4 text-sm">
         <div>
           <p class="text-[--muted]">Procedure</p>
-          <p id="procedure" class="font-semibold">—</p>
+          <p id="procedure" class="font-semibold text-base">—</p>
         </div>
 
         <div>
@@ -100,10 +129,10 @@
     </div>
 
     <!-- DOCTOR INFO -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="font-bold mb-4">Assigned Doctors</h3>
+    <div class="glass rounded-2xl shadow border border-[--border] p-6">
+      <h3 class="font-bold text-lg mb-4">Assigned Doctors</h3>
 
-      <div class="space-y-3 text-sm">
+      <div class="space-y-4 text-sm">
         <div>
           <p class="text-[--muted]">Surgeon</p>
           <p id="surgeon" class="font-semibold">—</p>
@@ -117,24 +146,15 @@
     </div>
 
     <!-- NOTES -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h3 class="font-bold mb-4">Clinical Notes</h3>
+    <div class="glass rounded-2xl shadow border border-[--border] p-6">
+      <h3 class="font-bold text-lg mb-4">Clinical Notes</h3>
       <p
         id="notes"
-        class="text-sm bg-slate-50 p-3 rounded-lg">
+        class="text-sm bg-slate-50 p-4 rounded-xl leading-relaxed">
         —
       </p>
     </div>
 
-  </section>
-
-  <!-- ACTIONS -->
-  <section class="flex justify-end gap-3">
-    <button
-      id="markCompleted"
-      class="px-5 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700">
-      Mark as Completed
-    </button>
   </section>
 
 </main>

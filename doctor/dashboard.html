@@ -11,147 +11,196 @@
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F8FAFC;
+      --bg:#F1F5F9;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(10px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
   <!-- Auth Guard + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<!-- ================= MAIN ================= -->
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-12 fade-in">
 
-  <!-- ===== WELCOME / HERO ===== -->
-  <section>
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow">
-      <h1 class="text-2xl font-bold">Welcome back, Doctor 👋</h1>
-      <p class="text-sm text-blue-100 mt-1">
-        Here’s an overview of your surgeries and patients today
-      </p>
-    </div>
+  <!-- ================= HERO ================= -->
+  <section
+    class="bg-gradient-to-r from-blue-600 to-indigo-600
+           rounded-3xl p-8 text-white shadow-lg">
+
+    <h1 class="text-3xl font-bold">
+      Welcome back, Doctor 👋
+    </h1>
+
+    <p class="text-sm text-blue-100 mt-2">
+      Your surgeries, patients, and schedule overview for today
+    </p>
+
   </section>
 
-  <!-- ===== STATS ===== -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+  <!-- ================= STATS ================= -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
 
-    <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+    <div class="glass rounded-2xl shadow p-5 border border-[--border]">
       <p class="text-sm text-[--muted]">Today’s Surgeries</p>
-      <h3 class="text-2xl font-bold mt-1 text-blue-600">3</h3>
+      <h3 class="text-3xl font-bold mt-1 text-blue-600">3</h3>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+    <div class="glass rounded-2xl shadow p-5 border border-[--border]">
       <p class="text-sm text-[--muted]">Upcoming</p>
-      <h3 class="text-2xl font-bold mt-1 text-yellow-600">7</h3>
+      <h3 class="text-3xl font-bold mt-1 text-yellow-600">7</h3>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-      <p class="text-sm text-[--muted]">Patients</p>
-      <h3 class="text-2xl font-bold mt-1">18</h3>
+    <div class="glass rounded-2xl shadow p-5 border border-[--border]">
+      <p class="text-sm text-[--muted]">Total Patients</p>
+      <h3 class="text-3xl font-bold mt-1">18</h3>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-      <p class="text-sm text-[--muted]">Status</p>
-      <h3 class="text-lg font-bold mt-2 text-green-600">
+    <div class="glass rounded-2xl shadow p-5 border border-[--border]">
+      <p class="text-sm text-[--muted]">Current Status</p>
+      <span
+        class="inline-block mt-2 px-3 py-1 rounded-full
+               text-sm font-semibold bg-green-100 text-green-700">
         Available
-      </h3>
+      </span>
     </div>
 
   </section>
 
-  <!-- ===== TODAY'S SCHEDULE ===== -->
-  <section class="bg-white rounded-2xl shadow p-6">
+  <!-- ================= TODAY SCHEDULE ================= -->
+  <section class="glass rounded-3xl shadow p-6 border border-[--border]">
 
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
       <h2 class="text-lg font-bold">Today’s Schedule</h2>
+
       <a href="/doctor/my-schedule.html"
          class="text-sm font-semibold text-[--primary] hover:underline">
-        View All
+        View Full Schedule →
       </a>
     </div>
 
     <div class="space-y-4">
 
       <!-- ITEM -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between
-                  border rounded-xl p-4 hover:bg-slate-50 hover:shadow transition cursor-pointer">
+      <div
+        class="flex flex-col md:flex-row md:items-center
+               md:justify-between gap-4 p-5 rounded-2xl
+               border border-[--border]
+               hover:bg-slate-50 hover:shadow transition cursor-pointer">
 
-        <div class="border-l-4 border-blue-500 pl-4">
-          <p class="font-semibold">Heart Bypass Surgery</p>
-          <p class="text-sm text-[--muted]">Patient: Ramesh Kumar</p>
-          <p class="text-sm text-[--muted]">OT-1 • 10:00 AM</p>
+        <div class="pl-4 border-l-4 border-blue-500">
+          <p class="font-semibold text-base">
+            Heart Bypass Surgery
+          </p>
+          <p class="text-sm text-[--muted]">
+            Patient: Ramesh Kumar
+          </p>
+          <p class="text-sm text-[--muted]">
+            OT-1 • 10:00 AM
+          </p>
         </div>
 
-        <span class="mt-3 md:mt-0 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+        <span
+          class="px-3 py-1 rounded-full text-xs font-semibold
+                 bg-blue-100 text-blue-700">
           Upcoming
         </span>
       </div>
 
       <!-- ITEM -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between
-                  border rounded-xl p-4 hover:bg-slate-50 hover:shadow transition cursor-pointer">
+      <div
+        class="flex flex-col md:flex-row md:items-center
+               md:justify-between gap-4 p-5 rounded-2xl
+               border border-[--border]
+               hover:bg-slate-50 hover:shadow transition cursor-pointer">
 
-        <div class="border-l-4 border-green-500 pl-4">
-          <p class="font-semibold">Angioplasty</p>
-          <p class="text-sm text-[--muted]">Patient: Suresh Patel</p>
-          <p class="text-sm text-[--muted]">OT-2 • 2:30 PM</p>
+        <div class="pl-4 border-l-4 border-green-500">
+          <p class="font-semibold text-base">
+            Angioplasty
+          </p>
+          <p class="text-sm text-[--muted]">
+            Patient: Suresh Patel
+          </p>
+          <p class="text-sm text-[--muted]">
+            OT-2 • 2:30 PM
+          </p>
         </div>
 
-        <span class="mt-3 md:mt-0 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+        <span
+          class="px-3 py-1 rounded-full text-xs font-semibold
+                 bg-green-100 text-green-700">
           Completed
         </span>
       </div>
 
     </div>
+
   </section>
 
-  <!-- ===== RECENT PATIENTS ===== -->
-  <section class="bg-white rounded-2xl shadow p-6">
+  <!-- ================= RECENT PATIENTS ================= -->
+  <section class="glass rounded-3xl shadow p-6 border border-[--border]">
 
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
       <h2 class="text-lg font-bold">Recent Patients</h2>
+
       <a href="/doctor/patient-list.html"
          class="text-sm font-semibold text-[--primary] hover:underline">
-        View All
+        View All →
       </a>
     </div>
 
     <div class="overflow-x-auto">
-      <table class="w-full text-sm border-separate border-spacing-y-1">
+      <table class="w-full text-sm border-separate border-spacing-y-2">
 
-        <thead class="bg-slate-50">
+        <thead class="text-[--muted]">
           <tr>
-            <th class="px-4 py-3 text-left">Patient</th>
-            <th class="px-4 py-3 text-left">Procedure</th>
-            <th class="px-4 py-3 text-left">Date</th>
-            <th class="px-4 py-3 text-left">Status</th>
+            <th class="px-4 py-2 text-left">Patient</th>
+            <th class="px-4 py-2 text-left">Procedure</th>
+            <th class="px-4 py-2 text-left">Date</th>
+            <th class="px-4 py-2 text-left">Status</th>
           </tr>
         </thead>
 
         <tbody>
 
-          <tr class="bg-white hover:bg-slate-50 rounded-lg">
+          <tr class="bg-white rounded-xl shadow-sm hover:shadow transition">
             <td class="px-4 py-3 font-semibold">Amit Shah</td>
             <td class="px-4 py-3">Bypass</td>
             <td class="px-4 py-3">Today</td>
             <td class="px-4 py-3">
-              <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              <span class="px-2 py-1 rounded-full text-xs
+                           bg-green-100 text-green-700">
                 Stable
               </span>
             </td>
           </tr>
 
-          <tr class="bg-white hover:bg-slate-50 rounded-lg">
+          <tr class="bg-white rounded-xl shadow-sm hover:shadow transition">
             <td class="px-4 py-3 font-semibold">Neha Verma</td>
             <td class="px-4 py-3">Angiography</td>
             <td class="px-4 py-3">Yesterday</td>
             <td class="px-4 py-3">
-              <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+              <span class="px-2 py-1 rounded-full text-xs
+                           bg-blue-100 text-blue-700">
                 Recovering
               </span>
             </td>

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Patient Details — Doctor</title>
+  <title>Patient Details · Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,9 +11,25 @@
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F8FAFC;
+      --bg:#F1F5F9;
+      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(8px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
@@ -24,124 +40,147 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-8 fade-in">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <section>
     <a href="/doctor/patient-list.html"
        class="text-sm text-[--primary] font-semibold hover:underline">
       ← Back to Patients
     </a>
 
-    <h1 class="text-2xl font-bold mt-2">Patient Details</h1>
+    <h1 class="text-3xl font-bold mt-2">Patient Details</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Complete medical profile and surgery history
+      Medical profile, condition summary and surgery history
     </p>
   </section>
 
-  <!-- PATIENT SUMMARY CARD -->
-  <section class="bg-white rounded-2xl shadow p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- ================= PATIENT SUMMARY ================= -->
+  <section
+    class="glass border border-[--border] rounded-3xl shadow
+           p-6 flex flex-col md:flex-row md:items-center
+           md:justify-between gap-6">
 
     <div>
-      <h2 class="text-xl font-bold">Ramesh Kumar</h2>
+      <h2 class="text-2xl font-bold">Ramesh Kumar</h2>
       <p class="text-sm text-[--muted] mt-1">
-        Male • 54 Years • Patient ID: <span class="font-semibold text-[--text]">P-1023</span>
+        Male • 54 Years • Patient ID:
+        <span class="font-semibold text-[--text]">P-1023</span>
       </p>
       <p class="text-sm text-[--muted]">
-        Blood Group: B+ • Contact: +91 98765 43210
+        Blood Group: <strong class="text-[--text]">B+</strong> •
+        Contact: <strong class="text-[--text]">+91 98765 43210</strong>
       </p>
     </div>
 
-    <span class="px-4 py-1 rounded-full text-sm bg-green-100 text-green-700 font-semibold">
+    <span
+      class="px-5 py-1.5 rounded-full text-sm font-semibold
+             bg-green-100 text-green-700">
       Stable
     </span>
   </section>
 
-  <!-- INFO GRID -->
+  <!-- ================= INFO GRID ================= -->
   <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <!-- MEDICAL SUMMARY -->
-    <div class="bg-white rounded-2xl shadow p-6">
-      <h3 class="font-semibold mb-4">Medical Summary</h3>
+    <div class="glass border border-[--border] rounded-3xl shadow p-6">
+      <h3 class="font-semibold text-lg mb-4">Medical Summary</h3>
 
-      <ul class="space-y-2 text-sm">
+      <ul class="space-y-3 text-sm">
         <li>
-          <span class="text-[--muted]">Primary Condition:</span>
-          <span class="font-semibold">Coronary Artery Disease</span>
+          <span class="text-[--muted]">Primary Condition</span>
+          <p class="font-semibold">Coronary Artery Disease</p>
         </li>
+
         <li>
-          <span class="text-[--muted]">Allergies:</span>
-          <span class="font-semibold">Penicillin</span>
+          <span class="text-[--muted]">Allergies</span>
+          <p class="font-semibold">Penicillin</p>
         </li>
+
         <li>
-          <span class="text-[--muted]">Chronic Illness:</span>
-          <span class="font-semibold">Hypertension</span>
+          <span class="text-[--muted]">Chronic Illness</span>
+          <p class="font-semibold">Hypertension</p>
         </li>
+
         <li>
-          <span class="text-[--muted]">Current Medications:</span>
-          <span class="font-semibold">Aspirin, Atenolol</span>
+          <span class="text-[--muted]">Current Medications</span>
+          <p class="font-semibold">Aspirin, Atenolol</p>
         </li>
       </ul>
     </div>
 
     <!-- EMERGENCY & NOTES -->
-    <div class="bg-white rounded-2xl shadow p-6">
-      <h3 class="font-semibold mb-4">Emergency & Notes</h3>
+    <div class="glass border border-[--border] rounded-3xl shadow p-6">
+      <h3 class="font-semibold text-lg mb-4">
+        Emergency & Clinical Notes
+      </h3>
 
       <p class="text-sm mb-3">
-        <span class="text-[--muted]">Emergency Contact:</span>
-        <span class="font-semibold">Suresh Kumar (Brother)</span>
+        <span class="text-[--muted]">Emergency Contact</span>
+        <br />
+        <span class="font-semibold">
+          Suresh Kumar (Brother)
+        </span>
       </p>
 
-      <p class="text-sm text-[--muted]">
-        Patient is responding well to medication. Surgery scheduled as planned.
-      </p>
+      <div class="bg-slate-50 rounded-xl p-4 text-sm text-slate-700">
+        Patient is responding well to medication.
+        Surgery scheduled as planned.
+      </div>
     </div>
 
   </section>
 
-  <!-- SURGERY HISTORY -->
-  <section class="bg-white rounded-2xl shadow p-6">
-    <h3 class="font-semibold mb-4">Surgery History</h3>
+  <!-- ================= SURGERY HISTORY ================= -->
+  <section
+    class="glass border border-[--border] rounded-3xl shadow p-6">
+
+    <h3 class="font-semibold text-lg mb-4">Surgery History</h3>
 
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
+
         <thead class="bg-slate-50 text-slate-600">
           <tr>
-            <th class="px-4 py-3 text-left">Procedure</th>
-            <th class="px-4 py-3 text-left">OT</th>
-            <th class="px-4 py-3 text-left">Date</th>
-            <th class="px-4 py-3 text-left">Status</th>
+            <th class="px-5 py-3 text-left">Procedure</th>
+            <th class="px-5 py-3 text-left">OT</th>
+            <th class="px-5 py-3 text-left">Date</th>
+            <th class="px-5 py-3 text-left">Status</th>
           </tr>
         </thead>
 
         <tbody class="divide-y">
 
           <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold">Angiography</td>
-            <td class="px-4 py-3">OT-2</td>
-            <td class="px-4 py-3">12 Sep 2025</td>
-            <td class="px-4 py-3">
-              <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700 font-semibold">
+            <td class="px-5 py-3 font-semibold">Angiography</td>
+            <td class="px-5 py-3">OT-2</td>
+            <td class="px-5 py-3">12 Sep 2025</td>
+            <td class="px-5 py-3">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold
+                           bg-green-100 text-green-700">
                 Completed
               </span>
             </td>
           </tr>
 
           <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold">Bypass Surgery</td>
-            <td class="px-4 py-3">OT-1</td>
-            <td class="px-4 py-3">15 Sep 2025</td>
-            <td class="px-4 py-3">
-              <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-semibold">
+            <td class="px-5 py-3 font-semibold">Bypass Surgery</td>
+            <td class="px-5 py-3">OT-1</td>
+            <td class="px-5 py-3">15 Sep 2025</td>
+            <td class="px-5 py-3">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold
+                           bg-blue-100 text-blue-700">
                 Upcoming
               </span>
             </td>
           </tr>
 
         </tbody>
+
       </table>
     </div>
+
   </section>
 
 </main>

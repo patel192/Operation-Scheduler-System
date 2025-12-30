@@ -60,7 +60,8 @@ async function loadSchedules() {
 
     const card = document.createElement("div");
     card.className =
-      "bg-white rounded-xl shadow p-5 border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition";
+  "glass rounded-2xl shadow border border-[--border] p-5 cursor-pointer hover:shadow-lg transition";
+
 
     card.innerHTML = `
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
