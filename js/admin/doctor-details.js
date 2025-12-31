@@ -7,6 +7,7 @@ import {
   query,
   where,
   getDocs,
+  orderBy,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 /* ================= PARAM ================= */
@@ -26,14 +27,23 @@ const availabilityEl = document.getElementById("availability");
 const departmentEl = document.getElementById("department");
 const toggleStatusBtn = document.getElementById("toggleStatusBtn");
 
-const scheduleTable = document.getElementById("scheduleTable");
-const emptySchedules = document.getElementById("emptySchedules");
+const timelineList = document.getElementById("timelineList");
+const timelineEmpty = document.getElementById("timelineEmpty");
 
 /* ================= HELPERS ================= */
-function statusBadge(status) {
-  return status === "disabled"
-    ? "bg-red-100 text-red-700"
-    : "bg-emerald-100 text-emerald-700";
+function statusStyle(status) {
+  if (status === "Completed") return "border-green-500 text-green-700";
+  if (status === "Ongoing") return "border-yellow-500 text-yellow-700";
+  if (status === "Cancelled") return "border-red-500 text-red-700";
+  return "border-blue-500 text-blue-700";
+}
+
+function formatDate(ts) {
+  return ts.toDate().toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function formatTime(ts) {
@@ -63,7 +73,11 @@ async function loadDoctor() {
 
   statusBadgeEl.textContent = d.status || "active";
   statusBadgeEl.className =
-    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(d.status)}`;
+    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
+      d.status === "disabled"
+        ? "bg-red-100 text-red-700"
+        : "bg-emerald-100 text-emerald-700"
+    }`;
 
   toggleStatusBtn.textContent =
     d.status === "disabled" ? "Enable Doctor" : "Disable Doctor";
@@ -73,41 +87,59 @@ async function loadDoctor() {
       ? "px-5 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold"
       : "px-5 py-2 rounded-xl bg-red-100 text-red-700 font-semibold";
 
-  await loadSchedules();
+  await loadTimeline();
 }
 
-/* ================= LOAD SCHEDULES ================= */
-async function loadSchedules() {
-  scheduleTable.innerHTML = "";
-  emptySchedules.classList.add("hidden");
+/* ================= LOAD TIMELINE ================= */
+async function loadTimeline() {
+  timelineList.innerHTML = "";
+  timelineEmpty.classList.add("hidden");
 
   const q = query(
     collection(db, "schedules"),
-    where("surgeonId", "==", doctorId)
+    where("surgeonId", "==", doctorId),
+    orderBy("startTime", "asc")
   );
 
   const snap = await getDocs(q);
 
   if (snap.empty) {
-    emptySchedules.classList.remove("hidden");
+    timelineEmpty.classList.remove("hidden");
     return;
   }
 
   snap.forEach((docSnap) => {
     const s = docSnap.data();
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="px-6 py-4 font-semibold">${s.patientName || "—"}</td>
-      <td class="px-6 py-4">${s.procedure || "—"}</td>
-      <td class="px-6 py-4">${s.otRoom || "—"}</td>
-      <td class="px-6 py-4">
-        ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
-      </td>
-      <td class="px-6 py-4 capitalize">${s.status}</td>
+    const item = document.createElement("div");
+    item.className = `
+      border-l-4 pl-4 py-3 rounded cursor-pointer hover:bg-slate-50 transition
+      ${statusStyle(s.status)}
     `;
 
-    scheduleTable.appendChild(tr);
+    item.innerHTML = `
+      <p class="font-semibold">${s.procedure || "—"}</p>
+
+      <p class="text-sm text-slate-600">
+        Patient: ${s.patientName || "—"} • ${s.otRoom || "—"}
+      </p>
+
+      <p class="text-xs text-slate-500">
+        ${formatDate(s.startTime)} •
+        ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
+      </p>
+
+      <span class="text-xs font-semibold uppercase">
+        ${s.status}
+      </span>
+    `;
+
+    item.onclick = () => {
+      window.location.href =
+        `/admin/schedule-details.html?id=${docSnap.id}`;
+    };
+
+    timelineList.appendChild(item);
   });
 }
 
@@ -122,9 +154,9 @@ toggleStatusBtn.onclick = async () => {
     return;
   }
 
-  const next = d.status === "disabled" ? "active" : "disabled";
+  const nextStatus = d.status === "disabled" ? "active" : "disabled";
+  await updateDoc(ref, { status: nextStatus });
 
-  await updateDoc(ref, { status: next });
   loadDoctor();
 };
 
