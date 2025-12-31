@@ -37,8 +37,7 @@ async function loadDepartments() {
     const u = docSnap.data();
     if (!u.department) return;
 
-    doctorCountMap[u.department] =
-      (doctorCountMap[u.department] || 0) + 1;
+    doctorCountMap[u.department] = (doctorCountMap[u.department] || 0) + 1;
 
     totalDoctors++;
   });
@@ -121,11 +120,43 @@ function bindToggleButtons() {
       const current = btn.dataset.status;
       const nextStatus = current === "active" ? "disabled" : "active";
 
-      const ok = confirm(
-        `Are you sure you want to ${nextStatus} this department?`
-      );
-      if (!ok) return;
+      if (nextStatus === "disabled") {
+        // 1️⃣ Fetch department
+        const deptSnap = await getDocs(query(collection(db, "departments")));
 
+        const deptDoc = deptSnap.docs.find((d) => d.id === id);
+        const deptName = deptDoc.data().name;
+
+        // 2️⃣ Check doctors
+        const doctorsSnap = await getDocs(
+          query(
+            collection(db, "users"),
+            where("role", "==", "Doctor"),
+            where("department", "==", deptName)
+          )
+        );
+
+        if (!doctorsSnap.empty) {
+          alert("Cannot disable department: doctors are assigned.");
+          return;
+        }
+
+        // 3️⃣ Check active schedules
+        const schedulesSnap = await getDocs(
+          query(
+            collection(db, "schedules"),
+            where("department", "==", deptName),
+            where("status", "in", ["Upcoming", "Ongoing"])
+          )
+        );
+
+        if (!schedulesSnap.empty) {
+          alert("Cannot disable department: active schedules exist.");
+          return;
+        }
+      }
+
+      // ✅ Safe to update
       await updateDoc(doc(db, "departments", id), {
         status: nextStatus,
         updatedAt: serverTimestamp(),

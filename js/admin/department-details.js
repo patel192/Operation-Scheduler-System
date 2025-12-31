@@ -55,8 +55,9 @@ async function loadDepartment() {
 
   deptNameEl.textContent = d.name;
   deptStatusEl.textContent = d.status;
-  deptStatusEl.className =
-    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(d.status)}`;
+  deptStatusEl.className = `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(
+    d.status
+  )}`;
 
   otRoomsEl.textContent = (d.otRooms || []).join(", ");
 
@@ -69,7 +70,7 @@ async function loadDepartment() {
       : "px-5 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold";
 
   /* ----- Department Head ----- */
-  await loadDepartmentDoctors(headDoctorSelect,d.name);
+  await loadDepartmentDoctors(headDoctorSelect, d.name);
 
   if (d.headDoctorId) {
     headDoctorSelect.value = d.headDoctorId;
@@ -117,9 +118,45 @@ async function loadDepartmentDoctorsList(departmentName) {
 toggleStatusBtn.onclick = async () => {
   const ref = doc(db, "departments", deptId);
   const snap = await getDoc(ref);
-  const newStatus = snap.data().status === "active" ? "disabled" : "active";
+  const d = snap.data();
 
-  await updateDoc(ref, { status: newStatus });
+  const nextStatus = d.status === "active" ? "disabled" : "active";
+
+  if (nextStatus === "disabled") {
+    // 1️⃣ Doctors check
+    const doctorsSnap = await getDocs(
+      query(
+        collection(db, "users"),
+        where("role", "==", "Doctor"),
+        where("department", "==", d.name)
+      )
+    );
+
+    if (!doctorsSnap.empty) {
+      alert("Cannot disable department: doctors are assigned.");
+      return;
+    }
+
+    // 2️⃣ Active schedules check
+    const schedulesSnap = await getDocs(
+      query(
+        collection(db, "schedules"),
+        where("department", "==", d.name),
+        where("status", "in", ["Upcoming", "Ongoing"])
+      )
+    );
+
+    if (!schedulesSnap.empty) {
+      alert("Cannot disable department: active schedules exist.");
+      return;
+    }
+  }
+
+  await updateDoc(ref, {
+    status: nextStatus,
+    updatedAt: serverTimestamp(),
+  });
+
   loadDepartment();
 };
 
