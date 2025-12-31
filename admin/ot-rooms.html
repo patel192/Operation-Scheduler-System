@@ -1,188 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
   <title>OT Rooms · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
-      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
-      --radius:18px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-
-    .action-link {
-      font-weight: 600;
-      transition: color .15s ease;
-    }
-
-    .action-link:hover {
-      text-decoration: underline;
     }
   </style>
 
+  <!-- Auth + Layout -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+
+  <!-- Page Logic -->
+  <script type="module" defer src="/js/admin/ot-rooms.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
 <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <!-- ===== HERO HEADER ===== -->
-  <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- HEADER -->
+  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-bold">Operation Theatres</h1>
+      <h1 class="text-3xl font-bold">OT Rooms</h1>
       <p class="text-sm text-[--muted] mt-1">
-        Manage OT rooms, capacity, equipment and availability
+        Manage operation theatres and availability
       </p>
     </div>
 
     <a href="/admin/add-ot-room.html"
-      class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
-             bg-[--primary] text-white font-semibold hover:opacity-90">
+       class="px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold hover:opacity-90">
       + Add OT Room
     </a>
   </section>
 
-  <!-- ===== KPI STRIP ===== -->
+  <!-- KPI STRIP -->
   <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        Total OT Rooms
-      </p>
-      <h3 class="text-3xl font-bold mt-2">8</h3>
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">TOTAL OT ROOMS</p>
+      <h3 id="kpiTotal" class="text-3xl font-bold mt-2">0</h3>
     </div>
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        Available
-      </p>
-      <h3 class="text-3xl font-bold mt-2 text-emerald-600">5</h3>
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">AVAILABLE</p>
+      <h3 id="kpiAvailable" class="text-3xl font-bold mt-2 text-emerald-600">0</h3>
     </div>
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        In Use
-      </p>
-      <h3 class="text-3xl font-bold mt-2 text-blue-600">2</h3>
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">IN USE</p>
+      <h3 id="kpiInUse" class="text-3xl font-bold mt-2 text-blue-600">0</h3>
     </div>
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        Maintenance
-      </p>
-      <h3 class="text-3xl font-bold mt-2 text-red-600">1</h3>
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">MAINTENANCE</p>
+      <h3 id="kpiMaintenance" class="text-3xl font-bold mt-2 text-amber-600">0</h3>
     </div>
 
   </section>
 
-  <!-- ===== TABLE ===== -->
-  <section class="card overflow-hidden">
+  <!-- TABLE -->
+  <section class="bg-white rounded-2xl shadow overflow-hidden">
 
-    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
-      <h2 class="font-semibold text-lg">OT Room Directory</h2>
-      <span class="text-sm text-[--muted]">Operational overview</span>
+    <div class="px-6 py-4 border-b flex justify-between items-center">
+      <h2 class="font-semibold text-lg">OT Room List</h2>
+      <span class="text-sm text-[--muted]">Administrative view</span>
     </div>
 
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left text-[--muted]">
+      <thead class="bg-slate-50 text-[--muted]">
         <tr>
-          <th class="px-6 py-4 font-semibold">OT Room</th>
-          <th class="px-6 py-4 font-semibold">Department</th>
-          <th class="px-6 py-4 font-semibold">Capacity</th>
-          <th class="px-6 py-4 font-semibold">Equipment</th>
-          <th class="px-6 py-4 font-semibold">Status</th>
-          <th class="px-6 py-4 font-semibold text-right">Actions</th>
+          <th class="px-6 py-4 text-left">OT Room</th>
+          <th class="px-6 py-4 text-left">Department</th>
+          <th class="px-6 py-4 text-left">Equipment</th>
+          <th class="px-6 py-4 text-left">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
         </tr>
       </thead>
 
-      <tbody class="divide-y">
-
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-semibold">
-            <div>OT-1</div>
-            <div class="text-xs text-[--muted]">Primary Cardiac OT</div>
-          </td>
-
-          <td class="px-6 py-4">Cardiology</td>
-
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
-              Full
-            </span>
-          </td>
-
-          <td class="px-6 py-4 text-[--muted]">
-            Ventilator, ECG, Monitor
-          </td>
-
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-emerald-100 text-emerald-700">
-              Available
-            </span>
-          </td>
-
-          <td class="px-6 py-4">
-            <div class="flex justify-end gap-4">
-              <a href="#" class="action-link text-[--primary]">View</a>
-              <a href="#" class="action-link text-amber-600">Edit</a>
-              <a href="#" class="action-link text-red-600">Disable</a>
-            </div>
-          </td>
-        </tr>
-
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-semibold">
-            <div>OT-3</div>
-            <div class="text-xs text-[--muted]">Orthopedic Surgery OT</div>
-          </td>
-
-          <td class="px-6 py-4">Orthopedics</td>
-
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
-              Partial
-            </span>
-          </td>
-
-          <td class="px-6 py-4 text-[--muted]">
-            X-Ray, Drill Unit
-          </td>
-
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-blue-100 text-blue-700">
-              In Use
-            </span>
-          </td>
-
-          <td class="px-6 py-4">
-            <div class="flex justify-end gap-4">
-              <a href="#" class="action-link text-[--primary]">View</a>
-              <a href="#" class="action-link text-amber-600">Edit</a>
-            </div>
-          </td>
-        </tr>
-
+      <tbody id="otTableBody" class="divide-y">
+        <!-- injected by JS -->
       </tbody>
     </table>
+
+    <div id="emptyState"
+         class="hidden text-center text-[--muted] py-10">
+      No OT Rooms found.
+    </div>
 
   </section>
 
