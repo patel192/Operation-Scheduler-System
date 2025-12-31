@@ -33,11 +33,15 @@ const timelineEmpty = document.getElementById("timelineEmpty");
 const filterStatus = document.getElementById("filterStatus");
 const filterDate = document.getElementById("filterDate");
 
+const tabUpcoming = document.getElementById("tabUpcoming");
+const tabPast = document.getElementById("tabPast");
+
 /* ================= STATE ================= */
 let allSchedules = [];
+let activeTab = "upcoming";
 
 /* ================= HELPERS ================= */
-function statusStyle(status = "Upcoming") {
+function statusStyle(status) {
   if (status === "Completed") return "border-green-500 text-green-700";
   if (status === "Ongoing") return "border-yellow-500 text-yellow-700";
   if (status === "Cancelled") return "border-red-500 text-red-700";
@@ -59,34 +63,26 @@ function formatTime(ts) {
   });
 }
 
-function groupByDate(schedules) {
+function groupByDate(list) {
   const map = {};
-
-  schedules.forEach((s) => {
+  list.forEach(s => {
     const key = s.startTime.toDate().toISOString().slice(0, 10);
     if (!map[key]) map[key] = [];
     map[key].push(s);
   });
-
   return map;
 }
 
 /* ================= LOAD DOCTOR ================= */
 async function loadDoctor() {
-  const ref = doc(db, "users", doctorId);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    alert("Doctor not found");
-    window.location.href = "/admin/doctors.html";
-    return;
-  }
+  const snap = await getDoc(doc(db, "users", doctorId));
+  if (!snap.exists()) return;
 
   const d = snap.data();
 
   doctorNameEl.textContent = d.displayName || "—";
   doctorEmailEl.textContent = d.email || "—";
-  availabilityEl.textContent = d.availability || "unknown";
+  availabilityEl.textContent = d.availability || "—";
   departmentEl.textContent = d.department || "—";
 
   statusBadgeEl.textContent = d.status || "active";
@@ -117,78 +113,59 @@ async function loadTimeline() {
   );
 
   const snap = await getDocs(q);
-
-  allSchedules = snap.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  }));
+  allSchedules = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   applyFilters();
 }
 
-/* ================= FILTER + RENDER ================= */
+/* ================= FILTER + TABS ================= */
 function applyFilters() {
   timelineList.innerHTML = "";
   timelineEmpty.classList.add("hidden");
 
-  let filtered = [...allSchedules];
+  let list = [...allSchedules];
 
+  // TAB FILTER
+  if (activeTab === "upcoming") {
+    list = list.filter(s =>
+      ["Upcoming", "Ongoing"].includes(s.status)
+    );
+  } else {
+    list = list.filter(s =>
+      ["Completed", "Cancelled"].includes(s.status)
+    );
+  }
+
+  // STATUS FILTER
   if (filterStatus.value) {
-    filtered = filtered.filter((s) => s.status === filterStatus.value);
+    list = list.filter(s => s.status === filterStatus.value);
   }
 
+  // DATE FILTER
   if (filterDate.value) {
-    filtered = filtered.filter((s) => {
-      const d = s.startTime.toDate().toISOString().slice(0, 10);
-      return d === filterDate.value;
-    });
+    list = list.filter(s =>
+      s.startTime.toDate().toISOString().slice(0, 10) === filterDate.value
+    );
   }
 
-  if (!filtered.length) {
+  if (!list.length) {
     timelineEmpty.classList.remove("hidden");
     return;
   }
 
-  const grouped = groupByDate(filtered);
-
-  Object.entries(grouped).forEach(([date, schedules]) => {
-    renderDateGroup(date, schedules);
-  });
+  const grouped = groupByDate(list);
+  Object.entries(grouped).forEach(([date, schedules]) =>
+    renderDateGroup(date, schedules)
+  );
 }
 
-function renderTimelineItem(s, container) {
-  const item = document.createElement("div");
-  item.className = `
-    border-l-4 pl-4 py-3 rounded cursor-pointer hover:bg-slate-50 transition
-    ${statusStyle(s.status)}
-  `;
-
-  item.innerHTML = `
-    <p class="font-semibold">${s.procedure || "—"}</p>
-    <p class="text-sm text-slate-600">
-      Patient: ${s.patientName || "—"} • ${s.otRoom || "—"}
-    </p>
-    <p class="text-xs text-slate-500">
-      ${formatDate(s.startTime)} •
-      ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
-    </p>
-    <span class="text-xs font-semibold uppercase">${s.status}</span>
-  `;
-
-  item.onclick = () => {
-    window.location.href =
-      `/admin/schedule-details.html?id=${s.id}`;
-  };
-
-  container.appendChild(item);
-}
-
+/* ================= RENDER ================= */
 function renderDateGroup(date, schedules) {
   const wrapper = document.createElement("div");
 
   const header = document.createElement("div");
   header.className =
-    "flex justify-between items-center cursor-pointer bg-slate-100 px-4 py-2 rounded font-semibold";
+    "flex justify-between items-center bg-slate-100 px-4 py-2 rounded cursor-pointer font-semibold";
 
   header.innerHTML = `
     <span>${new Date(date).toDateString()}</span>
@@ -198,7 +175,25 @@ function renderDateGroup(date, schedules) {
   const content = document.createElement("div");
   content.className = "mt-3 space-y-3";
 
-  schedules.forEach((s) => renderTimelineItem(s, content));
+  schedules.forEach(s => {
+    const item = document.createElement("div");
+    item.className =
+      `border-l-4 pl-4 py-3 rounded ${statusStyle(s.status)}`;
+
+    item.innerHTML = `
+      <p class="font-semibold">${s.procedure}</p>
+      <p class="text-sm text-slate-600">
+        Patient: ${s.patientName} • ${s.otRoom}
+      </p>
+      <p class="text-xs text-slate-500">
+        ${formatDate(s.startTime)} •
+        ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
+      </p>
+      <span class="text-xs font-semibold uppercase">${s.status}</span>
+    `;
+
+    content.appendChild(item);
+  });
 
   let collapsed = false;
   header.onclick = () => {
@@ -211,7 +206,24 @@ function renderDateGroup(date, schedules) {
   timelineList.appendChild(wrapper);
 }
 
-/* ================= ACTION ================= */
+/* ================= EVENTS ================= */
+tabUpcoming.onclick = () => {
+  activeTab = "upcoming";
+  tabUpcoming.classList.add("bg-[--primary]", "text-white");
+  tabPast.classList.remove("bg-[#0a6cff]","text-white");
+  applyFilters();
+};
+
+tabPast.onclick = () => {
+  activeTab = "past";
+  tabPast.classList.add("bg-[#0a6cff]","text-white");
+  tabUpcoming.classList.remove("bg-[--primary]", "text-white");
+  applyFilters();
+};
+
+filterStatus.addEventListener("change", applyFilters);
+filterDate.addEventListener("change", applyFilters);
+
 toggleStatusBtn.onclick = async () => {
   const ref = doc(db, "users", doctorId);
   const snap = await getDoc(ref);
@@ -222,15 +234,12 @@ toggleStatusBtn.onclick = async () => {
     return;
   }
 
-  const next = d.status === "disabled" ? "active" : "disabled";
-  await updateDoc(ref, { status: next });
+  await updateDoc(ref, {
+    status: d.status === "disabled" ? "active" : "disabled",
+  });
 
   loadDoctor();
 };
-
-/* ================= EVENTS ================= */
-filterStatus.addEventListener("change", applyFilters);
-filterDate.addEventListener("change", applyFilters);
 
 /* ================= INIT ================= */
 loadDoctor();
