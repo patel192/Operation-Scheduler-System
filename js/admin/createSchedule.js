@@ -10,6 +10,7 @@ import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
 import { loadOtStaff } from "./loadOtStaff.js";
 import { loadDoctors } from "./loadDoctors.js";
 import { loadOtRooms } from "./loadOtRooms.js";
+import { loadDepartments } from "./loadDepartments.js";
 
 /* ================= STATE ================= */
 const steps = document.querySelectorAll(".form-section");
@@ -17,6 +18,7 @@ const stepDots = document.querySelectorAll(".step-dot");
 const scheduleDraft = {};
 
 /* ================= ELEMENTS ================= */
+const departmentSelect = document.getElementById("departmentSelect");
 const otStaffSelect = document.getElementById("otStaffSelect");
 const surgeonSelect = document.getElementById("surgeonSelect");
 const otRoomSelect = document.getElementById("otRoomSelect");
@@ -24,21 +26,26 @@ const startTimeInput = document.getElementById("startTimeInput");
 const endTimeInput = document.getElementById("endTimeInput");
 
 /* ================= LOAD DROPDOWNS ================= */
+await loadDepartments(departmentSelect);
 await loadOtStaff(otStaffSelect);
 await loadDoctors(surgeonSelect);
 
 /* ================= STEP CONTROL ================= */
 function showStep(i) {
-  steps.forEach((s, idx) => s.classList.toggle("hidden-step", idx !== i));
-  stepDots.forEach((d, idx) => d.classList.toggle("active", idx === i));
+  steps.forEach((s, idx) =>
+    s.classList.toggle("hidden-step", idx !== i)
+  );
+  stepDots.forEach((d, idx) =>
+    d.classList.toggle("active", idx === i)
+  );
 }
 showStep(0);
 
-/* ================= STEP 1 ================= */
+/* ================= STEP 1: PATIENT & PROCEDURE ================= */
 steps[0].querySelector("button").onclick = async () => {
   const patientId = document.getElementById("patientIdInput").value.trim();
   const patientName = document.getElementById("patientNameInput").value.trim();
-  const department = document.getElementById("departmentSelect").value;
+  const department = departmentSelect.value;
   const procedure = document.getElementById("procedureInput").value.trim();
   const notes = document.getElementById("notesInput").value.trim();
 
@@ -53,13 +60,13 @@ steps[0].querySelector("button").onclick = async () => {
     notes,
   });
 
-  // 🔥 Load OT rooms dynamically
+  // 🔥 Load OT rooms based on department
   await loadOtRooms(otRoomSelect, department);
 
   showStep(1);
 };
 
-/* ================= STEP 2 ================= */
+/* ================= STEP 2: OT, DATE & STAFF ================= */
 const [back2, next2] = steps[1].querySelectorAll("button");
 
 back2.onclick = () => showStep(0);
@@ -92,7 +99,7 @@ next2.onclick = () => {
   showStep(2);
 };
 
-/* ================= STEP 3 ================= */
+/* ================= STEP 3: SURGEON ================= */
 const [back3, next3] = steps[2].querySelectorAll("button");
 
 back3.onclick = () => showStep(1);
@@ -106,17 +113,21 @@ next3.onclick = () => {
 
   document.getElementById("rvPatient").textContent =
     scheduleDraft.patientName || "—";
-  document.getElementById("rvPatientId").textContent = scheduleDraft.patientId;
-  document.getElementById("rvProcedure").textContent = scheduleDraft.procedure;
-  document.getElementById("rvOT").textContent = scheduleDraft.otRoom;
-  document.getElementById("rvSurgeon").textContent = scheduleDraft.surgeonName;
+  document.getElementById("rvPatientId").textContent =
+    scheduleDraft.patientId;
+  document.getElementById("rvProcedure").textContent =
+    scheduleDraft.procedure;
+  document.getElementById("rvOT").textContent =
+    scheduleDraft.otRoom;
+  document.getElementById("rvSurgeon").textContent =
+    scheduleDraft.surgeonName;
   document.getElementById("rvStaff").textContent =
     scheduleDraft.otStaffIds.length;
 
   showStep(3);
 };
 
-/* ================= STEP 4 ================= */
+/* ================= STEP 4: CONFIRM ================= */
 const [back4, confirm] = steps[3].querySelectorAll("button");
 
 back4.onclick = () => showStep(2);
@@ -143,6 +154,7 @@ confirm.onclick = async () => {
       createdAt: serverTimestamp(),
     });
 
+    // 🔁 Availability sync
     await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");
     for (const staffId of scheduleDraft.otStaffIds) {
       await syncAvailabilityForUser(staffId, "OT Staff");
