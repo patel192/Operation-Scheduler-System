@@ -61,6 +61,21 @@ function formatTime(ts) {
     minute: "2-digit",
   });
 }
+function groupByDate(schedules) {
+  const groups = {};
+
+  schedules.forEach((s) => {
+    const dateKey = s.startTime.toDate().toISOString().slice(0, 10); // YYYY-MM-DD
+
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+
+    groups[dateKey].push(s);
+  });
+
+  return groups;
+}
 
 /* ================= LOAD DOCTOR ================= */
 async function loadDoctor() {
@@ -81,12 +96,11 @@ async function loadDoctor() {
   departmentEl.textContent = d.department || "—";
 
   statusBadgeEl.textContent = d.status || "active";
-  statusBadgeEl.className =
-    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
-      d.status === "disabled"
-        ? "bg-red-100 text-red-700"
-        : "bg-emerald-100 text-emerald-700"
-    }`;
+  statusBadgeEl.className = `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
+    d.status === "disabled"
+      ? "bg-red-100 text-red-700"
+      : "bg-emerald-100 text-emerald-700"
+  }`;
 
   toggleStatusBtn.textContent =
     d.status === "disabled" ? "Enable Doctor" : "Disable Doctor";
@@ -109,7 +123,7 @@ async function loadTimeline() {
 
   const snap = await getDocs(q);
 
-  allSchedules = snap.docs.map(d => ({
+  allSchedules = snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),
   }));
@@ -129,12 +143,12 @@ function applyFilters() {
 
   // STATUS FILTER
   if (statusValue) {
-    filtered = filtered.filter(s => s.status === statusValue);
+    filtered = filtered.filter((s) => s.status === statusValue);
   }
 
   // DATE FILTER
   if (dateValue) {
-    filtered = filtered.filter(s => {
+    filtered = filtered.filter((s) => {
       if (!s.startTime) return false;
       const d = s.startTime.toDate().toISOString().slice(0, 10);
       return d === dateValue;
@@ -146,10 +160,35 @@ function applyFilters() {
     return;
   }
 
-  filtered.forEach(renderTimelineItem);
+  const grouped = groupByDate(filtered);
+
+  // Sort dates ascending
+  Object.keys(grouped)
+    .sort()
+    .forEach((dateKey) => {
+      renderDateHeader(dateKey);
+      grouped[dateKey].forEach(renderTimelineItem);
+    });
 }
 
 /* ================= RENDER ITEM ================= */
+function renderDateHeader(dateKey) {
+  const date = new Date(dateKey);
+
+  const header = document.createElement("div");
+  header.className =
+    "sticky top-0 bg-[--bg] z-10 text-sm font-bold text-slate-600 mt-6";
+
+  header.textContent = date.toLocaleDateString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  timelineList.appendChild(header);
+}
+
 function renderTimelineItem(s) {
   const item = document.createElement("div");
   item.className = `
@@ -172,8 +211,7 @@ function renderTimelineItem(s) {
   `;
 
   item.onclick = () => {
-    window.location.href =
-      `/admin/schedule-details.html?id=${s.id}`;
+    window.location.href = `/admin/schedule-details.html?id=${s.id}`;
   };
 
   timelineList.appendChild(item);
