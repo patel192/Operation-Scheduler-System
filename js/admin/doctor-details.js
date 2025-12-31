@@ -30,7 +30,6 @@ const toggleStatusBtn = document.getElementById("toggleStatusBtn");
 const timelineList = document.getElementById("timelineList");
 const timelineEmpty = document.getElementById("timelineEmpty");
 
-// ✅ FILTER ELEMENTS (MISSING BEFORE)
 const filterStatus = document.getElementById("filterStatus");
 const filterDate = document.getElementById("filterDate");
 
@@ -46,7 +45,6 @@ function statusStyle(status = "Upcoming") {
 }
 
 function formatDate(ts) {
-  if (!ts) return "—";
   return ts.toDate().toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
@@ -55,26 +53,22 @@ function formatDate(ts) {
 }
 
 function formatTime(ts) {
-  if (!ts) return "—";
   return ts.toDate().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
+
 function groupByDate(schedules) {
-  const groups = {};
+  const map = {};
 
   schedules.forEach((s) => {
-    const dateKey = s.startTime.toDate().toISOString().slice(0, 10); // YYYY-MM-DD
-
-    if (!groups[dateKey]) {
-      groups[dateKey] = [];
-    }
-
-    groups[dateKey].push(s);
+    const key = s.startTime.toDate().toISOString().slice(0, 10);
+    if (!map[key]) map[key] = [];
+    map[key].push(s);
   });
 
-  return groups;
+  return map;
 }
 
 /* ================= LOAD DOCTOR ================= */
@@ -96,11 +90,12 @@ async function loadDoctor() {
   departmentEl.textContent = d.department || "—";
 
   statusBadgeEl.textContent = d.status || "active";
-  statusBadgeEl.className = `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
-    d.status === "disabled"
-      ? "bg-red-100 text-red-700"
-      : "bg-emerald-100 text-emerald-700"
-  }`;
+  statusBadgeEl.className =
+    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
+      d.status === "disabled"
+        ? "bg-red-100 text-red-700"
+        : "bg-emerald-100 text-emerald-700"
+    }`;
 
   toggleStatusBtn.textContent =
     d.status === "disabled" ? "Enable Doctor" : "Disable Doctor";
@@ -131,27 +126,21 @@ async function loadTimeline() {
   applyFilters();
 }
 
-/* ================= FILTER LOGIC ================= */
+/* ================= FILTER + RENDER ================= */
 function applyFilters() {
   timelineList.innerHTML = "";
   timelineEmpty.classList.add("hidden");
 
-  const statusValue = filterStatus?.value || "";
-  const dateValue = filterDate?.value || "";
-
   let filtered = [...allSchedules];
 
-  // STATUS FILTER
-  if (statusValue) {
-    filtered = filtered.filter((s) => s.status === statusValue);
+  if (filterStatus.value) {
+    filtered = filtered.filter((s) => s.status === filterStatus.value);
   }
 
-  // DATE FILTER
-  if (dateValue) {
+  if (filterDate.value) {
     filtered = filtered.filter((s) => {
-      if (!s.startTime) return false;
       const d = s.startTime.toDate().toISOString().slice(0, 10);
-      return d === dateValue;
+      return d === filterDate.value;
     });
   }
 
@@ -162,34 +151,12 @@ function applyFilters() {
 
   const grouped = groupByDate(filtered);
 
-  // Sort dates ascending
-  Object.keys(grouped)
-    .sort()
-    .forEach((dateKey) => {
-      renderDateHeader(dateKey);
-      grouped[dateKey].forEach(renderTimelineItem);
-    });
-}
-
-/* ================= RENDER ITEM ================= */
-function renderDateHeader(dateKey) {
-  const date = new Date(dateKey);
-
-  const header = document.createElement("div");
-  header.className =
-    "sticky top-0 bg-[--bg] z-10 text-sm font-bold text-slate-600 mt-6";
-
-  header.textContent = date.toLocaleDateString(undefined, {
-    weekday: "long",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
+  Object.entries(grouped).forEach(([date, schedules]) => {
+    renderDateGroup(date, schedules);
   });
-
-  timelineList.appendChild(header);
 }
 
-function renderTimelineItem(s) {
+function renderTimelineItem(s, container) {
   const item = document.createElement("div");
   item.className = `
     border-l-4 pl-4 py-3 rounded cursor-pointer hover:bg-slate-50 transition
@@ -205,16 +172,43 @@ function renderTimelineItem(s) {
       ${formatDate(s.startTime)} •
       ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
     </p>
-    <span class="text-xs font-semibold uppercase">
-      ${s.status || "Upcoming"}
-    </span>
+    <span class="text-xs font-semibold uppercase">${s.status}</span>
   `;
 
   item.onclick = () => {
-    window.location.href = `/admin/schedule-details.html?id=${s.id}`;
+    window.location.href =
+      `/admin/schedule-details.html?id=${s.id}`;
   };
 
-  timelineList.appendChild(item);
+  container.appendChild(item);
+}
+
+function renderDateGroup(date, schedules) {
+  const wrapper = document.createElement("div");
+
+  const header = document.createElement("div");
+  header.className =
+    "flex justify-between items-center cursor-pointer bg-slate-100 px-4 py-2 rounded font-semibold";
+
+  header.innerHTML = `
+    <span>${new Date(date).toDateString()}</span>
+    <span class="text-sm text-slate-500">(${schedules.length})</span>
+  `;
+
+  const content = document.createElement("div");
+  content.className = "mt-3 space-y-3";
+
+  schedules.forEach((s) => renderTimelineItem(s, content));
+
+  let collapsed = false;
+  header.onclick = () => {
+    collapsed = !collapsed;
+    content.classList.toggle("hidden", collapsed);
+  };
+
+  wrapper.appendChild(header);
+  wrapper.appendChild(content);
+  timelineList.appendChild(wrapper);
 }
 
 /* ================= ACTION ================= */
@@ -228,15 +222,15 @@ toggleStatusBtn.onclick = async () => {
     return;
   }
 
-  const nextStatus = d.status === "disabled" ? "active" : "disabled";
-  await updateDoc(ref, { status: nextStatus });
+  const next = d.status === "disabled" ? "active" : "disabled";
+  await updateDoc(ref, { status: next });
 
   loadDoctor();
 };
 
-/* ================= FILTER EVENTS ================= */
-filterStatus?.addEventListener("change", applyFilters);
-filterDate?.addEventListener("change", applyFilters);
+/* ================= EVENTS ================= */
+filterStatus.addEventListener("change", applyFilters);
+filterDate.addEventListener("change", applyFilters);
 
 /* ================= INIT ================= */
 loadDoctor();
