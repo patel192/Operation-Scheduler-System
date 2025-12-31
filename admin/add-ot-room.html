@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add OT Room · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/add-ot-room.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-3xl mx-auto px-4 py-10 space-y-8">
+
+  <!-- HEADER -->
+  <section>
+    <a href="/admin/ot-rooms.html"
+       class="text-sm text-[--primary] font-semibold hover:underline">
+      ← Back to OT Rooms
+    </a>
+
+    <h1 class="text-2xl font-bold mt-2">Add OT Room</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Register a new operation theatre room
+    </p>
+  </section>
+
+  <!-- FORM -->
+  <section class="bg-white rounded-2xl shadow p-6 space-y-6">
+
+    <!-- OT NAME -->
+    <div>
+      <label class="block text-sm font-semibold mb-1">
+        OT Room Name <span class="text-red-500">*</span>
+      </label>
+      <input
+        id="otName"
+        type="text"
+        placeholder="OT-1"
+        class="w-full border rounded-xl px-4 py-2 focus:ring-2 focus:ring-[--primary]"
+      />
+    </div>
+
+    <!-- DEPARTMENT -->
+    <div>
+      <label class="block text-sm font-semibold mb-1">
+        Department <span class="text-red-500">*</span>
+      </label>
+      <select
+        id="departmentSelect"
+        class="w-full border rounded-xl px-4 py-2">
+        <option value="">Select Department</option>
+      </select>
+    </div>
+
+    <!-- EQUIPMENT -->
+    <div>
+      <label class="block text-sm font-semibold mb-1">
+        Equipment
+      </label>
+      <input
+        id="equipmentInput"
+        type="text"
+        placeholder="Ventilator, Heart Monitor"
+        class="w-full border rounded-xl px-4 py-2"
+      />
+      <p class="text-xs text-[--muted] mt-1">
+        Comma separated values
+      </p>
+    </div>
+
+    <!-- STATUS -->
+    <div>
+      <label class="block text-sm font-semibold mb-1">
+        Status
+      </label>
+      <select
+        id="statusSelect"
+        class="w-full border rounded-xl px-4 py-2">
+        <option value="available">Available</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="disabled">Disabled</option>
+      </select>
+    </div>
+
+    <!-- NOTES -->
+    <div>
+      <label class="block text-sm font-semibold mb-1">
+        Notes
+      </label>
+      <textarea
+        id="notesInput"
+        rows="3"
+        placeholder="Optional notes"
+        class="w-full border rounded-xl px-4 py-2"></textarea>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="flex justify-end gap-3 pt-4">
+      <button
+        type="button"
+        onclick="history.back()"
+        class="px-5 py-2 rounded-xl bg-slate-100 font-semibold hover:bg-slate-200">
+        Cancel
+      </button>
+
+      <button
+        id="saveBtn"
+        class="px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold hover:opacity-90">
+        Create OT Room
+      </button>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
