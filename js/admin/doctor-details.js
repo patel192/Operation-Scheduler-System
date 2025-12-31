@@ -30,8 +30,15 @@ const toggleStatusBtn = document.getElementById("toggleStatusBtn");
 const timelineList = document.getElementById("timelineList");
 const timelineEmpty = document.getElementById("timelineEmpty");
 
+// ✅ FILTER ELEMENTS (MISSING BEFORE)
+const filterStatus = document.getElementById("filterStatus");
+const filterDate = document.getElementById("filterDate");
+
+/* ================= STATE ================= */
+let allSchedules = [];
+
 /* ================= HELPERS ================= */
-function statusStyle(status) {
+function statusStyle(status = "Upcoming") {
   if (status === "Completed") return "border-green-500 text-green-700";
   if (status === "Ongoing") return "border-yellow-500 text-yellow-700";
   if (status === "Cancelled") return "border-red-500 text-red-700";
@@ -39,6 +46,7 @@ function statusStyle(status) {
 }
 
 function formatDate(ts) {
+  if (!ts) return "—";
   return ts.toDate().toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
@@ -47,6 +55,7 @@ function formatDate(ts) {
 }
 
 function formatTime(ts) {
+  if (!ts) return "—";
   return ts.toDate().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -92,9 +101,6 @@ async function loadDoctor() {
 
 /* ================= LOAD TIMELINE ================= */
 async function loadTimeline() {
-  timelineList.innerHTML = "";
-  timelineEmpty.classList.add("hidden");
-
   const q = query(
     collection(db, "schedules"),
     where("surgeonId", "==", doctorId),
@@ -103,44 +109,74 @@ async function loadTimeline() {
 
   const snap = await getDocs(q);
 
-  if (snap.empty) {
+  allSchedules = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data(),
+  }));
+
+  applyFilters();
+}
+
+/* ================= FILTER LOGIC ================= */
+function applyFilters() {
+  timelineList.innerHTML = "";
+  timelineEmpty.classList.add("hidden");
+
+  const statusValue = filterStatus?.value || "";
+  const dateValue = filterDate?.value || "";
+
+  let filtered = [...allSchedules];
+
+  // STATUS FILTER
+  if (statusValue) {
+    filtered = filtered.filter(s => s.status === statusValue);
+  }
+
+  // DATE FILTER
+  if (dateValue) {
+    filtered = filtered.filter(s => {
+      if (!s.startTime) return false;
+      const d = s.startTime.toDate().toISOString().slice(0, 10);
+      return d === dateValue;
+    });
+  }
+
+  if (!filtered.length) {
     timelineEmpty.classList.remove("hidden");
     return;
   }
 
-  snap.forEach((docSnap) => {
-    const s = docSnap.data();
+  filtered.forEach(renderTimelineItem);
+}
 
-    const item = document.createElement("div");
-    item.className = `
-      border-l-4 pl-4 py-3 rounded cursor-pointer hover:bg-slate-50 transition
-      ${statusStyle(s.status)}
-    `;
+/* ================= RENDER ITEM ================= */
+function renderTimelineItem(s) {
+  const item = document.createElement("div");
+  item.className = `
+    border-l-4 pl-4 py-3 rounded cursor-pointer hover:bg-slate-50 transition
+    ${statusStyle(s.status)}
+  `;
 
-    item.innerHTML = `
-      <p class="font-semibold">${s.procedure || "—"}</p>
+  item.innerHTML = `
+    <p class="font-semibold">${s.procedure || "—"}</p>
+    <p class="text-sm text-slate-600">
+      Patient: ${s.patientName || "—"} • ${s.otRoom || "—"}
+    </p>
+    <p class="text-xs text-slate-500">
+      ${formatDate(s.startTime)} •
+      ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
+    </p>
+    <span class="text-xs font-semibold uppercase">
+      ${s.status || "Upcoming"}
+    </span>
+  `;
 
-      <p class="text-sm text-slate-600">
-        Patient: ${s.patientName || "—"} • ${s.otRoom || "—"}
-      </p>
+  item.onclick = () => {
+    window.location.href =
+      `/admin/schedule-details.html?id=${s.id}`;
+  };
 
-      <p class="text-xs text-slate-500">
-        ${formatDate(s.startTime)} •
-        ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
-      </p>
-
-      <span class="text-xs font-semibold uppercase">
-        ${s.status}
-      </span>
-    `;
-
-    item.onclick = () => {
-      window.location.href =
-        `/admin/schedule-details.html?id=${docSnap.id}`;
-    };
-
-    timelineList.appendChild(item);
-  });
+  timelineList.appendChild(item);
 }
 
 /* ================= ACTION ================= */
@@ -159,6 +195,10 @@ toggleStatusBtn.onclick = async () => {
 
   loadDoctor();
 };
+
+/* ================= FILTER EVENTS ================= */
+filterStatus?.addEventListener("change", applyFilters);
+filterDate?.addEventListener("change", applyFilters);
 
 /* ================= INIT ================= */
 loadDoctor();
