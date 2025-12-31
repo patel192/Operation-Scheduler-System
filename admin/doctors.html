@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
   <title>Doctors · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -11,156 +11,71 @@
     :root {
       --primary:#0A6CFF;
       --bg:#F8FAFC;
-      --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
-      --radius:18px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-
-    .filter-input {
-      border-radius: 14px;
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      font-size: 0.875rem;
-    }
-
-    .filter-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(10,108,255,.15);
-    }
-
-    .action-link {
-      font-weight: 600;
-      transition: color .15s ease;
-    }
-
-    .action-link:hover {
-      text-decoration: underline;
     }
   </style>
 
+  <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+
+  <!-- Page Logic -->
+  <script type="module" defer src="/js/admin/doctors.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
 <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
-  <!-- ===== HERO HEADER ===== -->
-  <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold">Doctors</h1>
-      <p class="text-sm text-[--muted] mt-1">
-        Manage doctors, specialties, availability and status
-      </p>
-    </div>
-
-    <a href="/admin/add-doctor.html"
-      class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
-             bg-[--primary] text-white font-semibold hover:opacity-90">
-      + Add Doctor
-    </a>
+  <!-- HEADER -->
+  <section>
+    <h1 class="text-3xl font-bold">Doctors</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Manage doctors, departments and availability
+    </p>
   </section>
 
-  <!-- ===== FILTER BAR ===== -->
-  <section class="card p-5 grid md:grid-cols-4 gap-4 text-sm">
-
-    <input
-      type="text"
-      placeholder="Search by doctor name"
-      class="filter-input"/>
-
-    <select class="filter-input bg-white">
-      <option>All Departments</option>
-      <option>Cardiology</option>
-      <option>Orthopedics</option>
-      <option>Neurology</option>
-    </select>
-
-    <select class="filter-input bg-white">
-      <option>Status</option>
-      <option>Active</option>
-      <option>On Leave</option>
-      <option>Inactive</option>
-    </select>
-
-    <button
-      class="rounded-xl bg-slate-100 font-semibold hover:bg-slate-200 transition">
-      Apply Filters
-    </button>
-
-  </section>
-
-  <!-- ===== TABLE ===== -->
-  <section class="card overflow-hidden">
-
-    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
-      <h2 class="font-semibold text-lg">Doctor Directory</h2>
-      <span class="text-sm text-[--muted]">Administrative view</span>
+  <!-- KPI STRIP -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
+    <div class="bg-white rounded-xl p-5 shadow">
+      <p class="text-xs text-[--muted] font-semibold">TOTAL DOCTORS</p>
+      <h3 id="kpiTotal" class="text-3xl font-bold mt-2">0</h3>
     </div>
 
+    <div class="bg-white rounded-xl p-5 shadow">
+      <p class="text-xs text-[--muted] font-semibold">ACTIVE</p>
+      <h3 id="kpiActive" class="text-3xl font-bold mt-2 text-emerald-600">0</h3>
+    </div>
+
+    <div class="bg-white rounded-xl p-5 shadow">
+      <p class="text-xs text-[--muted] font-semibold">BUSY</p>
+      <h3 id="kpiBusy" class="text-3xl font-bold mt-2 text-yellow-600">0</h3>
+    </div>
+
+    <div class="bg-white rounded-xl p-5 shadow">
+      <p class="text-xs text-[--muted] font-semibold">DEPARTMENTS</p>
+      <h3 id="kpiDepartments" class="text-3xl font-bold mt-2">0</h3>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <section class="bg-white rounded-2xl shadow overflow-hidden">
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left text-[--muted]">
+      <thead class="bg-slate-50 text-[--muted]">
         <tr>
-          <th class="px-6 py-4 font-semibold">Doctor</th>
-          <th class="px-6 py-4 font-semibold">Department</th>
-          <th class="px-6 py-4 font-semibold">Specialty</th>
-          <th class="px-6 py-4 font-semibold">Availability</th>
-          <th class="px-6 py-4 font-semibold">Status</th>
-          <th class="px-6 py-4 font-semibold text-right">Actions</th>
+          <th class="px-6 py-4 text-left">Doctor</th>
+          <th class="px-6 py-4 text-left">Email</th>
+          <th class="px-6 py-4 text-left">Department</th>
+          <th class="px-6 py-4 text-left">Availability</th>
+          <th class="px-6 py-4 text-left">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
         </tr>
       </thead>
 
-      <tbody class="divide-y">
-
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-6 py-4 font-semibold flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-              RM
-            </div>
-            <div>
-              <div>Dr. Rahul Mehta</div>
-              <div class="text-xs text-[--muted]">ID: DOC-1023</div>
-            </div>
-          </td>
-
-          <td class="px-6 py-4">Cardiology</td>
-          <td class="px-6 py-4">Heart Surgery</td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-              Mon–Fri
-            </span>
-          </td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-emerald-100 text-emerald-700">
-              Active
-            </span>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex justify-end gap-4">
-              <a href="#" class="action-link text-[--primary]">View</a>
-              <a href="#" class="action-link text-amber-600">Edit</a>
-              <a href="#" class="action-link text-red-600">Disable</a>
-            </div>
-          </td>
-        </tr>
-
-        <!-- more rows -->
-
-      </tbody>
+      <tbody id="doctorTable" class="divide-y"></tbody>
     </table>
-
   </section>
 
 </main>
