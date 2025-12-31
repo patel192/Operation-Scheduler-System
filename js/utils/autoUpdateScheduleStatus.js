@@ -5,16 +5,17 @@ import {
   updateDoc,
   doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
 import { syncAvailabilityForUser } from "./syncAvailability.js";
+
 /**
  * Automatically updates schedule status based on time
  *
  * STATUS FLOW:
  * Upcoming → Ongoing → Completed
  *
- * SIDE EFFECTS:
- * - When schedule is Completed or Cancelled:
- *   → free doctor & OT staff availability
+ * IMPORTANT RULE:
+ * - Manual states (Completed, Cancelled) are FINAL
  */
 export async function autoUpdateScheduleStatus() {
   const now = new Date();
@@ -25,47 +26,42 @@ export async function autoUpdateScheduleStatus() {
 
     if (!data.startTime || !data.endTime) continue;
 
+    // ✅ DO NOT OVERRIDE MANUAL STATES
+    if (data.status === "Completed" || data.status === "Cancelled") {
+      continue;
+    }
+
     const start = data.startTime.toDate();
     const end = data.endTime.toDate();
 
     let computedStatus = data.status;
 
     /* ================= COMPUTE STATUS ================= */
-    if (data.status !== "Cancelled") {
-      if (now < start) {
-        computedStatus = "Upcoming";
-      } else if (now >= start && now < end) {
-        computedStatus = "Ongoing";
-      } else if (now >= end) {
-        computedStatus = "Completed";
-      }
+    if (now < start) {
+      computedStatus = "Upcoming";
+    } else if (now >= start && now < end) {
+      computedStatus = "Ongoing";
+    } else if (now >= end) {
+      computedStatus = "Completed";
     }
 
-    /* ================= UPDATE STATUS (ONLY IF CHANGED) ================= */
+    /* ================= UPDATE STATUS ================= */
     if (computedStatus !== data.status) {
       await updateDoc(doc(db, "schedules", d.id), {
         status: computedStatus,
       });
     }
 
-    /* ================= RELEASE RESOURCES (SAFE & IDENTITY-BASED) ================= */
-    if (computedStatus === "Completed" || computedStatus === "Cancelled") {
+    /* ================= RELEASE RESOURCES ================= */
+    if (computedStatus === "Completed") {
       // 🧑‍⚕️ Free surgeon
       if (data.surgeonId) {
         await syncAvailabilityForUser(data.surgeonId, "Doctor");
-
-        for (const id of data.otStaffIds || []) {
-          await syncAvailabilityForUser(id, "OT Staff");
-        }
       }
 
       // 👩‍⚕️ Free OT staff
-      if (Array.isArray(data.otStaffIds)) {
-        for (const staffId of data.otStaffIds) {
-          await updateDoc(doc(db, "users", staffId), {
-            availability: "available",
-          });
-        }
+      for (const staffId of data.otStaffIds || []) {
+        await syncAvailabilityForUser(staffId, "OT Staff");
       }
     }
   }

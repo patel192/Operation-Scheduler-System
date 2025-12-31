@@ -4,42 +4,46 @@ import {
   addDoc,
   Timestamp,
   serverTimestamp,
-  updateDoc,
-  doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {syncAvailabilityForUser } from "../utils/syncAvailability.js";
+
+import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
 import { loadOtStaff } from "./loadOtStaff.js";
 import { loadDoctors } from "./loadDoctors.js";
+import { loadOtRooms } from "./loadOtRooms.js";
 
-/* ===== STATE ===== */
+/* ================= STATE ================= */
 const steps = document.querySelectorAll(".form-section");
 const stepDots = document.querySelectorAll(".step-dot");
 const scheduleDraft = {};
 
-/* ===== ELEMENTS ===== */
+/* ================= ELEMENTS ================= */
 const otStaffSelect = document.getElementById("otStaffSelect");
 const surgeonSelect = document.getElementById("surgeonSelect");
+const otRoomSelect = document.getElementById("otRoomSelect");
+const startTimeInput = document.getElementById("startTimeInput");
+const endTimeInput = document.getElementById("endTimeInput");
 
-/* ===== LOAD DROPDOWNS ===== */
+/* ================= LOAD DROPDOWNS ================= */
 await loadOtStaff(otStaffSelect);
 await loadDoctors(surgeonSelect);
 
-/* ===== STEP CONTROL ===== */
+/* ================= STEP CONTROL ================= */
 function showStep(i) {
   steps.forEach((s, idx) => s.classList.toggle("hidden-step", idx !== i));
   stepDots.forEach((d, idx) => d.classList.toggle("active", idx === i));
 }
 showStep(0);
 
-/* ===== STEP 1 ===== */
-steps[0].querySelector("button").onclick = () => {
+/* ================= STEP 1 ================= */
+steps[0].querySelector("button").onclick = async () => {
   const patientId = document.getElementById("patientIdInput").value.trim();
   const patientName = document.getElementById("patientNameInput").value.trim();
   const department = document.getElementById("departmentSelect").value;
   const procedure = document.getElementById("procedureInput").value.trim();
   const notes = document.getElementById("notesInput").value.trim();
 
-  if (!procedure) return alert("Procedure required");
+  if (!procedure) return alert("Procedure is required");
+  if (!department) return alert("Select department");
 
   Object.assign(scheduleDraft, {
     patientId: patientId || `PAT-${Date.now()}`,
@@ -49,37 +53,46 @@ steps[0].querySelector("button").onclick = () => {
     notes,
   });
 
+  // 🔥 Load OT rooms dynamically
+  await loadOtRooms(otRoomSelect, department);
+
   showStep(1);
 };
 
-/* ===== STEP 2 ===== */
+/* ================= STEP 2 ================= */
 const [back2, next2] = steps[1].querySelectorAll("button");
 
 back2.onclick = () => showStep(0);
 
 next2.onclick = () => {
-  const [date, otRoom, , startTime, endTime] =
-    steps[1].querySelectorAll("input,select");
+  const dateInput = steps[1].querySelector('input[type="date"]');
+  const staffIds = [...otStaffSelect.selectedOptions].map(o => o.value);
 
-  const staffIds = [...otStaffSelect.selectedOptions].map((o) => o.value);
+  if (
+    !dateInput.value ||
+    !otRoomSelect.value ||
+    !startTimeInput.value ||
+    !endTimeInput.value
+  ) {
+    return alert("Date, OT room and time are required");
+  }
 
-  if (!date.value || !otRoom.value || !startTime.value || !endTime.value)
-    return alert("Date, OT and time required");
-
-  if (!staffIds.length) return alert("Select OT staff");
+  if (!staffIds.length) {
+    return alert("Select at least one OT staff");
+  }
 
   Object.assign(scheduleDraft, {
-    date: date.value,
-    otRoom: otRoom.value,
-    startTime: startTime.value,
-    endTime: endTime.value,
+    date: dateInput.value,
+    otRoom: otRoomSelect.value,
+    startTime: startTimeInput.value,
+    endTime: endTimeInput.value,
     otStaffIds: staffIds,
   });
 
   showStep(2);
 };
 
-/* ===== STEP 3 ===== */
+/* ================= STEP 3 ================= */
 const [back3, next3] = steps[2].querySelectorAll("button");
 
 back3.onclick = () => showStep(1);
@@ -103,7 +116,7 @@ next3.onclick = () => {
   showStep(3);
 };
 
-/* ===== STEP 4 ===== */
+/* ================= STEP 4 ================= */
 const [back4, confirm] = steps[3].querySelectorAll("button");
 
 back4.onclick = () => showStep(2);
@@ -113,9 +126,15 @@ confirm.onclick = async () => {
     const start = new Date(`${scheduleDraft.date}T${scheduleDraft.startTime}`);
     const end = new Date(`${scheduleDraft.date}T${scheduleDraft.endTime}`);
 
-    if (start >= end) return alert("Invalid time range");
+    if (isNaN(start) || isNaN(end)) {
+      return alert("Invalid time selected");
+    }
 
-    const docRef = await addDoc(collection(db, "schedules"), {
+    if (start >= end) {
+      return alert("End time must be after start time");
+    }
+
+    await addDoc(collection(db, "schedules"), {
       ...scheduleDraft,
       startTime: Timestamp.fromDate(start),
       endTime: Timestamp.fromDate(end),
@@ -124,9 +143,7 @@ confirm.onclick = async () => {
       createdAt: serverTimestamp(),
     });
 
-    // ✅ SYNC AVAILABILITY (single source of truth)
     await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");
-
     for (const staffId of scheduleDraft.otStaffIds) {
       await syncAvailabilityForUser(staffId, "OT Staff");
     }
@@ -134,7 +151,7 @@ confirm.onclick = async () => {
     alert("Schedule created successfully");
     window.location.href = "/admin/schedule-board.html";
   } catch (err) {
-    console.error(err);
+    console.error("Create schedule error:", err);
     alert("Error creating schedule");
   }
 };

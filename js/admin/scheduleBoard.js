@@ -4,6 +4,7 @@ import {
   query,
   orderBy,
   onSnapshot,
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
@@ -12,7 +13,6 @@ import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 const rowsContainer = document.getElementById("scheduleRows");
 
 /* ================= CONSTANTS ================= */
-const OT_ROOMS = ["OT-1", "OT-2", "OT-3"];
 const MAX_COLS = 6;
 
 /* ================= HELPERS ================= */
@@ -36,8 +36,16 @@ function statusStyles(status) {
   return "bg-blue-50 border-blue-200 text-blue-700";
 }
 
+/* ================= LOAD OT ROOMS ================= */
+async function loadOtRooms() {
+  const snap = await getDocs(collection(db, "otRooms"));
+  return snap.docs.map((d) => d.data().name);
+}
+
 /* ================= REAL-TIME LISTENER ================= */
-function listenSchedules() {
+async function listenSchedules() {
+  const otRooms = await loadOtRooms();
+
   const q = query(collection(db, "schedules"), orderBy("startTime", "asc"));
 
   onSnapshot(q, (snapshot) => {
@@ -48,7 +56,7 @@ function listenSchedules() {
       ...d.data(),
     }));
 
-    OT_ROOMS.forEach((ot) => {
+    otRooms.forEach((ot) => {
       const otSchedules = schedules.filter((s) => s.otRoom === ot);
 
       const row = document.createElement("div");
@@ -72,8 +80,6 @@ function listenSchedules() {
         const span = Math.min(getColSpan(start, end), MAX_COLS);
 
         const card = document.createElement("div");
-
-        // SAFELY apply col-span
         card.style.gridColumn = `span ${span}`;
 
         card.className = `
@@ -88,9 +94,7 @@ function listenSchedules() {
           <div class="schedule-time">
             ${formatTime(start)} – ${formatTime(end)}
           </div>
-          <span class="schedule-status">
-            ${sch.status}
-          </span>
+          <span class="schedule-status">${sch.status}</span>
         `;
 
         card.onclick = () => {
@@ -118,5 +122,5 @@ function listenSchedules() {
 /* ================= INIT ================= */
 (async () => {
   await autoUpdateScheduleStatus();
-  listenSchedules();
+  await listenSchedules();
 })();
