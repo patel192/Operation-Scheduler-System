@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Doctor Details · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+  </style>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+
+  <!-- Page Logic -->
+  <script type="module" defer src="/js/admin/doctor-details.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-6xl mx-auto px-4 py-10 space-y-10">
+
+  <!-- HEADER -->
+  <section>
+    <a href="/admin/doctors.html"
+       class="text-sm text-[--primary] font-semibold hover:underline">
+      ← Back to Doctors
+    </a>
+
+    <h1 id="doctorName" class="text-3xl font-bold mt-2">—</h1>
+    <p id="doctorEmail" class="text-sm text-[--muted] mt-1">—</p>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
+
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">STATUS</p>
+      <span id="statusBadge"
+        class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold">
+        —
+      </span>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">AVAILABILITY</p>
+      <p id="availability" class="mt-2 font-semibold">—</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5">
+      <p class="text-xs text-[--muted] font-semibold">DEPARTMENT</p>
+      <p id="department" class="mt-2 font-semibold">—</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5 flex items-center justify-center">
+      <button id="toggleStatusBtn"
+        class="px-5 py-2 rounded-xl font-semibold">
+        —
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ASSIGNED SCHEDULES -->
+  <section class="bg-white rounded-2xl shadow overflow-hidden">
+
+    <div class="px-6 py-4 border-b">
+      <h2 class="font-semibold text-lg">Assigned Schedules</h2>
+    </div>
+
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-[--muted]">
+        <tr>
+          <th class="px-6 py-4 text-left">Patient</th>
+          <th class="px-6 py-4 text-left">Procedure</th>
+          <th class="px-6 py-4 text-left">OT</th>
+          <th class="px-6 py-4 text-left">Time</th>
+          <th class="px-6 py-4 text-left">Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="scheduleTable" class="divide-y"></tbody>
+    </table>
+
+    <div id="emptySchedules"
+      class="hidden p-8 text-center text-[--muted]">
+      No schedules assigned to this doctor.
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
