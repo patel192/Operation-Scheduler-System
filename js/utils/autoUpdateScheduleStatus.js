@@ -24,29 +24,30 @@ export async function autoUpdateScheduleStatus() {
 
     let computedStatus = data.status;
 
-    // ===== STATUS COMPUTATION =====
-    if (data.status !== "Cancelled") {
+    /* ================= STATUS COMPUTATION ================= */
+    // ⛔ Do NOT override manual status
+    if (data.status !== "Completed" && data.status !== "Cancelled") {
       if (now < start) computedStatus = "Upcoming";
       else if (now >= start && now < end) computedStatus = "Ongoing";
       else computedStatus = "Completed";
+
+      if (computedStatus !== data.status) {
+        await updateDoc(doc(db, "schedules", d.id), {
+          status: computedStatus,
+        });
+      }
     }
 
-    // ===== UPDATE SCHEDULE STATUS =====
-    if (computedStatus !== data.status) {
-      await updateDoc(doc(db, "schedules", d.id), {
-        status: computedStatus,
-      });
-    }
-
-    // ===== OT ROOM STATUS (CORRECT WAY) =====
+    /* ================= OT ROOM SYNC (ALWAYS RUN) ================= */
     const otQuery = query(
-      collection(db, "otRooms"),   // ✅ correct collection name
+      collection(db, "otRooms"),
       where("name", "==", data.otRoom)
     );
 
     const otSnap = await getDocs(otQuery);
 
     for (const otDoc of otSnap.docs) {
+      // If schedule is running → OT in use
       if (computedStatus === "Ongoing") {
         await updateDoc(doc(db, "otRooms", otDoc.id), {
           status: "in-use",
@@ -54,7 +55,11 @@ export async function autoUpdateScheduleStatus() {
         });
       }
 
-      if (computedStatus === "Completed" || computedStatus === "Cancelled") {
+      // If schedule finished or cancelled → OT free
+      if (
+        computedStatus === "Completed" ||
+        computedStatus === "Cancelled"
+      ) {
         await updateDoc(doc(db, "otRooms", otDoc.id), {
           status: "available",
           activeScheduleId: null,
@@ -62,8 +67,11 @@ export async function autoUpdateScheduleStatus() {
       }
     }
 
-    // ===== RELEASE DOCTOR & STAFF =====
-    if (computedStatus === "Completed" || computedStatus === "Cancelled") {
+    /* ================= RELEASE PEOPLE ================= */
+    if (
+      computedStatus === "Completed" ||
+      computedStatus === "Cancelled"
+    ) {
       if (data.surgeonId) {
         await syncAvailabilityForUser(data.surgeonId, "Doctor");
       }
