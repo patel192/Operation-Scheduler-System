@@ -4,6 +4,11 @@ import {
   addDoc,
   Timestamp,
   serverTimestamp,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
@@ -15,7 +20,9 @@ import { loadDepartments } from "./loadDepartments.js";
 /* ================= STATE ================= */
 const steps = document.querySelectorAll(".form-section");
 const stepDots = document.querySelectorAll(".step-dot");
-const scheduleDraft = {};
+const scheduleDraft = {
+  equipmentIds: [],
+};
 
 /* ================= ELEMENTS ================= */
 const departmentSelect = document.getElementById("departmentSelect");
@@ -24,6 +31,9 @@ const surgeonSelect = document.getElementById("surgeonSelect");
 const otRoomSelect = document.getElementById("otRoomSelect");
 const startTimeInput = document.getElementById("startTimeInput");
 const endTimeInput = document.getElementById("endTimeInput");
+
+const equipmentGrid = document.getElementById("equipmentGrid");
+const equipmentEmpty = document.getElementById("equipmentEmpty");
 
 /* ================= LOAD DROPDOWNS ================= */
 await loadDepartments(departmentSelect);
@@ -41,7 +51,7 @@ function showStep(i) {
 }
 showStep(0);
 
-/* ================= STEP 1: PATIENT & PROCEDURE ================= */
+/* ================= STEP 1 ================= */
 steps[0].querySelector("button").onclick = async () => {
   const patientId = document.getElementById("patientIdInput").value.trim();
   const patientName = document.getElementById("patientNameInput").value.trim();
@@ -60,20 +70,79 @@ steps[0].querySelector("button").onclick = async () => {
     notes,
   });
 
-  // 🔥 Load OT rooms based on department
   await loadOtRooms(otRoomSelect, department);
+
+  // reset equipment
+  equipmentGrid.innerHTML = "";
+  equipmentEmpty.classList.add("hidden");
+  scheduleDraft.equipmentIds = [];
 
   showStep(1);
 };
 
-/* ================= STEP 2: OT, DATE & STAFF ================= */
+/* ================= LOAD EQUIPMENT FOR OT ================= */
+otRoomSelect.onchange = async () => {
+  equipmentGrid.innerHTML = "";
+  equipmentEmpty.classList.add("hidden");
+  scheduleDraft.equipmentIds = [];
+
+  if (!otRoomSelect.value) return;
+
+  const otSnap = await getDocs(
+    query(collection(db, "otRooms"), where("name", "==", otRoomSelect.value))
+  );
+
+  if (otSnap.empty) return;
+
+  const otRoom = otSnap.docs[0].data();
+  const equipmentIds = otRoom.equipmentIds || [];
+
+  if (!equipmentIds.length) {
+    equipmentEmpty.classList.remove("hidden");
+    return;
+  }
+
+  const eqSnap = await getDocs(collection(db, "equipment"));
+
+  eqSnap.forEach((docSnap) => {
+    if (!equipmentIds.includes(docSnap.id)) return;
+
+    const eq = docSnap.data();
+
+    const card = document.createElement("div");
+    card.className =
+      "border rounded-xl p-3 cursor-pointer transition hover:border-blue-400";
+
+    card.innerHTML = `
+      <div class="aspect-square bg-slate-50 rounded mb-2 flex items-center justify-center">
+        <span class="text-xs text-slate-400">Image</span>
+      </div>
+      <p class="text-sm font-semibold text-center">${eq.name}</p>
+    `;
+
+    card.onclick = () => {
+      if (scheduleDraft.equipmentIds.includes(docSnap.id)) {
+        scheduleDraft.equipmentIds =
+          scheduleDraft.equipmentIds.filter((id) => id !== docSnap.id);
+        card.classList.remove("border-blue-500", "bg-blue-50");
+      } else {
+        scheduleDraft.equipmentIds.push(docSnap.id);
+        card.classList.add("border-blue-500", "bg-blue-50");
+      }
+    };
+
+    equipmentGrid.appendChild(card);
+  });
+};
+
+/* ================= STEP 2 ================= */
 const [back2, next2] = steps[1].querySelectorAll("button");
 
 back2.onclick = () => showStep(0);
 
 next2.onclick = () => {
   const dateInput = steps[1].querySelector('input[type="date"]');
-  const staffIds = [...otStaffSelect.selectedOptions].map(o => o.value);
+  const staffIds = [...otStaffSelect.selectedOptions].map((o) => o.value);
 
   if (
     !dateInput.value ||
@@ -99,7 +168,7 @@ next2.onclick = () => {
   showStep(2);
 };
 
-/* ================= STEP 3: SURGEON ================= */
+/* ================= STEP 3 ================= */
 const [back3, next3] = steps[2].querySelectorAll("button");
 
 back3.onclick = () => showStep(1);
@@ -127,7 +196,7 @@ next3.onclick = () => {
   showStep(3);
 };
 
-/* ================= STEP 4: CONFIRM ================= */
+/* ================= STEP 4 ================= */
 const [back4, confirm] = steps[3].querySelectorAll("button");
 
 back4.onclick = () => showStep(2);
@@ -137,13 +206,7 @@ confirm.onclick = async () => {
     const start = new Date(`${scheduleDraft.date}T${scheduleDraft.startTime}`);
     const end = new Date(`${scheduleDraft.date}T${scheduleDraft.endTime}`);
 
-    if (isNaN(start) || isNaN(end)) {
-      return alert("Invalid time selected");
-    }
-
-    if (start >= end) {
-      return alert("End time must be after start time");
-    }
+    if (start >= end) return alert("Invalid time range");
 
     await addDoc(collection(db, "schedules"), {
       ...scheduleDraft,
@@ -154,7 +217,6 @@ confirm.onclick = async () => {
       createdAt: serverTimestamp(),
     });
 
-    // 🔁 Availability sync
     await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");
     for (const staffId of scheduleDraft.otStaffIds) {
       await syncAvailabilityForUser(staffId, "OT Staff");
@@ -163,7 +225,7 @@ confirm.onclick = async () => {
     alert("Schedule created successfully");
     window.location.href = "/admin/schedule-board.html";
   } catch (err) {
-    console.error("Create schedule error:", err);
+    console.error(err);
     alert("Error creating schedule");
   }
 };
