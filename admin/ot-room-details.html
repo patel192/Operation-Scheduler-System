@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>OT Room Details · Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,11 +18,8 @@
     }
   </style>
 
-  <!-- Auth + Layout -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
-
-  <!-- Page Logic -->
   <script type="module" defer src="/js/admin/ot-room-details.js"></script>
 </head>
 
@@ -32,24 +29,18 @@
 
   <!-- HEADER -->
   <section>
-    <a href="/admin/ot-rooms.html"
-       class="text-sm text-[--primary] font-semibold hover:underline">
+    <a href="/admin/ot-rooms.html" class="text-sm text-[--primary] font-semibold hover:underline">
       ← Back to OT Rooms
     </a>
-
     <h1 id="otName" class="text-3xl font-bold mt-2">—</h1>
     <p id="otDepartment" class="text-sm text-[--muted] mt-1">—</p>
   </section>
 
   <!-- SUMMARY -->
   <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
-
     <div class="bg-white rounded-xl shadow p-5">
       <p class="text-xs text-[--muted] font-semibold">STATUS</p>
-      <span id="statusBadge"
-            class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold">
-        —
-      </span>
+      <span id="statusBadge" class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold">—</span>
     </div>
 
     <div class="bg-white rounded-xl shadow p-5">
@@ -61,50 +52,45 @@
       <p class="text-xs text-[--muted] font-semibold">LAST UPDATED</p>
       <p id="lastUpdated" class="mt-2 font-semibold text-sm">—</p>
     </div>
+  </section>
 
-    <div class="bg-white rounded-xl shadow p-5 flex items-center justify-center">
-      <button id="toggleStatusBtn"
-              class="px-5 py-2 rounded-xl font-semibold">
-        —
+  <!-- MANAGE EQUIPMENT -->
+  <section class="bg-white rounded-2xl shadow p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold">Manage Equipment</h2>
+      <button id="saveEquipmentBtn"
+        class="px-4 py-2 rounded-xl bg-[--primary] text-white text-sm font-semibold">
+        Save Equipment
       </button>
     </div>
 
+    <div id="equipmentGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+    <p class="text-xs text-[--muted] mt-4">
+      Click equipment cards to assign them to this OT Room
+    </p>
   </section>
 
-  <!-- EQUIPMENT -->
+  <!-- ASSIGNED EQUIPMENT -->
   <section class="bg-white rounded-2xl shadow p-6">
+    <h2 class="text-lg font-bold mb-4">Assigned Equipment</h2>
 
-    <h2 class="text-lg font-bold mb-4">Equipment</h2>
+    <ul id="equipmentList" class="list-disc pl-5 space-y-1 text-sm"></ul>
 
-    <ul id="equipmentList"
-        class="list-disc pl-5 space-y-1 text-sm">
-      <!-- injected -->
-    </ul>
-
-    <div id="emptyEquipment"
-         class="hidden text-sm text-[--muted] text-center py-4">
-      No equipment registered.
+    <div id="emptyEquipment" class="hidden text-sm text-[--muted] text-center py-4">
+      No equipment assigned.
     </div>
-
   </section>
 
   <!-- TIMELINE -->
   <section class="bg-white rounded-2xl shadow p-6">
-
     <h2 class="text-lg font-bold mb-4">OT Usage Timeline</h2>
-
-    <div id="timelineEmpty"
-         class="hidden text-sm text-[--muted] text-center py-6">
-      No schedules found for this OT Room.
+    <div id="timelineEmpty" class="hidden text-sm text-[--muted] text-center py-6">
+      No schedules found.
     </div>
-
-    <div id="timelineList" class="space-y-4">
-      <!-- injected -->
-    </div>
-
+    <div id="timelineList" class="space-y-4"></div>
   </section>
 
 </main>
-
 </body>
 </html>

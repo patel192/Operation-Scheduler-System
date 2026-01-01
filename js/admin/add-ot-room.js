@@ -11,7 +11,6 @@ import {
 /* ================= ELEMENTS ================= */
 const otNameInput = document.getElementById("otName");
 const departmentSelect = document.getElementById("departmentSelect");
-const equipmentInput = document.getElementById("equipmentInput");
 const statusSelect = document.getElementById("statusSelect");
 const notesInput = document.getElementById("notesInput");
 const saveBtn = document.getElementById("saveBtn");
@@ -46,7 +45,6 @@ saveBtn.onclick = async () => {
     const name = otNameInput.value.trim();
     const department = departmentSelect.value;
     const status = statusSelect.value;
-    const equipment = parseEquipment(equipmentInput.value);
     const notes = notesInput.value.trim();
 
     if (!name) {
@@ -76,7 +74,7 @@ saveBtn.onclick = async () => {
       name,
       department,
       status,
-      equipment,
+      equipmentIds:[],
       notes: notes || null,
 
       activeScheduleId: null,

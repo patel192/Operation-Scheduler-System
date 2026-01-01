@@ -28,10 +28,16 @@ const equipmentListEl = document.getElementById("equipmentList");
 const equipmentCountEl = document.getElementById("equipmentCount");
 const emptyEquipmentEl = document.getElementById("emptyEquipment");
 const lastUpdatedEl = document.getElementById("lastUpdated");
-const toggleStatusBtn = document.getElementById("toggleStatusBtn");
+
+const equipmentGrid = document.getElementById("equipmentGrid");
+const saveEquipmentBtn = document.getElementById("saveEquipmentBtn");
 
 const timelineList = document.getElementById("timelineList");
 const timelineEmpty = document.getElementById("timelineEmpty");
+
+/* ================= STATE ================= */
+let otRoomData = null;
+let selectedEquipmentIds = new Set();
 
 /* ================= HELPERS ================= */
 function statusClass(status) {
@@ -47,68 +53,100 @@ function formatDate(ts) {
 
 /* ================= LOAD OT ROOM ================= */
 async function loadOtRoom() {
-  const ref = doc(db, "otRooms", otId);
-  const snap = await getDoc(ref);
+  const snap = await getDoc(doc(db, "otRooms", otId));
+  if (!snap.exists()) return;
 
-  if (!snap.exists()) {
-    alert("OT Room not found");
-    window.location.href = "/admin/ot-rooms.html";
-    return;
-  }
+  otRoomData = snap.data();
+  selectedEquipmentIds = new Set(otRoomData.equipmentIds || []);
 
-  const d = snap.data();
-
-  otNameEl.textContent = d.name || "—";
-  otDepartmentEl.textContent = d.department || "—";
-
-  statusBadgeEl.textContent = d.status;
+  otNameEl.textContent = otRoomData.name;
+  otDepartmentEl.textContent = otRoomData.department || "—";
+  statusBadgeEl.textContent = otRoomData.status;
   statusBadgeEl.className =
-    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusClass(d.status)}`;
+    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusClass(otRoomData.status)}`;
 
-  equipmentCountEl.textContent = (d.equipment || []).length;
-  lastUpdatedEl.textContent = formatDate(d.updatedAt || d.createdAt);
+  equipmentCountEl.textContent = selectedEquipmentIds.size;
+  lastUpdatedEl.textContent = formatDate(otRoomData.updatedAt || otRoomData.createdAt);
 
-  toggleStatusBtn.textContent =
-    d.status === "disabled" ? "Enable OT Room" : "Disable OT Room";
-
-  toggleStatusBtn.className =
-    d.status === "disabled"
-      ? "px-5 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold"
-      : "px-5 py-2 rounded-xl bg-red-100 text-red-700 font-semibold";
-
-  renderEquipment(d.equipment || []);
-  await loadTimeline(d.name);
+  await loadEquipmentGrid();
+  await renderAssignedEquipment();
+  await loadTimeline(otRoomData.name);
 }
 
-/* ================= EQUIPMENT ================= */
-function renderEquipment(list) {
-  equipmentListEl.innerHTML = "";
-  emptyEquipmentEl.classList.add("hidden");
+/* ================= EQUIPMENT GRID ================= */
+async function loadEquipmentGrid() {
+  equipmentGrid.innerHTML = "";
 
-  if (!list.length) {
-    emptyEquipmentEl.classList.remove("hidden");
-    return;
-  }
+  const snap = await getDocs(
+    query(collection(db, "equipment"), where("status", "==", "active"))
+  );
 
-  list.forEach((eq) => {
-    const li = document.createElement("li");
-    li.textContent = eq;
-    equipmentListEl.appendChild(li);
+  snap.forEach((docSnap) => {
+    const eq = docSnap.data();
+    const selected = selectedEquipmentIds.has(docSnap.id);
+
+    const card = document.createElement("div");
+    card.className = `
+      border rounded-xl p-3 cursor-pointer transition
+      ${selected ? "border-blue-500 bg-blue-50" : "hover:border-slate-300"}
+    `;
+
+    card.innerHTML = `
+      <img src="${eq.imageUrl}" class="w-full h-28 object-contain mb-2" />
+      <p class="text-sm font-semibold text-center">${eq.name}</p>
+    `;
+
+    card.onclick = () => {
+      selected
+        ? selectedEquipmentIds.delete(docSnap.id)
+        : selectedEquipmentIds.add(docSnap.id);
+      loadEquipmentGrid();
+    };
+
+    equipmentGrid.appendChild(card);
   });
 }
+
+/* ================= ASSIGNED EQUIPMENT ================= */
+async function renderAssignedEquipment() {
+  equipmentListEl.innerHTML = "";
+  emptyEquipmentEl.classList.toggle("hidden", selectedEquipmentIds.size > 0);
+
+  if (!selectedEquipmentIds.size) return;
+
+  const snap = await getDocs(collection(db, "equipment"));
+  snap.forEach((docSnap) => {
+    if (selectedEquipmentIds.has(docSnap.id)) {
+      const li = document.createElement("li");
+      li.textContent = docSnap.data().name;
+      equipmentListEl.appendChild(li);
+    }
+  });
+}
+
+/* ================= SAVE ================= */
+saveEquipmentBtn.onclick = async () => {
+  await updateDoc(doc(db, "otRooms", otId), {
+    equipmentIds: Array.from(selectedEquipmentIds),
+    updatedAt: serverTimestamp(),
+  });
+
+  alert("Equipment updated successfully");
+  loadOtRoom();
+};
 
 /* ================= TIMELINE ================= */
 async function loadTimeline(otName) {
   timelineList.innerHTML = "";
   timelineEmpty.classList.add("hidden");
 
-  const q = query(
-    collection(db, "schedules"),
-    where("otRoom", "==", otName),
-    orderBy("startTime", "asc")
+  const snap = await getDocs(
+    query(
+      collection(db, "schedules"),
+      where("otRoom", "==", otName),
+      orderBy("startTime", "asc")
+    )
   );
-
-  const snap = await getDocs(q);
 
   if (snap.empty) {
     timelineEmpty.classList.remove("hidden");
@@ -133,34 +171,9 @@ async function loadTimeline(otName) {
       <span class="text-xs font-semibold uppercase">${s.status}</span>
     `;
 
-    card.onclick = () => {
-      window.location.href = `/admin/schedule-details.html?id=${docSnap.id}`;
-    };
-
     timelineList.appendChild(card);
   });
 }
-
-/* ================= ACTION ================= */
-toggleStatusBtn.onclick = async () => {
-  const ref = doc(db, "otRooms", otId);
-  const snap = await getDoc(ref);
-  const d = snap.data();
-
-  if (d.status === "in-use") {
-    alert("Cannot disable an OT Room currently in use");
-    return;
-  }
-
-  const nextStatus = d.status === "disabled" ? "available" : "disabled";
-
-  await updateDoc(ref, {
-    status: nextStatus,
-    updatedAt: serverTimestamp(),
-  });
-
-  loadOtRoom();
-};
 
 /* ================= INIT ================= */
 loadOtRoom();
