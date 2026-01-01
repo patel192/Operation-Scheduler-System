@@ -15,7 +15,7 @@ export async function loadOtRooms(selectEl, department = null) {
 
   let q = query(
     collection(db, "otRooms"),
-    where("status", "in", ["available", "in-use"])
+    where("status", "==", "available")
   );
 
   const snapshot = await getDocs(q);
