@@ -9,8 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 /**
- * Sync availability for a single user (Doctor / OT Staff)
- * Availability is derived ONLY from schedules
+ * Availability is derived ONLY from ONGOING schedules
  */
 export async function syncAvailabilityForUser(userId, role) {
   if (!userId || !role) return;
@@ -22,7 +21,7 @@ export async function syncAvailabilityForUser(userId, role) {
     q = query(
       collection(db, "schedules"),
       where("surgeonId", "==", userId),
-      where("status", "in", ["Upcoming", "Ongoing"])
+      where("status", "==", "Ongoing") // ✅ FIX
     );
   }
 
@@ -31,7 +30,7 @@ export async function syncAvailabilityForUser(userId, role) {
     q = query(
       collection(db, "schedules"),
       where("otStaffIds", "array-contains", userId),
-      where("status", "in", ["Upcoming", "Ongoing"])
+      where("status", "==", "Ongoing") // ✅ FIX
     );
   }
 

@@ -221,8 +221,14 @@ confirm.onclick = async () => {
   try {
     const start = new Date(`${scheduleDraft.date}T${scheduleDraft.startTime}`);
     const end = new Date(`${scheduleDraft.date}T${scheduleDraft.endTime}`);
+    const now = new Date();
 
     if (start >= end) return alert("Invalid time range");
+
+    // ✅ compute initial status
+    let initialStatus = "Upcoming";
+    if (now >= start && now < end) initialStatus = "Ongoing";
+    if (now >= end) initialStatus = "Completed";
 
     const docRef = await addDoc(collection(db, "schedules"), {
       patientId: scheduleDraft.patientId,
@@ -231,8 +237,8 @@ confirm.onclick = async () => {
       procedure: scheduleDraft.procedure,
       notes: scheduleDraft.notes,
 
-      otRoomId: scheduleDraft.otRoomId, // ✅ ID
-      otRoomName: scheduleDraft.otRoomName, // ✅ NAME
+      otRoomId: scheduleDraft.otRoomId,
+      otRoomName: scheduleDraft.otRoomName,
       otStaffIds: scheduleDraft.otStaffIds,
       equipmentIds: scheduleDraft.equipmentIds,
 
@@ -241,24 +247,36 @@ confirm.onclick = async () => {
 
       startTime: Timestamp.fromDate(start),
       endTime: Timestamp.fromDate(end),
-      status: "Upcoming",
+      status: initialStatus,
       createdBy: auth.currentUser.uid,
       createdAt: serverTimestamp(),
     });
 
-    // 🔒 LOCK EQUIPMENT
-    for (const eqId of scheduleDraft.equipmentIds || []) {
-      await updateDoc(doc(db, "equipment", eqId), {
+    /* ======================================================
+       🔒 LOCK RESOURCES IF ONGOING
+    ====================================================== */
+    if (initialStatus === "Ongoing") {
+      for (const eqId of scheduleDraft.equipmentIds) {
+        await updateDoc(doc(db, "equipment", eqId), {
+          status: "in-use",
+          currentScheduleId: docRef.id,
+          currentOtRoomId: scheduleDraft.otRoomId,
+          currentOtRoomName: scheduleDraft.otRoomName,
+          lastUsedAt: serverTimestamp(),
+        });
+      }
+
+      await updateDoc(doc(db, "otRooms", scheduleDraft.otRoomId), {
         status: "in-use",
-        currentScheduleId: docRef.id,
-        currentOtRoomId: scheduleDraft.otRoomId, // ✅ FIXED
-        currentOtRoomName: scheduleDraft.otRoomName,
-        lastUsedAt: serverTimestamp(),
+        activeScheduleId: docRef.id,
       });
     }
 
-    // Availability sync
+    /* ======================================================
+       ✅ ADD THIS BLOCK (CRITICAL FIX)
+    ====================================================== */
     await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");
+
     for (const staffId of scheduleDraft.otStaffIds) {
       await syncAvailabilityForUser(staffId, "OT Staff");
     }
@@ -266,7 +284,8 @@ confirm.onclick = async () => {
     alert("Schedule created successfully");
     window.location.href = "/admin/schedule-board.html";
   } catch (err) {
-    console.error("Create schedule error:", err);
+    console.error(err);
     alert("Error creating schedule");
   }
 };
+

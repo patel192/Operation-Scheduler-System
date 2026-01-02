@@ -4,7 +4,8 @@ import {
   getDoc,
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
+
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 
 const params = new URLSearchParams(window.location.search);
 const scheduleId = params.get("id");
@@ -58,7 +59,7 @@ async function loadSchedule() {
 
   patientNameEl.textContent = d.patientName || "—";
   procedureEl.textContent = d.procedure || "—";
-  otRoomEl.textContent = d.otRoom || "—";
+  otRoomEl.textContent = d.otRoomName || "—";
   surgeonEl.textContent = d.surgeonName || "—";
   anesthEl.textContent = d.anesthesiologist || "—";
   notesEl.textContent = d.notes || "No clinical notes";
@@ -78,31 +79,28 @@ async function loadSchedule() {
 }
 
 /* ================= ACTIONS ================= */
+
+// ▶ Mark Ongoing
 btnOngoing.onclick = async () => {
   await updateDoc(doc(db, "schedules", scheduleId), {
     status: "Ongoing",
   });
-  loadSchedule();
+
+  await autoUpdateScheduleStatus();
+  await loadSchedule();
 };
 
+// ✅ Mark Completed
 btnCompleted.onclick = async () => {
   await updateDoc(doc(db, "schedules", scheduleId), {
     status: "Completed",
   });
 
-  const snap = await getDoc(doc(db, "schedules", scheduleId));
-  const d = snap.data();
-
-  await syncAvailabilityForUser(d.surgeonId, "Doctor");
-
-  for (const id of d.otStaffIds || []) {
-    await syncAvailabilityForUser(id, "OT Staff");
-  }
-
-  loadSchedule();
+  await autoUpdateScheduleStatus();
+  await loadSchedule();
 };
 
-
+// ❌ Cancel
 btnCancel.onclick = async () => {
   if (!confirm("Cancel this schedule?")) return;
 
@@ -110,18 +108,9 @@ btnCancel.onclick = async () => {
     status: "Cancelled",
   });
 
-  const snap = await getDoc(doc(db, "schedules", scheduleId));
-  const d = snap.data();
-
-  await syncAvailabilityForUser(d.surgeonId, "Doctor");
-
-  for (const id of d.otStaffIds || []) {
-    await syncAvailabilityForUser(id, "OT Staff");
-  }
-
+  await autoUpdateScheduleStatus();
   window.location.href = "/admin/schedule-board.html";
 };
-
 
 /* ================= INIT ================= */
 loadSchedule();

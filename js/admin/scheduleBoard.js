@@ -7,8 +7,6 @@ import {
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
-
 /* ================= ELEMENTS ================= */
 const rowsContainer = document.getElementById("scheduleRows");
 
@@ -39,14 +37,20 @@ function statusStyles(status) {
 /* ================= LOAD OT ROOMS ================= */
 async function loadOtRooms() {
   const snap = await getDocs(collection(db, "otRooms"));
-  return snap.docs.map((d) => d.data().name);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    name: d.data().name,
+  }));
 }
 
-/* ================= REAL-TIME LISTENER ================= */
+/* ================= LISTEN ================= */
 async function listenSchedules() {
   const otRooms = await loadOtRooms();
 
-  const q = query(collection(db, "schedules"), orderBy("startTime", "asc"));
+  const q = query(
+    collection(db, "schedules"),
+    orderBy("startTime", "asc")
+  );
 
   onSnapshot(q, (snapshot) => {
     rowsContainer.innerHTML = "";
@@ -57,7 +61,9 @@ async function listenSchedules() {
     }));
 
     otRooms.forEach((ot) => {
-      const otSchedules = schedules.filter((s) => s.otRoom === ot);
+      const otSchedules = schedules.filter(
+        (s) => s.otRoomId === ot.id
+      );
 
       const row = document.createElement("div");
       row.className =
@@ -66,12 +72,11 @@ async function listenSchedules() {
       /* ---- OT LABEL ---- */
       const label = document.createElement("div");
       label.className = "ot-label";
-      label.innerHTML = `<span class="ot-dot"></span>${ot}`;
+      label.innerHTML = `<span class="ot-dot"></span>${ot.name}`;
       row.appendChild(label);
 
       let filledCols = 0;
 
-      /* ---- SCHEDULE BLOCKS ---- */
       otSchedules.forEach((sch) => {
         if (!sch.startTime || !sch.endTime) return;
 
@@ -81,12 +86,9 @@ async function listenSchedules() {
 
         const card = document.createElement("div");
         card.style.gridColumn = `span ${span}`;
-
-        card.className = `
-          schedule-card
-          border
-          ${statusStyles(sch.status)}
-        `;
+        card.className = `schedule-card border ${statusStyles(
+          sch.status
+        )}`;
 
         card.innerHTML = `
           <div class="schedule-title">${sch.procedure}</div>
@@ -106,7 +108,6 @@ async function listenSchedules() {
         filledCols += span;
       });
 
-      /* ---- EMPTY TIME CELLS ---- */
       while (filledCols < MAX_COLS) {
         const empty = document.createElement("div");
         empty.className = "time-cell";
@@ -120,7 +121,4 @@ async function listenSchedules() {
 }
 
 /* ================= INIT ================= */
-(async () => {
-  await autoUpdateScheduleStatus();
-  await listenSchedules();
-})();
+listenSchedules();

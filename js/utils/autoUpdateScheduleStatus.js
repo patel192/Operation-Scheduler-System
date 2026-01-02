@@ -4,68 +4,72 @@ import {
   getDocs,
   updateDoc,
   doc,
-  query,
-  where,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { syncAvailabilityForUser } from "./syncAvailability.js";
 
+/**
+ * SINGLE SOURCE OF TRUTH
+ * ----------------------
+ * - Call on interval (schedule board)
+ * - Call after manual status change
+ * - NEVER call inside onSnapshot
+ */
 export async function autoUpdateScheduleStatus() {
   const now = new Date();
   const snapshot = await getDocs(collection(db, "schedules"));
 
-  for (const d of snapshot.docs) {
-    const data = d.data();
+  for (const snap of snapshot.docs) {
+    const data = snap.data();
+    const scheduleId = snap.id;
 
-    if (!data.startTime || !data.endTime || !data.otRoom) continue;
+    // Required fields
+    if (!data.startTime || !data.endTime || !data.otRoomId) continue;
 
     const start = data.startTime.toDate();
     const end = data.endTime.toDate();
 
     let computedStatus = data.status;
 
-    /* ================= STATUS COMPUTATION ================= */
-    // ⛔ Do NOT override manual status
+    /* ======================================================
+       1️⃣ COMPUTE STATUS (TIME-BASED)
+    ====================================================== */
     if (data.status !== "Completed" && data.status !== "Cancelled") {
       if (now < start) computedStatus = "Upcoming";
       else if (now >= start && now < end) computedStatus = "Ongoing";
       else computedStatus = "Completed";
 
       if (computedStatus !== data.status) {
-        await updateDoc(doc(db, "schedules", d.id), {
+        await updateDoc(doc(db, "schedules", scheduleId), {
           status: computedStatus,
         });
       }
     }
 
-    /* ================= OT ROOM SYNC (ALWAYS RUN) ================= */
-    const otQuery = query(
-      collection(db, "otRooms"),
-      where("name", "==", data.otRoom)
-    );
+    /* ======================================================
+       2️⃣ OT ROOM SYNC
+    ====================================================== */
+    const otRef = doc(db, "otRooms", data.otRoomId);
 
-    const otSnap = await getDocs(otQuery);
-
-    for (const otDoc of otSnap.docs) {
-      // If schedule is running → OT in use
-      if (computedStatus === "Ongoing") {
-        await updateDoc(doc(db, "otRooms", otDoc.id), {
-          status: "in-use",
-          activeScheduleId: d.id,
-        });
-      }
-
-      // If schedule finished or cancelled → OT free
-      if (computedStatus === "Completed" || computedStatus === "Cancelled") {
-        await updateDoc(doc(db, "otRooms", otDoc.id), {
-          status: "available",
-          activeScheduleId: null,
-        });
-      }
+    if (computedStatus === "Ongoing") {
+      await updateDoc(otRef, {
+        status: "in-use",
+        activeScheduleId: scheduleId,
+      });
     }
 
-    /* ================= RELEASE PEOPLE ================= */
     if (computedStatus === "Completed" || computedStatus === "Cancelled") {
+      await updateDoc(otRef, {
+        status: "available",
+        activeScheduleId: null,
+      });
+    }
+
+    /* ======================================================
+       3️⃣ DOCTOR & STAFF AVAILABILITY
+    ====================================================== */
+    if (computedStatus === "Ongoing") {
+      // 🔒 MARK BUSY
       if (data.surgeonId) {
         await syncAvailabilityForUser(data.surgeonId, "Doctor");
       }
@@ -74,16 +78,31 @@ export async function autoUpdateScheduleStatus() {
         await syncAvailabilityForUser(staffId, "OT Staff");
       }
     }
+
     if (computedStatus === "Completed" || computedStatus === "Cancelled") {
-      // 🔓 RELEASE EQUIPMENT
-      if (Array.isArray(data.equipmentIds)) {
-        for (const eqId of data.equipmentIds) {
-          await updateDoc(doc(db, "equipment", eqId), {
-            status: "active",
-            currentScheduleId: null,
-            // ⚠️ DO NOT clear currentOtRoomId
-          });
-        }
+      // 🔓 RELEASE
+      if (data.surgeonId) {
+        await syncAvailabilityForUser(data.surgeonId, "Doctor");
+      }
+
+      for (const staffId of data.otStaffIds || []) {
+        await syncAvailabilityForUser(staffId, "OT Staff");
+      }
+    }
+
+    /* ======================================================
+       4️⃣ EQUIPMENT MANAGEMENT
+    ====================================================== */
+    if (
+      (computedStatus === "Completed" || computedStatus === "Cancelled") &&
+      Array.isArray(data.equipmentIds)
+    ) {
+      for (const eqId of data.equipmentIds) {
+        await updateDoc(doc(db, "equipment", eqId), {
+          status: "active",
+          currentScheduleId: null,
+          // keep currentOtRoomId for location tracking
+        });
       }
     }
   }
