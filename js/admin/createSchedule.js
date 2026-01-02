@@ -5,6 +5,8 @@ import {
   Timestamp,
   serverTimestamp,
   getDocs,
+  doc,
+  updateDoc,
   query,
   where,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -155,6 +157,7 @@ back2.onclick = () => showStep(0);
 next2.onclick = () => {
   const dateInput = steps[1].querySelector('input[type="date"]');
   const staffIds = [...otStaffSelect.selectedOptions].map((o) => o.value);
+  const selectedOption = otRoomSelect.selectedOptions[0];
 
   if (
     !dateInput.value ||
@@ -171,7 +174,8 @@ next2.onclick = () => {
 
   Object.assign(scheduleDraft, {
     date: dateInput.value,
-    otRoom: otRoomSelect.value,
+    otRoomId: selectedOption.dataset.id,
+    otRoomName: selectedOption.value,
     startTime: startTimeInput.value,
     endTime: endTimeInput.value,
     otStaffIds: staffIds,
@@ -198,7 +202,7 @@ next3.onclick = () => {
     scheduleDraft.patientName || "—";
   document.getElementById("rvPatientId").textContent = scheduleDraft.patientId;
   document.getElementById("rvProcedure").textContent = scheduleDraft.procedure;
-  document.getElementById("rvOT").textContent = scheduleDraft.otRoom;
+  document.getElementById("rvOT").textContent = scheduleDraft.otRoomName;
   document.getElementById("rvSurgeon").textContent = scheduleDraft.surgeonName;
   document.getElementById("rvStaff").textContent =
     scheduleDraft.otStaffIds.length;
@@ -220,14 +224,38 @@ confirm.onclick = async () => {
 
     if (start >= end) return alert("Invalid time range");
 
-    await addDoc(collection(db, "schedules"), {
-      ...scheduleDraft,
+    const docRef = await addDoc(collection(db, "schedules"), {
+      patientId: scheduleDraft.patientId,
+      patientName: scheduleDraft.patientName,
+      department: scheduleDraft.department,
+      procedure: scheduleDraft.procedure,
+      notes: scheduleDraft.notes,
+
+      otRoomId: scheduleDraft.otRoomId, // ✅ ID
+      otRoomName: scheduleDraft.otRoomName, // ✅ NAME
+      otStaffIds: scheduleDraft.otStaffIds,
+      equipmentIds: scheduleDraft.equipmentIds,
+
+      surgeonId: scheduleDraft.surgeonId,
+      surgeonName: scheduleDraft.surgeonName,
+
       startTime: Timestamp.fromDate(start),
       endTime: Timestamp.fromDate(end),
       status: "Upcoming",
       createdBy: auth.currentUser.uid,
       createdAt: serverTimestamp(),
     });
+
+    // 🔒 LOCK EQUIPMENT
+    for (const eqId of scheduleDraft.equipmentIds || []) {
+      await updateDoc(doc(db, "equipment", eqId), {
+        status: "in-use",
+        currentScheduleId: docRef.id,
+        currentOtRoomId: scheduleDraft.otRoomId, // ✅ FIXED
+        currentOtRoomName: scheduleDraft.otRoomName,
+        lastUsedAt: serverTimestamp(),
+      });
+    }
 
     // Availability sync
     await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");

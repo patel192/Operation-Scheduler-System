@@ -56,10 +56,7 @@ export async function autoUpdateScheduleStatus() {
       }
 
       // If schedule finished or cancelled → OT free
-      if (
-        computedStatus === "Completed" ||
-        computedStatus === "Cancelled"
-      ) {
+      if (computedStatus === "Completed" || computedStatus === "Cancelled") {
         await updateDoc(doc(db, "otRooms", otDoc.id), {
           status: "available",
           activeScheduleId: null,
@@ -68,16 +65,25 @@ export async function autoUpdateScheduleStatus() {
     }
 
     /* ================= RELEASE PEOPLE ================= */
-    if (
-      computedStatus === "Completed" ||
-      computedStatus === "Cancelled"
-    ) {
+    if (computedStatus === "Completed" || computedStatus === "Cancelled") {
       if (data.surgeonId) {
         await syncAvailabilityForUser(data.surgeonId, "Doctor");
       }
 
       for (const staffId of data.otStaffIds || []) {
         await syncAvailabilityForUser(staffId, "OT Staff");
+      }
+    }
+    if (computedStatus === "Completed" || computedStatus === "Cancelled") {
+      // 🔓 RELEASE EQUIPMENT
+      if (Array.isArray(data.equipmentIds)) {
+        for (const eqId of data.equipmentIds) {
+          await updateDoc(doc(db, "equipment", eqId), {
+            status: "active",
+            currentScheduleId: null,
+            // ⚠️ DO NOT clear currentOtRoomId
+          });
+        }
       }
     }
   }
