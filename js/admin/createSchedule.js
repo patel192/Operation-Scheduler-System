@@ -1,14 +1,7 @@
 import { auth, db } from "../firebase.js";
 import {
-  collection,
-  addDoc,
-  Timestamp,
-  serverTimestamp,
-  getDocs,
-  doc,
-  updateDoc,
-  query,
-  where,
+  collection, addDoc, Timestamp, serverTimestamp,
+  getDocs, doc, updateDoc, query, where
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
@@ -19,273 +12,175 @@ import { loadDepartments } from "./loadDepartments.js";
 
 /* ================= STATE ================= */
 const steps = document.querySelectorAll(".form-section");
-const stepDots = document.querySelectorAll(".step-dot");
+const dots = document.querySelectorAll(".step-dot");
 
-const scheduleDraft = {
+const state = {
   equipmentIds: [],
 };
 
 /* ================= ELEMENTS ================= */
-const departmentSelect = document.getElementById("departmentSelect");
-const otRoomSelect = document.getElementById("otRoomSelect");
-const otStaffSelect = document.getElementById("otStaffSelect");
-const surgeonSelect = document.getElementById("surgeonSelect");
-const startTimeInput = document.getElementById("startTimeInput");
-const endTimeInput = document.getElementById("endTimeInput");
-const equipmentGrid = document.getElementById("equipmentGrid");
+const el = {
+  step1Next: document.getElementById("step1NextBtn"),
+  step2Back: document.getElementById("step2BackBtn"),
+  step2Next: document.getElementById("step2NextBtn"),
+  step3Back: document.getElementById("step3BackBtn"),
+  step3Next: document.getElementById("step3NextBtn"),
+  step4Back: document.getElementById("step4BackBtn"),
+  confirm: document.getElementById("confirmScheduleBtn"),
 
-/* ================= INIT DROPDOWNS ================= */
-await loadDepartments(departmentSelect);
-await loadOtStaff(otStaffSelect);
-await loadDoctors(surgeonSelect);
+  department: document.getElementById("departmentSelect"),
+  otRoom: document.getElementById("otRoomSelect"),
+  equipmentGrid: document.getElementById("equipmentGrid"),
+  loadExternalEq: document.getElementById("loadExternalEquipmentBtn"),
 
-/* ================= STEPPER ================= */
+  date: document.getElementById("scheduleDateInput"),
+  start: document.getElementById("startTimeInput"),
+  end: document.getElementById("endTimeInput"),
+
+  staff: document.getElementById("otStaffSelect"),
+  surgeon: document.getElementById("surgeonSelect"),
+};
+
+/* ================= INIT ================= */
+await loadDepartments(el.department);
+await loadOtStaff(el.staff);
+await loadDoctors(el.surgeon);
+
 function showStep(i) {
   steps.forEach((s, idx) => s.classList.toggle("hidden-step", idx !== i));
-  stepDots.forEach((d, idx) => d.classList.toggle("active", idx === i));
+  dots.forEach((d, idx) => d.classList.toggle("active", idx === i));
 }
 showStep(0);
 
-/* ======================================================
-   STEP 1 — PATIENT & PROCEDURE
-====================================================== */
-steps[0].querySelector("button").onclick = async () => {
-  const patientId =
-    document.getElementById("patientIdInput").value.trim() ||
-    `PAT-${Date.now()}`;
+/* ================= STEP 1 ================= */
+el.step1Next.onclick = async () => {
+  state.patientId =
+    document.getElementById("patientIdInput").value || `PAT-${Date.now()}`;
+  state.patientName =
+    document.getElementById("patientNameInput").value;
+  state.procedure =
+    document.getElementById("procedureInput").value;
+  state.notes =
+    document.getElementById("notesInput").value;
+  state.department = el.department.value;
 
-  const patientName = document.getElementById("patientNameInput").value.trim();
+  if (!state.department || !state.procedure)
+    return alert("Department & procedure required");
 
-  const procedure = document.getElementById("procedureInput").value.trim();
-
-  const notes = document.getElementById("notesInput").value.trim();
-
-  const department = departmentSelect.value;
-
-  if (!department) return alert("Select department");
-  if (!procedure) return alert("Procedure is required");
-
-  Object.assign(scheduleDraft, {
-    patientId,
-    patientName,
-    department,
-    procedure,
-    notes,
-  });
-
-  // Load OT rooms by department
-  await loadOtRooms(otRoomSelect, department);
-
-  // Reset equipment
-  equipmentGrid.innerHTML = "";
-  scheduleDraft.equipmentIds = [];
+  await loadOtRooms(el.otRoom, state.department);
+  state.equipmentIds = [];
+  el.equipmentGrid.innerHTML = "";
 
   showStep(1);
 };
 
-/* ======================================================
-   LOAD EQUIPMENT WHEN OT ROOM SELECTED
-====================================================== */
-otRoomSelect.onchange = async () => {
-  equipmentGrid.innerHTML = "";
-  scheduleDraft.equipmentIds = [];
+/* ================= EQUIPMENT ================= */
+function renderEquipment(docSnap, borrowed = false) {
+  const eq = docSnap.data();
+  const id = docSnap.id;
 
-  if (!otRoomSelect.value) return;
+  const card = document.createElement("div");
+  card.className = "border rounded-xl p-3 cursor-pointer";
+  card.innerHTML = `
+    <p class="text-sm font-semibold text-center">${eq.name}</p>
+    ${borrowed ? `<p class="text-xs text-center">From ${eq.currentOtRoomName}</p>` : ""}
+  `;
+
+  card.onclick = () => {
+    if (state.equipmentIds.includes(id)) {
+      state.equipmentIds = state.equipmentIds.filter(e => e !== id);
+      card.classList.remove("bg-blue-50");
+    } else {
+      state.equipmentIds.push(id);
+      card.classList.add("bg-blue-50");
+    }
+  };
+
+  el.equipmentGrid.appendChild(card);
+}
+
+el.otRoom.onchange = async () => {
+  el.equipmentGrid.innerHTML = "";
+  state.equipmentIds = [];
 
   const otSnap = await getDocs(
-    query(collection(db, "otRooms"), where("name", "==", otRoomSelect.value))
+    query(collection(db, "otRooms"), where("name", "==", el.otRoom.value))
   );
-
   if (otSnap.empty) return;
 
-  const otRoom = otSnap.docs[0].data();
-  const equipmentIds = otRoom.equipmentIds || [];
-
-  if (!equipmentIds.length) {
-    equipmentGrid.innerHTML = `<p class="text-xs text-slate-400">No equipment assigned to this OT Room</p>`;
-    return;
-  }
-
+  const eqIds = otSnap.docs[0].data().equipmentIds || [];
   const eqSnap = await getDocs(collection(db, "equipment"));
 
-  eqSnap.forEach((docSnap) => {
-    if (!equipmentIds.includes(docSnap.id)) return;
-
-    const eq = docSnap.data();
-    const selected = scheduleDraft.equipmentIds.includes(docSnap.id);
-
-    const card = document.createElement("div");
-    card.className = `
-      border rounded-xl p-3 cursor-pointer transition
-      ${selected ? "border-blue-500 bg-blue-50" : "hover:border-slate-300"}
-    `;
-
-    card.innerHTML = `
-      <div class="aspect-square bg-slate-100 rounded mb-2 flex items-center justify-center text-xs text-slate-400">
-        Equipment
-      </div>
-      <p class="text-sm font-semibold text-center">${eq.name}</p>
-    `;
-
-    card.onclick = () => {
-      const id = docSnap.id;
-
-      if (scheduleDraft.equipmentIds.includes(id)) {
-        scheduleDraft.equipmentIds = scheduleDraft.equipmentIds.filter(
-          (eid) => eid !== id
-        );
-
-        card.classList.remove("border-blue-500", "bg-blue-50");
-      } else {
-        scheduleDraft.equipmentIds.push(id);
-
-        card.classList.add("border-blue-500", "bg-blue-50");
-      }
-    };
-
-    equipmentGrid.appendChild(card);
+  eqSnap.forEach(d => {
+    if (eqIds.includes(d.id)) renderEquipment(d);
   });
 };
 
-/* ======================================================
-   STEP 2 — OT, DATE, STAFF, TIME
-====================================================== */
-const [back2, next2] = steps[1].querySelectorAll("button");
-
-back2.onclick = () => showStep(0);
-
-next2.onclick = () => {
-  const dateInput = steps[1].querySelector('input[type="date"]');
-  const staffIds = [...otStaffSelect.selectedOptions].map((o) => o.value);
-  const selectedOption = otRoomSelect.selectedOptions[0];
-
-  if (
-    !dateInput.value ||
-    !otRoomSelect.value ||
-    !startTimeInput.value ||
-    !endTimeInput.value
-  ) {
-    return alert("Date, OT room and time are required");
-  }
-
-  if (!staffIds.length) {
-    return alert("Select at least one OT staff");
-  }
-
-  Object.assign(scheduleDraft, {
-    date: dateInput.value,
-    otRoomId: selectedOption.dataset.id,
-    otRoomName: selectedOption.value,
-    startTime: startTimeInput.value,
-    endTime: endTimeInput.value,
-    otStaffIds: staffIds,
+el.loadExternalEq.onclick = async () => {
+  const snap = await getDocs(
+    query(collection(db, "equipment"), where("status", "==", "active"))
+  );
+  snap.forEach(d => {
+    if (!state.equipmentIds.includes(d.id))
+      renderEquipment(d, true);
   });
+};
+
+/* ================= STEP NAV ================= */
+el.step2Back.onclick = () => showStep(0);
+el.step2Next.onclick = () => {
+  state.date = el.date.value;
+  state.startTime = el.start.value;
+  state.endTime = el.end.value;
+  state.otRoomName = el.otRoom.value;
+  state.otRoomId = el.otRoom.selectedOptions[0]?.dataset.id;
+  state.staffIds = [...el.staff.selectedOptions].map(o => o.value);
+
+  if (!state.date || !state.startTime || !state.endTime)
+    return alert("Date & time required");
 
   showStep(2);
 };
 
-/* ======================================================
-   STEP 3 — SURGEON
-====================================================== */
-const [back3, next3] = steps[2].querySelectorAll("button");
+el.step3Back.onclick = () => showStep(1);
+el.step3Next.onclick = () => {
+  state.surgeonId = el.surgeon.value;
+  state.surgeonName =
+    el.surgeon.selectedOptions[0]?.textContent;
 
-back3.onclick = () => showStep(1);
-
-next3.onclick = () => {
-  if (!surgeonSelect.value) return alert("Select surgeon");
-
-  scheduleDraft.surgeonId = surgeonSelect.value;
-  scheduleDraft.surgeonName =
-    surgeonSelect.options[surgeonSelect.selectedIndex].textContent;
-
-  document.getElementById("rvPatient").textContent =
-    scheduleDraft.patientName || "—";
-  document.getElementById("rvPatientId").textContent = scheduleDraft.patientId;
-  document.getElementById("rvProcedure").textContent = scheduleDraft.procedure;
-  document.getElementById("rvOT").textContent = scheduleDraft.otRoomName;
-  document.getElementById("rvSurgeon").textContent = scheduleDraft.surgeonName;
-  document.getElementById("rvStaff").textContent =
-    scheduleDraft.otStaffIds.length;
+  document.getElementById("rvPatient").textContent = state.patientName;
+  document.getElementById("rvProcedure").textContent = state.procedure;
+  document.getElementById("rvOT").textContent = state.otRoomName;
+  document.getElementById("rvSurgeon").textContent = state.surgeonName;
 
   showStep(3);
 };
 
-/* ======================================================
-   STEP 4 — CONFIRM & CREATE
-====================================================== */
-const [back4, confirm] = steps[3].querySelectorAll("button");
+el.step4Back.onclick = () => showStep(2);
 
-back4.onclick = () => showStep(2);
+/* ================= CONFIRM ================= */
+el.confirm.onclick = async () => {
+  const start = new Date(`${state.date}T${state.startTime}`);
+  const end = new Date(`${state.date}T${state.endTime}`);
+  const now = new Date();
 
-confirm.onclick = async () => {
-  try {
-    const start = new Date(`${scheduleDraft.date}T${scheduleDraft.startTime}`);
-    const end = new Date(`${scheduleDraft.date}T${scheduleDraft.endTime}`);
-    const now = new Date();
+  let status = "Upcoming";
+  if (now >= start && now < end) status = "Ongoing";
+  if (now >= end) status = "Completed";
 
-    if (start >= end) return alert("Invalid time range");
+  const ref = await addDoc(collection(db, "schedules"), {
+    ...state,
+    startTime: Timestamp.fromDate(start),
+    endTime: Timestamp.fromDate(end),
+    status,
+    createdBy: auth.currentUser.uid,
+    createdAt: serverTimestamp(),
+  });
 
-    // ✅ compute initial status
-    let initialStatus = "Upcoming";
-    if (now >= start && now < end) initialStatus = "Ongoing";
-    if (now >= end) initialStatus = "Completed";
-
-    const docRef = await addDoc(collection(db, "schedules"), {
-      patientId: scheduleDraft.patientId,
-      patientName: scheduleDraft.patientName,
-      department: scheduleDraft.department,
-      procedure: scheduleDraft.procedure,
-      notes: scheduleDraft.notes,
-
-      otRoomId: scheduleDraft.otRoomId,
-      otRoomName: scheduleDraft.otRoomName,
-      otStaffIds: scheduleDraft.otStaffIds,
-      equipmentIds: scheduleDraft.equipmentIds,
-
-      surgeonId: scheduleDraft.surgeonId,
-      surgeonName: scheduleDraft.surgeonName,
-
-      startTime: Timestamp.fromDate(start),
-      endTime: Timestamp.fromDate(end),
-      status: initialStatus,
-      createdBy: auth.currentUser.uid,
-      createdAt: serverTimestamp(),
-    });
-
-    /* ======================================================
-       🔒 LOCK RESOURCES IF ONGOING
-    ====================================================== */
-    if (initialStatus === "Ongoing") {
-      for (const eqId of scheduleDraft.equipmentIds) {
-        await updateDoc(doc(db, "equipment", eqId), {
-          status: "in-use",
-          currentScheduleId: docRef.id,
-          currentOtRoomId: scheduleDraft.otRoomId,
-          currentOtRoomName: scheduleDraft.otRoomName,
-          lastUsedAt: serverTimestamp(),
-        });
-      }
-
-      await updateDoc(doc(db, "otRooms", scheduleDraft.otRoomId), {
-        status: "in-use",
-        activeScheduleId: docRef.id,
-      });
-    }
-
-    /* ======================================================
-       ✅ ADD THIS BLOCK (CRITICAL FIX)
-    ====================================================== */
-    await syncAvailabilityForUser(scheduleDraft.surgeonId, "Doctor");
-
-    for (const staffId of scheduleDraft.otStaffIds) {
-      await syncAvailabilityForUser(staffId, "OT Staff");
-    }
-
-    alert("Schedule created successfully");
-    window.location.href = "/admin/schedule-board.html";
-  } catch (err) {
-    console.error(err);
-    alert("Error creating schedule");
+  await syncAvailabilityForUser(state.surgeonId, "Doctor");
+  for (const id of state.staffIds || []) {
+    await syncAvailabilityForUser(id, "OT Staff");
   }
-};
 
+  window.location.href = "/admin/schedule-board.html";
+};

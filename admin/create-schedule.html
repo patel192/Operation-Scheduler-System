@@ -12,7 +12,7 @@
   <script type="module" defer src="/js/admin/createSchedule.js"></script>
 
   <style>
-    .hidden-step { display:none; }
+    .hidden-step { display: none; }
     .form-section { animation: stepIn .45s ease forwards; }
     @keyframes stepIn {
       from { opacity:0; transform:translateY(16px); }
@@ -31,21 +31,7 @@
     .input-card {
       background:#fff;border:1px solid #e5e7eb;
       border-radius:14px;padding:14px;
-      transition:border-color .2s,box-shadow .2s;
     }
-    .input-card:focus-within {
-      border-color:#2563eb;
-      box-shadow:0 0 0 2px rgba(37,99,235,.15);
-    }
-    .btn { transition:.2s; }
-    .btn:hover {
-      transform:translateY(-1px);
-      box-shadow:0 10px 20px rgba(0,0,0,.08);
-    }
-    .review-item {
-      display:flex;justify-content:space-between;font-size:.875rem;
-    }
-    .review-item span:first-child { color:#64748b; }
   </style>
 </head>
 
@@ -61,151 +47,136 @@
 </section>
 
 <!-- STEPPER -->
-<section class="bg-white rounded-2xl shadow-sm p-5 flex justify-between items-center">
+<section class="bg-white rounded-2xl shadow-sm p-5 flex justify-between">
   <div class="flex gap-4">
     <span class="step-dot active">1</span>
     <span class="step-dot">2</span>
     <span class="step-dot">3</span>
     <span class="step-dot">4</span>
   </div>
-  <span class="text-xs text-slate-500">Draft → Review → Confirm</span>
 </section>
 
 <!-- ================= STEP 1 ================= -->
-<section class="form-section bg-white rounded-2xl shadow-sm p-8 space-y-6">
+<section class="form-section bg-white rounded-2xl p-8 space-y-6">
   <h2 class="text-lg font-semibold">Patient & Procedure</h2>
 
   <div class="grid md:grid-cols-2 gap-5">
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Patient ID</label>
-      <input id="patientIdInput" class="mt-1 w-full outline-none"/>
+      <label class="text-xs">Patient ID</label>
+      <input id="patientIdInput" class="w-full"/>
     </div>
 
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Patient Name</label>
-      <input id="patientNameInput" class="mt-1 w-full outline-none"/>
+      <label class="text-xs">Patient Name</label>
+      <input id="patientNameInput" class="w-full"/>
     </div>
 
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Department</label>
-      <select id="departmentSelect" class="mt-1 w-full outline-none bg-transparent">
-        <option value="">Select department</option>
-      </select>
+      <label class="text-xs">Department</label>
+      <select id="departmentSelect" class="w-full"></select>
     </div>
 
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Procedure *</label>
-      <input id="procedureInput" class="mt-1 w-full outline-none"/>
+      <label class="text-xs">Procedure *</label>
+      <input id="procedureInput" class="w-full"/>
     </div>
 
     <div class="input-card md:col-span-2">
-      <label class="text-xs font-semibold text-slate-500">Clinical Notes</label>
-      <textarea id="notesInput" rows="3" class="mt-1 w-full outline-none"></textarea>
+      <label class="text-xs">Clinical Notes</label>
+      <textarea id="notesInput" rows="3" class="w-full"></textarea>
     </div>
   </div>
 
   <div class="flex justify-end">
-    <button class="btn bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold">
+    <button id="step1NextBtn" class="bg-blue-600 text-white px-6 py-2 rounded-xl">
       Continue →
     </button>
   </div>
 </section>
 
 <!-- ================= STEP 2 ================= -->
-<section class="form-section hidden-step bg-white rounded-2xl shadow-sm p-8 space-y-6">
+<section class="form-section hidden-step bg-white rounded-2xl p-8 space-y-6">
   <h2 class="text-lg font-semibold">OT, Date & Staff</h2>
 
   <div class="grid md:grid-cols-3 gap-5">
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Date</label>
-      <input type="date" class="mt-1 w-full outline-none"/>
+      <label class="text-xs">Date</label>
+      <input id="scheduleDateInput" type="date" class="w-full"/>
     </div>
 
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">OT Room</label>
-      <select id="otRoomSelect" class="mt-1 w-full outline-none bg-transparent">
-        <option value="">Select OT</option>
-      </select>
-    </div>
-
-    <!-- EQUIPMENT -->
-    <div class="input-card md:col-span-3">
-      <label class="text-xs font-semibold text-slate-500">
-        Equipment (from selected OT Room)
-      </label>
-
-      <div id="equipmentGrid"
-           class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2"></div>
-
-      <p class="text-xs text-slate-400 mt-2">
-        Only equipment assigned to this OT Room is shown
-      </p>
+      <label class="text-xs">OT Room</label>
+      <select id="otRoomSelect" class="w-full"></select>
     </div>
 
     <div class="input-card md:col-span-3">
-      <label class="text-xs font-semibold text-slate-500">OT Staff</label>
-      <select id="otStaffSelect" multiple class="mt-1 w-full h-32 outline-none"></select>
+      <label class="text-xs">Equipment</label>
+      <div id="equipmentGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2"></div>
+
+      <button id="loadExternalEquipmentBtn" type="button"
+        class="mt-3 text-sm text-blue-600 font-semibold">
+        + Add equipment from other OT rooms
+      </button>
+    </div>
+
+    <div class="input-card md:col-span-3">
+      <label class="text-xs">OT Staff</label>
+      <select id="otStaffSelect" multiple class="w-full h-32"></select>
     </div>
 
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Start Time</label>
-      <input id="startTimeInput" type="time" class="mt-1 w-full outline-none"/>
+      <label class="text-xs">Start Time</label>
+      <input id="startTimeInput" type="time" class="w-full"/>
     </div>
 
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">End Time</label>
-      <input id="endTimeInput" type="time" class="mt-1 w-full outline-none"/>
+      <label class="text-xs">End Time</label>
+      <input id="endTimeInput" type="time" class="w-full"/>
     </div>
   </div>
 
   <div class="flex justify-between">
-    <button class="btn border px-6 py-2 rounded-xl">← Back</button>
-    <button class="btn bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold">
+    <button id="step2BackBtn" class="border px-6 py-2 rounded-xl">← Back</button>
+    <button id="step2NextBtn" class="bg-blue-600 text-white px-6 py-2 rounded-xl">
       Continue →
     </button>
   </div>
 </section>
 
 <!-- ================= STEP 3 ================= -->
-<section class="form-section hidden-step bg-white rounded-2xl shadow-sm p-8 space-y-6">
+<section class="form-section hidden-step bg-white rounded-2xl p-8 space-y-6">
   <h2 class="text-lg font-semibold">Doctor Assignment</h2>
 
   <div class="grid md:grid-cols-2 gap-5">
     <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Surgeon *</label>
-      <select id="surgeonSelect" class="mt-1 w-full outline-none bg-transparent"></select>
-    </div>
-
-    <div class="input-card">
-      <label class="text-xs font-semibold text-slate-500">Anesthesiologist</label>
-      <input class="mt-1 w-full outline-none"/>
+      <label class="text-xs">Surgeon</label>
+      <select id="surgeonSelect" class="w-full"></select>
     </div>
   </div>
 
   <div class="flex justify-between">
-    <button class="btn border px-6 py-2 rounded-xl">← Back</button>
-    <button class="btn bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold">
+    <button id="step3BackBtn" class="border px-6 py-2 rounded-xl">← Back</button>
+    <button id="step3NextBtn" class="bg-blue-600 text-white px-6 py-2 rounded-xl">
       Review →
     </button>
   </div>
 </section>
 
 <!-- ================= STEP 4 ================= -->
-<section class="form-section hidden-step bg-white rounded-2xl shadow-sm p-8 space-y-6">
+<section class="form-section hidden-step bg-white rounded-2xl p-8 space-y-6">
   <h2 class="text-lg font-semibold">Review & Confirm</h2>
 
-  <div class="bg-slate-50 rounded-xl p-5 space-y-3">
-    <div class="review-item"><span>Patient</span><span id="rvPatient"></span></div>
-    <div class="review-item"><span>Patient ID</span><span id="rvPatientId"></span></div>
-    <div class="review-item"><span>Procedure</span><span id="rvProcedure"></span></div>
-    <div class="review-item"><span>OT Room</span><span id="rvOT"></span></div>
-    <div class="review-item"><span>Surgeon</span><span id="rvSurgeon"></span></div>
-    <div class="review-item"><span>OT Staff</span><span id="rvStaff"></span></div>
+  <div class="space-y-2 text-sm">
+    <p>Patient: <span id="rvPatient"></span></p>
+    <p>Procedure: <span id="rvProcedure"></span></p>
+    <p>OT Room: <span id="rvOT"></span></p>
+    <p>Surgeon: <span id="rvSurgeon"></span></p>
   </div>
 
   <div class="flex justify-between">
-    <button class="btn border px-6 py-2 rounded-xl">← Back</button>
-    <button class="btn bg-emerald-600 text-white px-6 py-2 rounded-xl font-semibold">
+    <button id="step4BackBtn" class="border px-6 py-2 rounded-xl">← Back</button>
+    <button id="confirmScheduleBtn"
+      class="bg-emerald-600 text-white px-6 py-2 rounded-xl">
       Confirm Schedule
     </button>
   </div>
