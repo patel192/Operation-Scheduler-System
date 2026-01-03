@@ -16,34 +16,25 @@ export async function syncAvailabilityForUser(userId, role) {
 
   let q;
 
-  /* ================= DOCTOR ================= */
   if (role === "Doctor") {
     q = query(
       collection(db, "schedules"),
       where("surgeonId", "==", userId),
-      where("status", "==", "Ongoing") // ✅ FIX
+      where("status", "==", "Ongoing")
     );
-  }
-
-  /* ================= OT STAFF ================= */
-  else if (role === "OT Staff") {
+  } else if (role === "OT Staff") {
     q = query(
       collection(db, "schedules"),
       where("otStaffIds", "array-contains", userId),
-      where("status", "==", "Ongoing") // ✅ FIX
+      where("status", "==", "Ongoing")
     );
-  }
-
-  else {
-    console.warn("syncAvailabilityForUser: Unknown role", role);
+  } else {
     return;
   }
 
   const snap = await getDocs(q);
 
-  const availability = snap.empty ? "available" : "busy";
-
   await updateDoc(doc(db, "users", userId), {
-    availability,
+    availability: snap.empty ? "available" : "busy",
   });
 }

@@ -11,9 +11,9 @@ import { syncAvailabilityForUser } from "./syncAvailability.js";
 /**
  * SINGLE SOURCE OF TRUTH
  * ----------------------
- * - Call on interval (schedule board)
- * - Call after manual status change
- * - NEVER call inside onSnapshot
+ * - Time-based automation
+ * - Manual override respected
+ * - Resource lock & release enforced
  */
 export async function autoUpdateScheduleStatus() {
   const now = new Date();
@@ -23,27 +23,31 @@ export async function autoUpdateScheduleStatus() {
     const data = snap.data();
     const scheduleId = snap.id;
 
-    // Required fields
+    // Safety guard
     if (!data.startTime || !data.endTime || !data.otRoomId) continue;
 
     const start = data.startTime.toDate();
     const end = data.endTime.toDate();
 
-    let computedStatus = data.status;
+    let computedStatus;
 
     /* ======================================================
-       1️⃣ COMPUTE STATUS (TIME-BASED)
+       1️⃣ STATUS DECISION (MANUAL OVERRIDE SAFE)
     ====================================================== */
-    if (data.status !== "Completed" && data.status !== "Cancelled") {
+    if (data.status === "Completed" || data.status === "Cancelled") {
+      // 🔒 Manual finalization must never be overridden
+      computedStatus = data.status;
+    } else {
+      // ⏱️ Time-based automation
       if (now < start) computedStatus = "Upcoming";
       else if (now >= start && now < end) computedStatus = "Ongoing";
       else computedStatus = "Completed";
+    }
 
-      if (computedStatus !== data.status) {
-        await updateDoc(doc(db, "schedules", scheduleId), {
-          status: computedStatus,
-        });
-      }
+    if (computedStatus !== data.status) {
+      await updateDoc(doc(db, "schedules", scheduleId), {
+        status: computedStatus,
+      });
     }
 
     /* ======================================================
@@ -56,9 +60,7 @@ export async function autoUpdateScheduleStatus() {
         status: "in-use",
         activeScheduleId: scheduleId,
       });
-    }
-
-    if (computedStatus === "Completed" || computedStatus === "Cancelled") {
+    } else {
       await updateDoc(otRef, {
         status: "available",
         activeScheduleId: null,
@@ -66,44 +68,38 @@ export async function autoUpdateScheduleStatus() {
     }
 
     /* ======================================================
-       3️⃣ DOCTOR & STAFF AVAILABILITY
+       3️⃣ EQUIPMENT MANAGEMENT
     ====================================================== */
-    if (computedStatus === "Ongoing") {
-      // 🔒 MARK BUSY
-      if (data.surgeonId) {
-        await syncAvailabilityForUser(data.surgeonId, "Doctor");
-      }
-
-      for (const staffId of data.otStaffIds || []) {
-        await syncAvailabilityForUser(staffId, "OT Staff");
-      }
-    }
-
-    if (computedStatus === "Completed" || computedStatus === "Cancelled") {
-      // 🔓 RELEASE
-      if (data.surgeonId) {
-        await syncAvailabilityForUser(data.surgeonId, "Doctor");
-      }
-
-      for (const staffId of data.otStaffIds || []) {
-        await syncAvailabilityForUser(staffId, "OT Staff");
+    if (Array.isArray(data.equipmentIds)) {
+      for (const eqId of data.equipmentIds) {
+        if (computedStatus === "Ongoing") {
+          await updateDoc(doc(db, "equipment", eqId), {
+            status: "in-use",
+            currentScheduleId: scheduleId,
+            currentOtRoomId: data.otRoomId,
+            currentOtRoomName: data.otRoomName || null,
+          });
+        } else {
+          await updateDoc(doc(db, "equipment", eqId), {
+            status: "active",
+            currentScheduleId: null,
+            currentOtRoomId: null,
+            currentOtRoomName: null,
+            lastUsedAt: new Date(),
+          });
+        }
       }
     }
 
     /* ======================================================
-       4️⃣ EQUIPMENT MANAGEMENT
+       4️⃣ AVAILABILITY SYNC (DERIVED)
     ====================================================== */
-    if (
-      (computedStatus === "Completed" || computedStatus === "Cancelled") &&
-      Array.isArray(data.equipmentIds)
-    ) {
-      for (const eqId of data.equipmentIds) {
-        await updateDoc(doc(db, "equipment", eqId), {
-          status: "active",
-          currentScheduleId: null,
-          // keep currentOtRoomId for location tracking
-        });
-      }
+    if (data.surgeonId) {
+      await syncAvailabilityForUser(data.surgeonId, "Doctor");
+    }
+
+    for (const staffId of data.otStaffIds || []) {
+      await syncAvailabilityForUser(staffId, "OT Staff");
     }
   }
 }

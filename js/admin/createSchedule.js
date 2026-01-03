@@ -1,7 +1,14 @@
 import { auth, db } from "../firebase.js";
 import {
-  collection, addDoc, Timestamp, serverTimestamp,
-  getDocs, doc, updateDoc, query, where
+  collection,
+  addDoc,
+  Timestamp,
+  serverTimestamp,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { syncAvailabilityForUser } from "../utils/syncAvailability.js";
@@ -16,6 +23,7 @@ const dots = document.querySelectorAll(".step-dot");
 
 const state = {
   equipmentIds: [],
+  otStaffIds: [],
 };
 
 /* ================= ELEMENTS ================= */
@@ -56,12 +64,9 @@ showStep(0);
 el.step1Next.onclick = async () => {
   state.patientId =
     document.getElementById("patientIdInput").value || `PAT-${Date.now()}`;
-  state.patientName =
-    document.getElementById("patientNameInput").value;
-  state.procedure =
-    document.getElementById("procedureInput").value;
-  state.notes =
-    document.getElementById("notesInput").value;
+  state.patientName = document.getElementById("patientNameInput").value;
+  state.procedure = document.getElementById("procedureInput").value;
+  state.notes = document.getElementById("notesInput").value;
   state.department = el.department.value;
 
   if (!state.department || !state.procedure)
@@ -83,12 +88,16 @@ function renderEquipment(docSnap, borrowed = false) {
   card.className = "border rounded-xl p-3 cursor-pointer";
   card.innerHTML = `
     <p class="text-sm font-semibold text-center">${eq.name}</p>
-    ${borrowed ? `<p class="text-xs text-center">From ${eq.currentOtRoomName}</p>` : ""}
+    ${
+      borrowed
+        ? `<p class="text-xs text-center">From ${eq.currentOtRoomName || "Other OT"}</p>`
+        : ""
+    }
   `;
 
   card.onclick = () => {
     if (state.equipmentIds.includes(id)) {
-      state.equipmentIds = state.equipmentIds.filter(e => e !== id);
+      state.equipmentIds = state.equipmentIds.filter((e) => e !== id);
       card.classList.remove("bg-blue-50");
     } else {
       state.equipmentIds.push(id);
@@ -103,38 +112,51 @@ el.otRoom.onchange = async () => {
   el.equipmentGrid.innerHTML = "";
   state.equipmentIds = [];
 
+  const otRoomId = el.otRoom.selectedOptions[0]?.dataset.id;
+  if (!otRoomId) return;
+
   const otSnap = await getDocs(
-    query(collection(db, "otRooms"), where("name", "==", el.otRoom.value))
+    query(collection(db, "otRooms"), where("__name__", "==", otRoomId))
   );
+
   if (otSnap.empty) return;
 
   const eqIds = otSnap.docs[0].data().equipmentIds || [];
   const eqSnap = await getDocs(collection(db, "equipment"));
 
-  eqSnap.forEach(d => {
-    if (eqIds.includes(d.id)) renderEquipment(d);
+  eqSnap.forEach((d) => {
+    if (eqIds.includes(d.id) && d.data().currentScheduleId === null) {
+      renderEquipment(d);
+    }
   });
 };
 
 el.loadExternalEq.onclick = async () => {
   const snap = await getDocs(
-    query(collection(db, "equipment"), where("status", "==", "active"))
+    query(
+      collection(db, "equipment"),
+      where("status", "==", "active"),
+      where("currentScheduleId", "==", null)
+    )
   );
-  snap.forEach(d => {
-    if (!state.equipmentIds.includes(d.id))
+
+  snap.forEach((d) => {
+    if (!state.equipmentIds.includes(d.id)) {
       renderEquipment(d, true);
+    }
   });
 };
 
 /* ================= STEP NAV ================= */
 el.step2Back.onclick = () => showStep(0);
+
 el.step2Next.onclick = () => {
   state.date = el.date.value;
   state.startTime = el.start.value;
   state.endTime = el.end.value;
   state.otRoomName = el.otRoom.value;
   state.otRoomId = el.otRoom.selectedOptions[0]?.dataset.id;
-  state.staffIds = [...el.staff.selectedOptions].map(o => o.value);
+  state.otStaffIds = [...el.staff.selectedOptions].map((o) => o.value);
 
   if (!state.date || !state.startTime || !state.endTime)
     return alert("Date & time required");
@@ -143,15 +165,10 @@ el.step2Next.onclick = () => {
 };
 
 el.step3Back.onclick = () => showStep(1);
+
 el.step3Next.onclick = () => {
   state.surgeonId = el.surgeon.value;
-  state.surgeonName =
-    el.surgeon.selectedOptions[0]?.textContent;
-
-  document.getElementById("rvPatient").textContent = state.patientName;
-  document.getElementById("rvProcedure").textContent = state.procedure;
-  document.getElementById("rvOT").textContent = state.otRoomName;
-  document.getElementById("rvSurgeon").textContent = state.surgeonName;
+  state.surgeonName = el.surgeon.selectedOptions[0]?.textContent;
 
   showStep(3);
 };
@@ -164,21 +181,62 @@ el.confirm.onclick = async () => {
   const end = new Date(`${state.date}T${state.endTime}`);
   const now = new Date();
 
-  let status = "Upcoming";
-  if (now >= start && now < end) status = "Ongoing";
-  if (now >= end) status = "Completed";
+  let status;
+  if (now < start) status = "Upcoming";
+  else if (now >= start && now < end) status = "Ongoing";
+  else status = "Completed";
 
   const ref = await addDoc(collection(db, "schedules"), {
-    ...state,
+    patientId: state.patientId,
+    patientName: state.patientName,
+    department: state.department,
+    procedure: state.procedure,
+    notes: state.notes,
+
+    otRoomId: state.otRoomId,
+    otRoomName: state.otRoomName,
+
+    otStaffIds: state.otStaffIds,
+    equipmentIds: state.equipmentIds,
+
+    surgeonId: state.surgeonId,
+    surgeonName: state.surgeonName,
+
     startTime: Timestamp.fromDate(start),
     endTime: Timestamp.fromDate(end),
     status,
+
     createdBy: auth.currentUser.uid,
     createdAt: serverTimestamp(),
   });
 
+  const scheduleId = ref.id;
+
+  /* 🔒 LOCK RESOURCES IF ONGOING */
+  if (status === "Ongoing") {
+    await updateDoc(doc(db, "otRooms", state.otRoomId), {
+      status: "in-use",
+      activeScheduleId: scheduleId,
+      activeScheduleTime: {
+        start: Timestamp.fromDate(start),
+        end: Timestamp.fromDate(end),
+      },
+    });
+
+    for (const eqId of state.equipmentIds) {
+      await updateDoc(doc(db, "equipment", eqId), {
+        status: "in-use",
+        currentScheduleId: scheduleId,
+        currentOtRoomId: state.otRoomId,
+        currentOtRoomName: state.otRoomName,
+        lastUsedAt: serverTimestamp(),
+      });
+    }
+  }
+
+  /* 🔄 SYNC AVAILABILITY */
   await syncAvailabilityForUser(state.surgeonId, "Doctor");
-  for (const id of state.staffIds || []) {
+  for (const id of state.otStaffIds) {
     await syncAvailabilityForUser(id, "OT Staff");
   }
 
