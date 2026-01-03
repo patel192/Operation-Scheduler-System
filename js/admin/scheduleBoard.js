@@ -6,7 +6,7 @@ import {
   onSnapshot,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
+import {autoUpdateScheduleStatus} from "../utils/autoUpdateScheduleStatus.js"
 /* ================= ELEMENTS ================= */
 const rowsContainer = document.getElementById("scheduleRows");
 
@@ -46,7 +46,7 @@ async function loadOtRooms() {
 /* ================= LISTEN ================= */
 async function listenSchedules() {
   const otRooms = await loadOtRooms();
-
+await autoUpdateScheduleStatus();
   const q = query(
     collection(db, "schedules"),
     orderBy("startTime", "asc")
@@ -122,3 +122,7 @@ async function listenSchedules() {
 
 /* ================= INIT ================= */
 listenSchedules();
+// 🔁 AUTO STATUS UPDATE EVERY 60 SECONDS
+setInterval(async () => {
+  await autoUpdateScheduleStatus();
+}, 60 * 1000);
