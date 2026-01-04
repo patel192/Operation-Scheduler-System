@@ -5,22 +5,16 @@
   <title>My Profile · Doctor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F1F5F9;
+      --bg:#F4F7FB;
       --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
-    }
-
-    .glass {
-      background: rgba(255,255,255,.95);
-      backdrop-filter: blur(10px);
     }
 
     .fade-in {
@@ -28,148 +22,113 @@
     }
 
     @keyframes fade {
-      from { opacity:0; transform: translateY(8px); }
+      from { opacity:0; transform: translateY(10px); }
       to { opacity:1; transform:none; }
     }
   </style>
 
-  <!-- Auth + Navbar -->
+  <!-- Auth -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/profile.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-4xl mx-auto px-4 py-10 space-y-8 fade-in">
+<main class="max-w-5xl mx-auto px-4 py-10 fade-in space-y-8">
 
-  <!-- ================= HEADER ================= -->
-  <section>
+  <!-- HEADER -->
+  <header>
     <h1 class="text-3xl font-bold">My Profile</h1>
     <p class="text-sm text-[--muted] mt-1">
-      Professional identity, department and account status
+      Internal professional profile & system status
     </p>
-  </section>
+  </header>
 
-  <!-- ================= PROFILE OVERVIEW ================= -->
-  <section
-    class="glass border border-[--border] rounded-3xl shadow
-           p-6 flex flex-col sm:flex-row sm:items-center gap-6">
+  <!-- PROFILE CARD -->
+  <section class="bg-white rounded-3xl shadow border border-[--border] p-6 flex flex-col lg:flex-row gap-8">
 
-    <!-- AVATAR -->
-    <div class="relative">
-      <img
-        src="https://img.icons8.com/ios-filled/100/0A6CFF/doctor-male.png"
-        alt="Doctor Avatar"
-        class="w-28 h-28 rounded-full bg-blue-50 p-3 border"
-      />
-      <span
-        class="absolute bottom-2 right-2 w-4 h-4 rounded-full
-               bg-green-500 border-2 border-white"
-        title="Active">
-      </span>
-    </div>
+    <!-- LEFT -->
+    <div class="flex items-center gap-6 min-w-[280px]">
 
-    <!-- BASIC INFO -->
-    <div class="flex-1">
-      <h2 class="text-2xl font-bold">Dr. John Doe</h2>
-      <p class="text-sm text-[--muted] mt-1">
-        Cardiology Department
-      </p>
-
-      <div class="mt-4 flex flex-wrap gap-2">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold
-                     bg-blue-100 text-blue-700">
-          Doctor
+      <div class="relative">
+        <img
+          id="profileImage"
+          class="w-36 h-36 rounded-2xl object-cover border"
+          alt="Doctor photo"
+        />
+        <span
+          id="statusDot"
+          class="absolute bottom-2 right-2 w-4 h-4 rounded-full border-2 border-white">
         </span>
+      </div>
 
-        <span class="px-3 py-1 rounded-full text-xs font-semibold
-                     bg-green-100 text-green-700">
-          Active
-        </span>
+      <div>
+        <h2 id="doctorName" class="text-2xl font-bold">—</h2>
+        <p id="doctorDepartment" class="text-sm text-[--muted] mt-1">—</p>
+
+        <div class="mt-3 flex gap-2">
+          <span id="roleBadge" class="px-3 py-1 rounded-full text-xs font-semibold"></span>
+          <span id="statusBadge" class="px-3 py-1 rounded-full text-xs font-semibold"></span>
+        </div>
       </div>
     </div>
 
-  </section>
-
-  <!-- ================= DETAILS ================= -->
-  <section
-    class="glass border border-[--border] rounded-3xl shadow p-6">
-
-    <h3 class="text-lg font-bold mb-5">
-      Personal & Account Information
-    </h3>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+    <!-- RIGHT -->
+    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
 
       <div>
         <p class="text-[--muted]">Full Name</p>
-        <p class="font-semibold text-base">Dr. John Doe</p>
+        <p id="fullName" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Email</p>
-        <p class="font-semibold text-base">
-          john.doe@hospital.com
-        </p>
+        <p id="email" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Phone</p>
-        <p class="font-semibold text-base">
-          +91 98765 43210
-        </p>
+        <p id="phone" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Department</p>
-        <p class="font-semibold text-base">
-          Cardiology
-        </p>
+        <p id="department" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Role</p>
-        <p class="font-semibold text-base">
-          Doctor
-        </p>
+        <p id="role" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Account Status</p>
-        <p class="font-semibold text-base text-green-600">
-          Active
-        </p>
+        <p id="accountStatus" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Joined On</p>
-        <p class="font-semibold text-base">
-          15 Dec 2025
-        </p>
+        <p id="joinedOn" class="font-semibold text-base">—</p>
       </div>
 
       <div>
         <p class="text-[--muted]">Last Login</p>
-        <p class="font-semibold text-base">
-          Today, 09:12 AM
-        </p>
+        <p id="lastLogin" class="font-semibold text-base">—</p>
       </div>
 
     </div>
   </section>
 
-  <!-- ================= ACTIONS ================= -->
-  <section class="flex justify-end">
+  <!-- ACTION -->
+  <div class="flex justify-end">
     <button
       disabled
-      class="px-6 py-2.5 rounded-xl
-             bg-slate-200 text-slate-500
-             font-semibold cursor-not-allowed">
-      Edit Profile (Coming Soon)
+      class="px-6 py-2.5 rounded-xl bg-slate-200 text-slate-500 font-semibold cursor-not-allowed">
+      Profile Managed by Admin
     </button>
-  </section>
+  </div>
 
 </main>
-
 </body>
 </html>
