@@ -1,165 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard — Operation Scheduler</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OT Command Center · Admin</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    :root {
-      --primary:#2563eb;
-      --bg:#F1F5F9;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748B;
-      --border:#E2E8F0;
-    }
-  </style>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/dashboard.js"></script>
+
+  <style>
+    /* Smooth entry animation */
+    .fade-up {
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Ongoing pulse */
+    .pulse-amber {
+      animation: pulseAmber 2s infinite;
+    }
+
+    @keyframes pulseAmber {
+
+      0%,
+      100% {
+        background-color: rgb(254 243 199);
+      }
+
+      50% {
+        background-color: rgb(253 230 138);
+      }
+    }
+  </style>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-sky-50 text-slate-900 min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+  <div id="adminNavbar"></div>
 
-  <!-- ===== HERO ===== -->
-  <section class="bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-2xl p-6 text-white flex justify-between items-center">
-    <div>
-      <p class="text-sm opacity-80">Admin Panel</p>
-      <h1 class="text-2xl font-semibold mt-1">
-        Operation Theatres
-      </h1>
-      <p class="text-sm opacity-90 mt-1">
-        Manage OT rooms, equipment and availability
-      </p>
-    </div>
+  <main class="max-w-[1700px] mx-auto px-5 py-5 grid grid-cols-12 gap-5">
 
-    <button class="bg-white text-indigo-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-indigo-50 transition">
-      + Add OT Room
-    </button>
-  </section>
+    <!-- LEFT -->
+    <section class="col-span-3 space-y-5 fade-up">
 
-  <!-- ===== KPI STRIP ===== -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
-    <div class="metric-card">
-      <p class="metric-label">Total OT Rooms</p>
-      <h2 class="metric-value">8</h2>
-    </div>
+      <!-- HEALTH -->
+      <div class="bg-white rounded-2xl p-5 border shadow-sm">
+        <div class="flex items-center gap-2 text-sky-700">
+          <i data-lucide="activity"></i>
+          <h3 class="font-semibold">System Health</h3>
+        </div>
 
-    <div class="metric-card">
-      <p class="metric-label">Available</p>
-      <h2 class="metric-value text-emerald-600">5</h2>
-    </div>
+        <p id="healthScore" class="text-4xl font-bold text-sky-700 mt-4">
+          0%
+        </p>
 
-    <div class="metric-card">
-      <p class="metric-label">In Use</p>
-      <h2 class="metric-value text-blue-600">2</h2>
-    </div>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex justify-between items-center">
+            <span class="flex gap-2 items-center text-slate-600">
+              <i data-lucide="hospital" class="w-4"></i> OT Utilization
+            </span>
+            <span id="otUtilization" class="font-semibold text-blue-600">0%</span>
+          </div>
 
-    <div class="metric-card">
-      <p class="metric-label">Maintenance</p>
-      <h2 class="metric-value text-red-600">1</h2>
-    </div>
-  </section>
+          <div class="flex justify-between items-center">
+            <span class="flex gap-2 items-center text-slate-600">
+              <i data-lucide="stethoscope" class="w-4"></i> Equipment Load
+            </span>
+            <span id="equipmentUtilization" class="font-semibold text-emerald-600">0%</span>
+          </div>
 
-  <!-- ===== MAIN GRID ===== -->
-  <section class="grid lg:grid-cols-3 gap-8">
-
-    <!-- TABLE -->
-    <div class="lg:col-span-2 bg-white rounded-2xl border overflow-hidden">
-      <div class="px-6 py-4 border-b font-semibold flex justify-between items-center">
-        OT Rooms List
-        <span class="text-sm text-slate-500">Live status</span>
-      </div>
-
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50 text-slate-500">
-          <tr>
-            <th class="px-6 py-3 text-left">OT Name</th>
-            <th class="px-6 py-3 text-left">Department</th>
-            <th class="px-6 py-3 text-left">Capacity</th>
-            <th class="px-6 py-3 text-left">Equipment</th>
-            <th class="px-6 py-3 text-left">Status</th>
-            <th class="px-6 py-3 text-right">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody class="divide-y">
-          <tr class="hover:bg-slate-50 transition">
-            <td class="px-6 py-4 font-medium">OT-1</td>
-            <td class="px-6 py-4">Cardiology</td>
-            <td class="px-6 py-4">Full</td>
-            <td class="px-6 py-4">Ventilator, ECG</td>
-            <td class="px-6 py-4">
-              <span class="status-pill bg-emerald-100 text-emerald-700">
-                Available
-              </span>
-            </td>
-            <td class="px-6 py-4 text-right space-x-2">
-              <button class="text-blue-600 hover:underline">View</button>
-              <button class="text-amber-600 hover:underline">Edit</button>
-              <button class="text-red-600 hover:underline">Disable</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- SIDE WIDGET -->
-    <div class="bg-white rounded-2xl border p-6">
-      <h3 class="font-semibold mb-2">Utilization</h3>
-      <p class="text-sm text-slate-500 mb-6">
-        OT room usage today
-      </p>
-
-      <div class="flex justify-center">
-        <div class="h-32 w-32 rounded-full border-8 border-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-600">
-          62%
+          <div class="flex justify-between items-center">
+            <span class="flex gap-2 items-center text-slate-600">
+              <i data-lucide="users" class="w-4"></i> Staff Busy
+            </span>
+            <span id="staffUtilization" class="font-semibold text-amber-600">0%</span>
+          </div>
         </div>
       </div>
 
-      <div class="mt-6 text-sm text-slate-500 text-center">
-        Updated just now
+      <!-- ALERTS -->
+      <div class="bg-white rounded-2xl p-5 border shadow-sm">
+        <div class="flex items-center gap-2 text-red-600 mb-3">
+          <i data-lucide="alert-triangle"></i>
+          <h3 class="font-semibold">Critical Alerts</h3>
+        </div>
+
+        <ul id="alertsList" class="text-sm space-y-2 text-red-700">
+          <li class="text-slate-400">No active alerts</li>
+        </ul>
       </div>
-    </div>
 
-  </section>
-</main>
+    </section>
 
+    <!-- CENTER -->
+    <section class="col-span-6 space-y-5 fade-up">
 
-<!-- ================= UI HELPERS ================= -->
-<style>
-  .metric-card {
-    background: white;
-    border-radius: 1.25rem;
-    padding: 1.25rem;
-    border: 1px solid #e5e7eb;
-  }
+      <!-- LIVE OPS -->
+      <div class="bg-white rounded-2xl border shadow-sm">
+        <div class="px-5 py-3 border-b bg-sky-100 rounded-t-2xl flex items-center gap-2">
+          <i data-lucide="clock" class="text-sky-700"></i>
+          <h2 class="font-semibold text-sky-900">
+            Live Surgeries
+          </h2>
+        </div>
 
-  .metric-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 500;
-  }
+        <div id="liveOperations" class="divide-y"></div>
 
-  .metric-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-top: 0.25rem;
-  }
+        <div id="noLiveOps" class="hidden py-6 text-center text-slate-400">
+          No surgeries currently in progress
+        </div>
+      </div>
 
-  .status-pill {
-    padding: 4px 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 999px;
-    display: inline-block;
-  }
-</style>
+      <!-- TODAY -->
+      <div class="bg-white rounded-2xl border shadow-sm">
+        <div class="px-5 py-3 border-b flex items-center gap-2">
+          <i data-lucide="calendar-days"></i>
+          <h2 class="font-semibold">
+            Today’s OT Schedule
+          </h2>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-100 text-slate-600">
+              <tr>
+                <th class="p-3 text-left">Patient</th>
+                <th class="p-3">OT</th>
+                <th class="p-3">Time</th>
+                <th class="p-3">Surgeon</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="todayTable" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- ===== CHARTS ===== -->
+      <div class="grid grid-cols-2 gap-4 p-4 border-t bg-slate-50">
+
+        <!-- USER DISTRIBUTION -->
+        <div class="bg-white rounded-xl p-4 border shadow-sm">
+          <h4 class="text-sm font-semibold mb-2 flex items-center gap-2">
+            <i data-lucide="users"></i> Staff Distribution
+          </h4>
+          <canvas id="userChart" height="140"></canvas>
+        </div>
+
+        <!-- DEPARTMENT LOAD -->
+        <div class="bg-white rounded-xl p-4 border shadow-sm">
+          <h4 class="text-sm font-semibold mb-2 flex items-center gap-2">
+            <i data-lucide="layers"></i> Department Load (Today)
+          </h4>
+          <canvas id="deptChart" height="140"></canvas>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RIGHT -->
+    <section class="col-span-3 space-y-5 fade-up">
+
+      <div class="bg-white rounded-2xl p-5 border shadow-sm">
+        <h3 class="font-semibold flex items-center gap-2 mb-3">
+          <i data-lucide="layout-grid"></i> OT Rooms
+        </h3>
+        <ul id="otList" class="text-sm space-y-1"></ul>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border shadow-sm">
+        <h3 class="font-semibold flex items-center gap-2 mb-3">
+          <i data-lucide="cpu"></i> Equipment In Use
+        </h3>
+        <ul id="equipmentList" class="text-sm space-y-1"></ul>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border shadow-sm">
+        <h3 class="font-semibold flex items-center gap-2 mb-3">
+          <i data-lucide="user-check"></i> Staff Occupancy
+        </h3>
+        <ul id="staffList" class="text-sm space-y-1"></ul>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
 
 </body>
+
 </html>
