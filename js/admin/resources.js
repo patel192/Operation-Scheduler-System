@@ -39,7 +39,7 @@ function statusBadge(status) {
 async function loadEquipment() {
   const snap = await getDocs(collection(db, "equipment"));
 
-  equipmentList = snap.docs.map(d => ({
+  equipmentList = snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),
   }));
@@ -53,25 +53,25 @@ function populateFilters() {
   const categories = new Set();
   const departments = new Set();
 
-  equipmentList.forEach(e => {
+  equipmentList.forEach((e) => {
     if (e.category) categories.add(e.category);
-    (e.departments || []).forEach(d => departments.add(d));
+    (e.departments || []).forEach((d) => departments.add(d));
   });
 
   categoryFilter.innerHTML =
     `<option value="">All Categories</option>` +
-    [...categories].map(c => `<option value="${c}">${c}</option>`).join("");
+    [...categories].map((c) => `<option value="${c}">${c}</option>`).join("");
 
   departmentFilter.innerHTML =
     `<option value="">All Departments</option>` +
-    [...departments].map(d => `<option value="${d}">${d}</option>`).join("");
+    [...departments].map((d) => `<option value="${d}">${d}</option>`).join("");
 }
 
 /* ================= RENDER ================= */
 function render() {
   tableBody.innerHTML = "";
 
-  const filtered = equipmentList.filter(e => {
+  const filtered = equipmentList.filter((e) => {
     const searchMatch =
       !searchInput.value ||
       e.name?.toLowerCase().includes(searchInput.value.toLowerCase());
@@ -79,8 +79,7 @@ function render() {
     const categoryMatch =
       !categoryFilter.value || e.category === categoryFilter.value;
 
-    const statusMatch =
-      !statusFilter.value || e.status === statusFilter.value;
+    const statusMatch = !statusFilter.value || e.status === statusFilter.value;
 
     const departmentMatch =
       !departmentFilter.value ||
@@ -112,6 +111,15 @@ function renderRow(eq) {
     <td class="px-4 py-3">${statusBadge(eq.status)}</td>
     <td class="px-4 py-3">${eq.currentOtRoomName || "—"}</td>
     <td class="px-4 py-3">${formatDate(eq.lastUsedAt)}</td>
+    
+<td class="px-4 py-3 text-right">
+  <a
+    href="/admin/edit-equipment.html?id=${eq.id}"
+    class="text-blue-600 hover:underline text-sm">
+    Edit
+  </a>
+</td>
+
   `;
 
   tableBody.appendChild(tr);
@@ -120,9 +128,11 @@ function renderRow(eq) {
 /* ================= SUMMARY ================= */
 function updateSummary(list) {
   totalEl.textContent = list.length;
-  inUseEl.textContent = list.filter(e => e.status === "in-use").length;
-  maintenanceEl.textContent = list.filter(e => e.status === "maintenance").length;
-  availableEl.textContent = list.filter(e => e.status === "active").length;
+  inUseEl.textContent = list.filter((e) => e.status === "in-use").length;
+  maintenanceEl.textContent = list.filter(
+    (e) => e.status === "maintenance"
+  ).length;
+  availableEl.textContent = list.filter((e) => e.status === "active").length;
 }
 
 /* ================= EVENTS ================= */

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Equipment · Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/edit-equipment.js"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+  <div id="adminNavbar"></div>
+
+  <main class="max-w-3xl mx-auto px-6 py-6">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold">Edit Equipment</h1>
+      <p class="text-sm text-slate-500">
+        Update equipment details (safe fields only)
+      </p>
+    </div>
+
+    <!-- FORM -->
+    <form id="editEquipmentForm" class="bg-white border rounded-xl p-6 space-y-5">
+
+      <!-- NAME -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Equipment Name *</label>
+        <input
+          id="nameInput"
+          type="text"
+          required
+          class="w-full border rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <!-- CATEGORY -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Category *</label>
+        <input
+          id="categoryInput"
+          type="text"
+          required
+          class="w-full border rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <!-- DEPARTMENTS -->
+      <div>
+        <label class="block text-sm font-medium mb-1">
+          Departments
+        </label>
+        <select
+          id="departmentsSelect"
+          multiple
+          class="w-full border rounded-lg px-3 py-2 text-sm h-32">
+        </select>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Description</label>
+        <textarea
+          id="descriptionInput"
+          rows="3"
+          class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
+      </div>
+
+      <!-- IMAGE URL -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Image URL</label>
+        <input
+          id="imageUrlInput"
+          type="url"
+          class="w-full border rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <!-- INFO (READ-ONLY SYSTEM FIELDS) -->
+      <div class="border rounded-lg bg-slate-50 p-4 text-sm">
+        <p><strong>Status:</strong> <span id="statusText">—</span></p>
+        <p><strong>Current OT:</strong> <span id="currentOtText">—</span></p>
+        <p><strong>Current Schedule:</strong> <span id="currentScheduleText">—</span></p>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex justify-end gap-3 pt-4">
+        <a
+          href="/admin/resources.html"
+          class="px-4 py-2 text-sm border rounded-lg">
+          Cancel
+        </a>
+        <button
+          type="submit"
+          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Save Changes
+        </button>
+      </div>
+
+    </form>
+
+  </main>
+
+</body>
+</html>
