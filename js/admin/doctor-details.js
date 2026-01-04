@@ -16,22 +16,22 @@ const doctorId = params.get("id");
 
 if (!doctorId) {
   alert("Invalid doctor");
-  window.location.href = "/admin/doctors.html";
+  location.href = "/admin/doctors.html";
 }
 
 /* ================= ELEMENTS ================= */
 const doctorNameEl = document.getElementById("doctorName");
 const doctorEmailEl = document.getElementById("doctorEmail");
 const statusBadgeEl = document.getElementById("statusBadge");
-const availabilityEl = document.getElementById("availability");
 const departmentEl = document.getElementById("department");
+const availabilityEl = document.getElementById("availability");
 const toggleStatusBtn = document.getElementById("toggleStatusBtn");
+
+const upcomingCountEl = document.getElementById("upcomingCount");
+const completedCountEl = document.getElementById("completedCount");
 
 const timelineList = document.getElementById("timelineList");
 const timelineEmpty = document.getElementById("timelineEmpty");
-
-const filterStatus = document.getElementById("filterStatus");
-const filterDate = document.getElementById("filterDate");
 
 const tabUpcoming = document.getElementById("tabUpcoming");
 const tabPast = document.getElementById("tabPast");
@@ -41,11 +41,10 @@ let allSchedules = [];
 let activeTab = "upcoming";
 
 /* ================= HELPERS ================= */
-function statusStyle(status) {
-  if (status === "Completed") return "border-green-500 text-green-700";
-  if (status === "Ongoing") return "border-yellow-500 text-yellow-700";
-  if (status === "Cancelled") return "border-red-500 text-red-700";
-  return "border-blue-500 text-blue-700";
+function badgeClass(status) {
+  return status === "disabled"
+    ? "bg-red-200 text-red-800"
+    : "bg-emerald-200 text-emerald-800";
 }
 
 function formatDate(ts) {
@@ -63,16 +62,6 @@ function formatTime(ts) {
   });
 }
 
-function groupByDate(list) {
-  const map = {};
-  list.forEach(s => {
-    const key = s.startTime.toDate().toISOString().slice(0, 10);
-    if (!map[key]) map[key] = [];
-    map[key].push(s);
-  });
-  return map;
-}
-
 /* ================= LOAD DOCTOR ================= */
 async function loadDoctor() {
   const snap = await getDoc(doc(db, "users", doctorId));
@@ -82,30 +71,21 @@ async function loadDoctor() {
 
   doctorNameEl.textContent = d.displayName || "—";
   doctorEmailEl.textContent = d.email || "—";
-  availabilityEl.textContent = d.availability || "—";
   departmentEl.textContent = d.department || "—";
+  availabilityEl.textContent = d.availability || "available";
 
   statusBadgeEl.textContent = d.status || "active";
   statusBadgeEl.className =
-    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
-      d.status === "disabled"
-        ? "bg-red-100 text-red-700"
-        : "bg-emerald-100 text-emerald-700"
-    }`;
+    `px-4 py-2 rounded-full text-sm font-semibold ${badgeClass(d.status)}`;
 
   toggleStatusBtn.textContent =
     d.status === "disabled" ? "Enable Doctor" : "Disable Doctor";
 
-  toggleStatusBtn.className =
-    d.status === "disabled"
-      ? "px-5 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold"
-      : "px-5 py-2 rounded-xl bg-red-100 text-red-700 font-semibold";
-
-  await loadTimeline();
+  loadSchedules();
 }
 
-/* ================= LOAD TIMELINE ================= */
-async function loadTimeline() {
+/* ================= LOAD SCHEDULES ================= */
+async function loadSchedules() {
   const q = query(
     collection(db, "schedules"),
     where("surgeonId", "==", doctorId),
@@ -115,114 +95,72 @@ async function loadTimeline() {
   const snap = await getDocs(q);
   allSchedules = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  applyFilters();
+  upcomingCountEl.textContent =
+    allSchedules.filter(s => ["Upcoming", "Ongoing"].includes(s.status)).length;
+
+  completedCountEl.textContent =
+    allSchedules.filter(s => s.status === "Completed").length;
+
+  renderTimeline();
 }
 
-/* ================= FILTER + TABS ================= */
-function applyFilters() {
+/* ================= RENDER ================= */
+function renderTimeline() {
   timelineList.innerHTML = "";
   timelineEmpty.classList.add("hidden");
 
-  let list = [...allSchedules];
-
-  // TAB FILTER
-  if (activeTab === "upcoming") {
-    list = list.filter(s =>
-      ["Upcoming", "Ongoing"].includes(s.status)
-    );
-  } else {
-    list = list.filter(s =>
-      ["Completed", "Cancelled"].includes(s.status)
-    );
-  }
-
-  // STATUS FILTER
-  if (filterStatus.value) {
-    list = list.filter(s => s.status === filterStatus.value);
-  }
-
-  // DATE FILTER
-  if (filterDate.value) {
-    list = list.filter(s =>
-      s.startTime.toDate().toISOString().slice(0, 10) === filterDate.value
-    );
-  }
+  let list =
+    activeTab === "upcoming"
+      ? allSchedules.filter(s => ["Upcoming", "Ongoing"].includes(s.status))
+      : allSchedules.filter(s => ["Completed", "Cancelled"].includes(s.status));
 
   if (!list.length) {
     timelineEmpty.classList.remove("hidden");
     return;
   }
 
-  const grouped = groupByDate(list);
-  Object.entries(grouped).forEach(([date, schedules]) =>
-    renderDateGroup(date, schedules)
-  );
-}
+  list.forEach(s => {
+    const card = document.createElement("div");
+    card.className =
+      "border-l-4 pl-4 py-3 rounded bg-slate-50";
 
-/* ================= RENDER ================= */
-function renderDateGroup(date, schedules) {
-  const wrapper = document.createElement("div");
+    card.style.borderColor =
+      s.status === "Completed"
+        ? "#22c55e"
+        : s.status === "Ongoing"
+        ? "#f59e0b"
+        : "#3b82f6";
 
-  const header = document.createElement("div");
-  header.className =
-    "flex justify-between items-center bg-slate-100 px-4 py-2 rounded cursor-pointer font-semibold";
-
-  header.innerHTML = `
-    <span>${new Date(date).toDateString()}</span>
-    <span class="text-sm text-slate-500">(${schedules.length})</span>
-  `;
-
-  const content = document.createElement("div");
-  content.className = "mt-3 space-y-3";
-
-  schedules.forEach(s => {
-    const item = document.createElement("div");
-    item.className =
-      `border-l-4 pl-4 py-3 rounded ${statusStyle(s.status)}`;
-
-    item.innerHTML = `
+    card.innerHTML = `
       <p class="font-semibold">${s.procedure}</p>
       <p class="text-sm text-slate-600">
-        Patient: ${s.patientName} • ${s.otRoom}
+        Patient: ${s.patientName || "—"} · ${s.otRoomName}
       </p>
       <p class="text-xs text-slate-500">
-        ${formatDate(s.startTime)} •
+        ${formatDate(s.startTime)} ·
         ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
       </p>
       <span class="text-xs font-semibold uppercase">${s.status}</span>
     `;
 
-    content.appendChild(item);
+    timelineList.appendChild(card);
   });
-
-  let collapsed = false;
-  header.onclick = () => {
-    collapsed = !collapsed;
-    content.classList.toggle("hidden", collapsed);
-  };
-
-  wrapper.appendChild(header);
-  wrapper.appendChild(content);
-  timelineList.appendChild(wrapper);
 }
 
 /* ================= EVENTS ================= */
 tabUpcoming.onclick = () => {
   activeTab = "upcoming";
-  tabUpcoming.classList.add("bg-[--primary]", "text-white");
-  tabPast.classList.remove("bg-[#0a6cff]","text-white");
-  applyFilters();
+  tabUpcoming.classList.add("bg-indigo-600", "text-white");
+  tabPast.classList.remove("bg-indigo-600", "text-white");
+  renderTimeline();
 };
 
 tabPast.onclick = () => {
   activeTab = "past";
-  tabPast.classList.add("bg-[#0a6cff]","text-white");
-  tabUpcoming.classList.remove("bg-[--primary]", "text-white");
-  applyFilters();
+  tabPast.classList.add("bg-indigo-600", "text-white");
+  tabUpcoming.classList.remove("bg-indigo-600", "text-white");
+  renderTimeline();
 };
-
-filterStatus.addEventListener("change", applyFilters);
-filterDate.addEventListener("change", applyFilters);
 
 toggleStatusBtn.onclick = async () => {
   const ref = doc(db, "users", doctorId);
@@ -230,7 +168,7 @@ toggleStatusBtn.onclick = async () => {
   const d = snap.data();
 
   if (d.availability === "busy" && d.status !== "disabled") {
-    alert("Cannot disable a doctor with active schedules");
+    alert("Cannot disable doctor with active schedules");
     return;
   }
 

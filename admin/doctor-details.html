@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Department Control · Admin</title>
+  <title>Doctor Details · Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10,156 +10,90 @@
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
-  <script type="module" defer src="/js/admin/department-details.js"></script>
-
-  <style>
-    .fade-in {
-      animation: fadeIn .45s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity:0; transform:translateY(10px); }
-      to { opacity:1; transform:translateY(0); }
-    }
-  </style>
+  <script type="module" defer src="/js/admin/doctor-details.js"></script>
 </head>
 
-<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen text-slate-900">
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen">
 
 <div id="adminNavbar"></div>
 
-<main class="max-w-[1500px] mx-auto px-6 py-8 space-y-10 fade-in">
+<main class="max-w-[1500px] mx-auto px-6 py-8 space-y-8">
 
   <!-- HERO -->
-  <section
-    class="rounded-3xl p-8 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xl">
+  <section class="rounded-3xl p-8 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xl">
+    <a href="/admin/doctors.html" class="text-sm opacity-80 hover:underline">
+      ← Doctors
+    </a>
 
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+    <h1 id="doctorName" class="text-3xl font-bold mt-3 flex items-center gap-3">
+      <i data-lucide="stethoscope"></i>
+      —
+    </h1>
 
-      <div>
-        <a href="/admin/departments.html"
-           class="text-sm opacity-80 hover:underline">
-          ← Departments
-        </a>
+    <p id="doctorEmail" class="text-sm opacity-90 mt-1">—</p>
 
-        <h1 id="deptName"
-            class="text-3xl font-bold mt-2 flex items-center gap-3">
-          <i data-lucide="layers"></i>
-          —
-        </h1>
+    <div class="flex gap-4 mt-4">
+      <span id="statusBadge"
+        class="px-4 py-2 rounded-full bg-white/20 text-sm font-semibold">
+        —
+      </span>
 
-        <p class="text-sm opacity-90 mt-1">
-          Department control & operational overview
-        </p>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <span id="deptStatus"
-          class="px-5 py-2 rounded-full text-sm font-semibold bg-white/20">
-          —
-        </span>
-
-        <button id="toggleStatusBtn"
-          class="px-6 py-2 rounded-xl font-semibold bg-white text-indigo-700 hover:bg-indigo-50 transition">
-          —
-        </button>
-      </div>
-
+      <button id="toggleStatusBtn"
+        class="px-5 py-2 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-indigo-50">
+        —
+      </button>
     </div>
   </section>
 
   <!-- KPI STRIP -->
-  <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-    <div class="bg-white rounded-2xl p-6 shadow-sm border">
-      <div class="flex items-center gap-3 text-indigo-600">
-        <i data-lucide="users"></i>
-        <span class="text-sm font-semibold">Doctors</span>
-      </div>
-      <h3 id="doctorCount" class="text-4xl font-bold mt-4">—</h3>
+  <section class="grid md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-sm text-slate-500">Department</p>
+      <p id="department" class="text-xl font-semibold mt-2">—</p>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 shadow-sm border">
-      <div class="flex items-center gap-3 text-emerald-600">
-        <i data-lucide="hospital"></i>
-        <span class="text-sm font-semibold">OT Rooms</span>
-      </div>
-      <p id="otRooms" class="mt-4 font-semibold text-sm">—</p>
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-sm text-slate-500">Availability</p>
+      <p id="availability" class="text-xl font-semibold mt-2 capitalize">—</p>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 shadow-sm border">
-      <div class="flex items-center gap-3 text-amber-600">
-        <i data-lucide="activity"></i>
-        <span class="text-sm font-semibold">Operational State</span>
-      </div>
-      <p class="mt-4 text-sm text-slate-600">
-        Auto-blocked if schedules or doctors are active
-      </p>
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-sm text-slate-500">Upcoming</p>
+      <h3 id="upcomingCount" class="text-3xl font-bold mt-2">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 shadow-sm border">
-      <div class="flex items-center gap-3 text-rose-600">
-        <i data-lucide="shield-alert"></i>
-        <span class="text-sm font-semibold">Safety Locks</span>
-      </div>
-      <p class="mt-4 text-sm text-slate-600">
-        Prevents accidental shutdowns
-      </p>
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-sm text-slate-500">Completed</p>
+      <h3 id="completedCount" class="text-3xl font-bold mt-2">0</h3>
     </div>
-
   </section>
 
-  <!-- CONTROL GRID -->
-  <section class="grid lg:grid-cols-3 gap-8">
+  <!-- SCHEDULE TIMELINE -->
+  <section class="bg-white rounded-2xl border shadow-sm overflow-hidden">
 
-    <!-- HEAD DOCTOR -->
-    <div class="lg:col-span-1 bg-white rounded-2xl p-6 shadow-sm border">
-      <h3 class="font-semibold flex items-center gap-2 mb-5">
-        <i data-lucide="stethoscope"></i>
-        Department Head
+    <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+      <h3 class="font-semibold flex items-center gap-2">
+        <i data-lucide="calendar"></i>
+        Surgery Timeline
       </h3>
 
-      <select
-        id="headDoctorSelect"
-        class="w-full border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-      </select>
-
-      <button
-        id="saveHead"
-        class="mt-4 w-full px-6 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2">
-        <i data-lucide="save"></i>
-        Save Assignment
-      </button>
+      <div class="flex gap-2">
+        <button id="tabUpcoming"
+          class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold">
+          Upcoming
+        </button>
+        <button id="tabPast"
+          class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm font-semibold">
+          Past
+        </button>
+      </div>
     </div>
 
-    <!-- DOCTORS TABLE -->
-    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div id="timelineList" class="p-6 space-y-4"></div>
 
-      <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-        <h3 class="font-semibold flex items-center gap-2">
-          <i data-lucide="user-round"></i>
-          Doctors in Department
-        </h3>
-        <span class="text-sm text-slate-500">Live availability</span>
-      </div>
-
-      <table class="w-full text-sm">
-        <thead class="text-slate-500 bg-white">
-          <tr>
-            <th class="px-6 py-4 text-left">Doctor</th>
-            <th class="px-6 py-4 text-left">Email</th>
-            <th class="px-6 py-4 text-left">Availability</th>
-          </tr>
-        </thead>
-
-        <tbody id="doctorsTable" class="divide-y"></tbody>
-      </table>
-
-      <div
-        id="emptyDoctors"
-        class="hidden p-10 text-center text-slate-400">
-        No doctors assigned to this department.
-      </div>
-
+    <div id="timelineEmpty"
+      class="hidden p-10 text-center text-slate-400">
+      No schedules found.
     </div>
 
   </section>
