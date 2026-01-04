@@ -6,126 +6,130 @@
   <title>Schedule Details · Admin</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/schedule-details.js"></script>
 
   <style>
-    .action-btn {
-      transition: all .2s ease;
-    }
-    .action-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0,0,0,.08);
-    }
-
-    .info-card {
+    .card {
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 18px;
       padding: 20px;
     }
-
     .label {
-      font-size: 0.75rem;
-      color: #64748b;
+      font-size: 0.7rem;
+      letter-spacing: .05em;
       font-weight: 600;
-      letter-spacing: .02em;
+      color: #64748b;
     }
-
     .value {
       font-size: 0.95rem;
       font-weight: 600;
       color: #0f172a;
       margin-top: 2px;
     }
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
+    }
   </style>
 </head>
 
 <body class="bg-slate-100 min-h-screen text-slate-800">
+<div id="adminNavbar"></div>
 
-<main class="max-w-5xl mx-auto px-4 py-10 space-y-8">
+<main class="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
   <!-- HEADER -->
   <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-bold">Schedule Details</h1>
+      <h1 class="text-3xl font-bold flex items-center gap-2">
+        <i data-lucide="clipboard-list"></i>
+        Schedule Details
+      </h1>
       <p class="text-sm text-slate-500 mt-1">
-        Complete operation lifecycle overview
+        End-to-end operation lifecycle control
       </p>
     </div>
 
     <span id="statusBadge"
-      class="px-4 py-2 rounded-full text-sm font-semibold">
+      class="px-5 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
       —
     </span>
   </section>
 
   <!-- ACTION BAR -->
-  <section class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3">
+  <section class="card flex flex-wrap gap-3 items-center">
     <button id="markOngoing"
-      class="action-btn px-4 py-2 rounded-xl bg-yellow-500 text-white text-sm font-semibold">
-      ▶ Mark Ongoing
+      class="action-btn flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-sm font-semibold">
+      <i data-lucide="play-circle"></i> Mark Ongoing
     </button>
 
     <button id="markCompleted"
-      class="action-btn px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold">
-      ✔ Mark Completed
+      class="action-btn flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold">
+      <i data-lucide="check-circle"></i> Mark Completed
     </button>
 
     <button id="cancelSchedule"
-      class="action-btn px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold ml-auto">
-      ✖ Cancel Schedule
+      class="action-btn ml-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold">
+      <i data-lucide="x-circle"></i> Cancel Schedule
     </button>
   </section>
 
-  <!-- MAIN DETAILS -->
+  <!-- CONTENT -->
   <section class="grid lg:grid-cols-3 gap-6">
 
-    <!-- LEFT: CORE INFO -->
-    <div class="lg:col-span-2 info-card space-y-6">
+    <!-- LEFT -->
+    <div class="lg:col-span-2 space-y-6">
 
-      <div class="grid sm:grid-cols-2 gap-6">
+      <div class="card grid sm:grid-cols-2 gap-6">
         <div>
-          <p class="label">Patient</p>
+          <p class="label">PATIENT</p>
           <p id="patientName" class="value">—</p>
         </div>
 
         <div>
-          <p class="label">Procedure</p>
+          <p class="label">PROCEDURE</p>
           <p id="procedure" class="value">—</p>
         </div>
 
         <div>
-          <p class="label">OT Room</p>
+          <p class="label">OT ROOM</p>
           <p id="otRoom" class="value">—</p>
         </div>
 
         <div>
-          <p class="label">Time Window</p>
-          <p id="timeRange" class="value">—</p>
+          <p class="label">TIME WINDOW</p>
+          <p id="timeRange" class="value flex items-center gap-2">
+            <i data-lucide="clock" class="w-4"></i> —
+          </p>
         </div>
       </div>
 
-      <div class="border-t pt-6 grid sm:grid-cols-2 gap-6">
+      <div class="card grid sm:grid-cols-2 gap-6">
         <div>
-          <p class="label">Surgeon</p>
+          <p class="label">SURGEON</p>
           <p id="surgeon" class="value">—</p>
         </div>
 
         <div>
-          <p class="label">Anesthesiologist</p>
+          <p class="label">ANESTHESIOLOGIST</p>
           <p id="anesthesiologist" class="value">—</p>
         </div>
       </div>
+
     </div>
 
-    <!-- RIGHT: NOTES -->
-    <div class="info-card space-y-3">
-      <p class="label">Clinical Notes</p>
+    <!-- RIGHT -->
+    <div class="card space-y-3">
+      <p class="label flex items-center gap-2">
+        <i data-lucide="file-text"></i> CLINICAL NOTES
+      </p>
       <p id="notes"
-        class="text-sm bg-slate-50 border rounded-xl p-4 min-h-[120px]">
+        class="text-sm bg-slate-50 border rounded-xl p-4 min-h-[140px]">
         —
       </p>
     </div>
@@ -134,5 +138,8 @@
 
 </main>
 
+<script>
+  lucide.createIcons();
+</script>
 </body>
 </html>

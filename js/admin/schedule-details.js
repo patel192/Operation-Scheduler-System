@@ -15,7 +15,7 @@ if (!scheduleId) {
   window.location.href = "/admin/schedule-board.html";
 }
 
-/* ================= ELEMENTS ================= */
+/* ELEMENTS */
 const patientNameEl = document.getElementById("patientName");
 const procedureEl = document.getElementById("procedure");
 const otRoomEl = document.getElementById("otRoom");
@@ -29,7 +29,7 @@ const btnOngoing = document.getElementById("markOngoing");
 const btnCompleted = document.getElementById("markCompleted");
 const btnCancel = document.getElementById("cancelSchedule");
 
-/* ================= HELPERS ================= */
+/* HELPERS */
 function formatTime(ts) {
   return ts.toDate().toLocaleTimeString([], {
     hour: "2-digit",
@@ -38,13 +38,16 @@ function formatTime(ts) {
 }
 
 function statusClass(status) {
-  if (status === "Completed") return "bg-emerald-100 text-emerald-700";
-  if (status === "Ongoing") return "bg-yellow-100 text-yellow-700";
-  if (status === "Cancelled") return "bg-red-100 text-red-700";
+  if (status === "Completed")
+    return "bg-emerald-100 text-emerald-700";
+  if (status === "Ongoing")
+    return "bg-amber-100 text-amber-700";
+  if (status === "Cancelled")
+    return "bg-red-100 text-red-700";
   return "bg-blue-100 text-blue-700";
 }
 
-/* ================= LOAD ================= */
+/* LOAD */
 async function loadSchedule() {
   const ref = doc(db, "schedules", scheduleId);
   const snap = await getDoc(ref);
@@ -64,53 +67,41 @@ async function loadSchedule() {
   anesthEl.textContent = d.anesthesiologist || "—";
   notesEl.textContent = d.notes || "No clinical notes";
 
-  timeRangeEl.textContent =
-    `${formatTime(d.startTime)} – ${formatTime(d.endTime)}`;
+  timeRangeEl.innerHTML =
+    `<i data-lucide="clock" class="w-4"></i>
+     ${formatTime(d.startTime)} – ${formatTime(d.endTime)}`;
 
   statusBadgeEl.textContent = d.status || "Upcoming";
   statusBadgeEl.className =
-    `px-4 py-2 rounded-full text-sm font-semibold ${statusClass(d.status)}`;
+    `px-5 py-2 rounded-full text-sm font-semibold flex items-center gap-2 ${statusClass(d.status)}`;
 
   btnOngoing.disabled = d.status !== "Upcoming";
   btnCompleted.disabled = d.status === "Completed" || d.status === "Cancelled";
 
   btnOngoing.classList.toggle("opacity-50", btnOngoing.disabled);
   btnCompleted.classList.toggle("opacity-50", btnCompleted.disabled);
+
+  lucide.createIcons();
 }
 
-/* ================= ACTIONS ================= */
-
-// ▶ Mark Ongoing
+/* ACTIONS */
 btnOngoing.onclick = async () => {
-  await updateDoc(doc(db, "schedules", scheduleId), {
-    status: "Ongoing",
-  });
-
+  await updateDoc(doc(db, "schedules", scheduleId), { status: "Ongoing" });
   await autoUpdateScheduleStatus();
   await loadSchedule();
 };
 
-// ✅ Mark Completed
 btnCompleted.onclick = async () => {
-  await updateDoc(doc(db, "schedules", scheduleId), {
-    status: "Completed",
-  });
-
+  await updateDoc(doc(db, "schedules", scheduleId), { status: "Completed" });
   await autoUpdateScheduleStatus();
   await loadSchedule();
 };
 
-// ❌ Cancel
 btnCancel.onclick = async () => {
   if (!confirm("Cancel this schedule?")) return;
-
-  await updateDoc(doc(db, "schedules", scheduleId), {
-    status: "Cancelled",
-  });
-
+  await updateDoc(doc(db, "schedules", scheduleId), { status: "Cancelled" });
   await autoUpdateScheduleStatus();
   window.location.href = "/admin/schedule-board.html";
 };
 
-/* ================= INIT ================= */
 loadSchedule();

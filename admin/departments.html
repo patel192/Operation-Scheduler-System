@@ -1,130 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Departments · Admin</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-  <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --card:#ffffff;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
-      --radius:18px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-
-    .action-link {
-      font-weight: 600;
-      transition: color .15s ease;
-    }
-
-    .action-link:hover {
-      text-decoration: underline;
-    }
-  </style>
-
-  <!-- Auth + Layout -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
-
-  <!-- Page Logic -->
   <script type="module" defer src="/js/admin/departments.js"></script>
+
+  <style>
+    .card {
+      background: white;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 2px 6px rgba(0,0,0,.05);
+    }
+    .kpi {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .chip {
+      padding: 4px 10px;
+      font-size: .7rem;
+      font-weight: 600;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+  </style>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+<div id="adminNavbar"></div>
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+<main class="max-w-[1500px] mx-auto px-4 py-10 space-y-8">
 
-  <!-- ===== HERO HEADER ===== -->
+  <!-- HEADER -->
   <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-bold">Departments</h1>
-      <p class="text-sm text-[--muted] mt-1">
-        Manage hospital departments, heads, and OT allocations
+      <h1 class="text-3xl font-bold flex items-center gap-2">
+        <i data-lucide="layers"></i> Departments
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Structural control over medical departments & OT allocation
       </p>
     </div>
 
     <a href="/admin/add-department.html"
-      class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
-             bg-[--primary] text-white font-semibold hover:opacity-90">
-      + Add Department
+       class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
+              bg-indigo-600 text-white font-semibold hover:bg-indigo-700">
+      <i data-lucide="plus"></i> Add Department
     </a>
   </section>
 
-  <!-- ===== KPI STRIP ===== -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
-
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        Total Departments
-      </p>
-      <h3 id="kpiTotal" class="text-3xl font-bold mt-2">0</h3>
+  <!-- KPI GRID -->
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="card p-5 kpi">
+      <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center">
+        <i data-lucide="layers"></i>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 font-semibold uppercase">Departments</p>
+        <h3 id="kpiTotal" class="text-2xl font-bold">0</h3>
+      </div>
     </div>
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        Active
-      </p>
-      <h3 id="kpiActive" class="text-3xl font-bold mt-2 text-emerald-600">0</h3>
+    <div class="card p-5 kpi">
+      <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+        <i data-lucide="check-circle"></i>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 font-semibold uppercase">Active</p>
+        <h3 id="kpiActive" class="text-2xl font-bold">0</h3>
+      </div>
     </div>
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        Doctors Assigned
-      </p>
-      <h3 id="kpiDoctors" class="text-3xl font-bold mt-2">0</h3>
+    <div class="card p-5 kpi">
+      <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+        <i data-lucide="stethoscope"></i>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 font-semibold uppercase">Doctors</p>
+        <h3 id="kpiDoctors" class="text-2xl font-bold">0</h3>
+      </div>
     </div>
 
-    <div class="card p-5">
-      <p class="text-xs text-[--muted] font-semibold uppercase tracking-wide">
-        OT Rooms Linked
-      </p>
-      <h3 id="kpiOTs" class="text-3xl font-bold mt-2">0</h3>
+    <div class="card p-5 kpi">
+      <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+        <i data-lucide="hospital"></i>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 font-semibold uppercase">OT Rooms</p>
+        <h3 id="kpiOTs" class="text-2xl font-bold">0</h3>
+      </div>
     </div>
-
   </section>
 
-  <!-- ===== TABLE ===== -->
+  <!-- TABLE -->
   <section class="card overflow-hidden">
 
-    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
-      <h2 class="font-semibold text-lg">Department List</h2>
-      <span class="text-sm text-[--muted]">Administrative view</span>
+    <div class="px-6 py-4 border-b flex justify-between items-center">
+      <h2 class="font-semibold text-lg">Department Directory</h2>
+      <span class="text-sm text-slate-500">Live administrative view</span>
     </div>
 
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left text-[--muted]">
+      <thead class="bg-slate-50 text-slate-600">
         <tr>
-          <th class="px-6 py-4 font-semibold">Department</th>
-          <th class="px-6 py-4 font-semibold">Head(s)</th>
-          <th class="px-6 py-4 font-semibold">Doctors</th>
-          <th class="px-6 py-4 font-semibold">OT Rooms</th>
-          <th class="px-6 py-4 font-semibold">Status</th>
-          <th class="px-6 py-4 font-semibold text-right">Actions</th>
+          <th class="px-6 py-4 text-left">Department</th>
+          <th class="px-6 py-4">Head</th>
+          <th class="px-6 py-4">Doctors</th>
+          <th class="px-6 py-4">OT Rooms</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
         </tr>
       </thead>
 
-      <tbody id="departmentTableBody" class="divide-y">
-        <!-- Dynamic rows injected by JS -->
-      </tbody>
+      <tbody id="departmentTableBody" class="divide-y"></tbody>
     </table>
 
   </section>
 
 </main>
 
+<script>
+  lucide.createIcons();
+</script>
 </body>
 </html>

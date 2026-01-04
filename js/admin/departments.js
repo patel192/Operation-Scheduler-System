@@ -9,15 +9,13 @@ import {
   where,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ================= ELEMENTS ================= */
+/* ELEMENTS */
 const tbody = document.getElementById("departmentTableBody");
-
 const kpiTotal = document.getElementById("kpiTotal");
 const kpiActive = document.getElementById("kpiActive");
 const kpiDoctors = document.getElementById("kpiDoctors");
 const kpiOTs = document.getElementById("kpiOTs");
 
-/* ================= LOAD DEPARTMENTS ================= */
 async function loadDepartments() {
   const deptSnap = await getDocs(collection(db, "departments"));
   const usersSnap = await getDocs(
@@ -26,74 +24,61 @@ async function loadDepartments() {
 
   tbody.innerHTML = "";
 
-  let total = 0;
-  let active = 0;
-  let totalDoctors = 0;
+  let total = 0, active = 0, totalDoctors = 0;
   const otSet = new Set();
-
-  /* ---------- GROUP DOCTORS BY DEPARTMENT ---------- */
   const doctorCountMap = {};
-  usersSnap.forEach((docSnap) => {
-    const u = docSnap.data();
+
+  usersSnap.forEach((d) => {
+    const u = d.data();
     if (!u.department) return;
-
     doctorCountMap[u.department] = (doctorCountMap[u.department] || 0) + 1;
-
     totalDoctors++;
   });
 
-  /* ---------- RENDER DEPARTMENTS ---------- */
   deptSnap.forEach((docSnap) => {
     const d = docSnap.data();
     total++;
-
     if (d.status === "active") active++;
 
     const doctorCount = doctorCountMap[d.name] || 0;
-
     (d.otRooms || []).forEach((ot) => otSet.add(ot));
 
     const tr = document.createElement("tr");
     tr.className = "hover:bg-slate-50 transition";
 
     tr.innerHTML = `
-      <td class="px-6 py-4 font-semibold">${d.name}</td>
-
       <td class="px-6 py-4">
-        ${d.headDoctorName || "—"}
+        <div class="font-semibold">${d.name}</div>
+        <div class="text-xs text-slate-500">ID: ${docSnap.id.slice(0,6)}…</div>
       </td>
 
-      <td class="px-6 py-4 font-semibold">
-        ${doctorCount}
-      </td>
+      <td class="px-6 py-4">${d.headDoctorName || "—"}</td>
+
+      <td class="px-6 py-4 font-semibold">${doctorCount}</td>
 
       <td class="px-6 py-4">
-        ${(d.otRooms || []).join(", ") || "—"}
+        ${(d.otRooms || []).map(ot => `<span class="chip">${ot}</span>`).join(" ") || "—"}
       </td>
 
       <td class="px-6 py-4">
         <span class="px-3 py-1 rounded-full text-xs font-semibold
-          ${
-            d.status === "active"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-red-100 text-red-700"
-          }">
+          ${d.status === "active"
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-red-100 text-red-700"}">
           ${d.status}
         </span>
       </td>
 
-      <td class="px-6 py-4">
-        <div class="flex justify-end gap-4">
-          <a
-            href="/admin/department-details.html?id=${docSnap.id}"
-            class="action-link text-[--primary]">
+      <td class="px-6 py-4 text-right">
+        <div class="flex justify-end gap-3">
+          <a href="/admin/department-details.html?id=${docSnap.id}"
+             class="text-indigo-600 font-semibold hover:underline">
             View
           </a>
-
           <button
             data-id="${docSnap.id}"
             data-status="${d.status}"
-            class="action-link text-amber-600 toggleBtn">
+            class="toggleBtn font-semibold text-amber-600 hover:underline">
             ${d.status === "active" ? "Disable" : "Enable"}
           </button>
         </div>
@@ -103,7 +88,6 @@ async function loadDepartments() {
     tbody.appendChild(tr);
   });
 
-  /* ================= KPI UPDATE ================= */
   kpiTotal.textContent = total;
   kpiActive.textContent = active;
   kpiDoctors.textContent = totalDoctors;
@@ -112,51 +96,33 @@ async function loadDepartments() {
   bindToggleButtons();
 }
 
-/* ================= ENABLE / DISABLE ================= */
 function bindToggleButtons() {
   document.querySelectorAll(".toggleBtn").forEach((btn) => {
     btn.onclick = async () => {
       const id = btn.dataset.id;
-      const current = btn.dataset.status;
-      const nextStatus = current === "active" ? "disabled" : "active";
+      const nextStatus =
+        btn.dataset.status === "active" ? "disabled" : "active";
 
       if (nextStatus === "disabled") {
-        // 1️⃣ Fetch department
-        const deptSnap = await getDocs(query(collection(db, "departments")));
-
-        const deptDoc = deptSnap.docs.find((d) => d.id === id);
+        const deptDoc = (await getDocs(collection(db, "departments")))
+          .docs.find(d => d.id === id);
         const deptName = deptDoc.data().name;
 
-        // 2️⃣ Check doctors
-        const doctorsSnap = await getDocs(
-          query(
-            collection(db, "users"),
-            where("role", "==", "Doctor"),
-            where("department", "==", deptName)
-          )
+        const doctors = await getDocs(
+          query(collection(db, "users"),
+          where("role", "==", "Doctor"),
+          where("department", "==", deptName))
         );
+        if (!doctors.empty) return alert("Doctors assigned.");
 
-        if (!doctorsSnap.empty) {
-          alert("Cannot disable department: doctors are assigned.");
-          return;
-        }
-
-        // 3️⃣ Check active schedules
-        const schedulesSnap = await getDocs(
-          query(
-            collection(db, "schedules"),
-            where("department", "==", deptName),
-            where("status", "in", ["Upcoming", "Ongoing"])
-          )
+        const schedules = await getDocs(
+          query(collection(db, "schedules"),
+          where("department", "==", deptName),
+          where("status", "in", ["Upcoming", "Ongoing"]))
         );
-
-        if (!schedulesSnap.empty) {
-          alert("Cannot disable department: active schedules exist.");
-          return;
-        }
+        if (!schedules.empty) return alert("Active schedules exist.");
       }
 
-      // ✅ Safe to update
       await updateDoc(doc(db, "departments", id), {
         status: nextStatus,
         updatedAt: serverTimestamp(),
@@ -167,5 +133,4 @@ function bindToggleButtons() {
   });
 }
 
-/* ================= INIT ================= */
 loadDepartments();
