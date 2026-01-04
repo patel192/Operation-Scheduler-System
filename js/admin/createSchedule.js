@@ -48,6 +48,25 @@ const el = {
   staff: document.getElementById("otStaffSelect"),
   surgeon: document.getElementById("surgeonSelect"),
 };
+const review = {
+  patient: document.getElementById("rvPatient"),
+  procedure: document.getElementById("rvProcedure"),
+  ot: document.getElementById("rvOT"),
+  surgeon: document.getElementById("rvSurgeon"),
+};
+
+// Helper Functions
+function renderReview() {
+  review.patient.textContent = `${state.patientName || "—"} (${
+    state.patientId
+  })`;
+
+  review.procedure.textContent = `${state.procedure} — ${state.department}`;
+
+  review.ot.textContent = `${state.otRoomName} | ${state.date} ${state.startTime}–${state.endTime}`;
+
+  review.surgeon.textContent = state.surgeonName || "—";
+}
 
 /* ================= INIT ================= */
 await loadDepartments(el.department);
@@ -85,23 +104,25 @@ function renderEquipment(docSnap, borrowed = false) {
   const id = docSnap.id;
 
   const card = document.createElement("div");
-  card.className = "border rounded-xl p-3 cursor-pointer";
+  card.className = "eq-card";
   card.innerHTML = `
-    <p class="text-sm font-semibold text-center">${eq.name}</p>
-    ${
-      borrowed
-        ? `<p class="text-xs text-center">From ${eq.currentOtRoomName || "Other OT"}</p>`
-        : ""
-    }
+    <p class="text-sm font-semibold">${eq.name}</p>
+    <p class="text-xs text-slate-500 mt-1">
+      ${
+        borrowed
+          ? `From ${eq.currentOtRoomName || "Other OT"}`
+          : eq.category || ""
+      }
+    </p>
   `;
 
   card.onclick = () => {
     if (state.equipmentIds.includes(id)) {
       state.equipmentIds = state.equipmentIds.filter((e) => e !== id);
-      card.classList.remove("bg-blue-50");
+      card.classList.remove("selected");
     } else {
       state.equipmentIds.push(id);
-      card.classList.add("bg-blue-50");
+      card.classList.add("selected");
     }
   };
 
@@ -169,7 +190,7 @@ el.step3Back.onclick = () => showStep(1);
 el.step3Next.onclick = () => {
   state.surgeonId = el.surgeon.value;
   state.surgeonName = el.surgeon.selectedOptions[0]?.textContent;
-
+renderReview();
   showStep(3);
 };
 
