@@ -1,10 +1,8 @@
 import { db } from "../firebase.js";
-import {
-  collection,
-  getDocs,
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, getDocs } from
+  "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ================= ELEMENTS ================= */
+/* ELEMENTS */
 const tableBody = document.getElementById("equipmentTableBody");
 const emptyState = document.getElementById("emptyState");
 
@@ -18,135 +16,95 @@ const categoryFilter = document.getElementById("categoryFilter");
 const departmentFilter = document.getElementById("departmentFilter");
 const statusFilter = document.getElementById("statusFilter");
 
-/* ================= STATE ================= */
+/* STATE */
 let equipmentList = [];
 
-/* ================= HELPERS ================= */
-function formatDate(ts) {
-  if (!ts) return "—";
-  return ts.toDate().toLocaleString();
-}
+/* HELPERS */
+const badge = s =>
+  s === "in-use"
+    ? "bg-amber-100 text-amber-700"
+    : s === "maintenance"
+    ? "bg-rose-100 text-rose-700"
+    : "bg-emerald-100 text-emerald-700";
 
-function statusBadge(status) {
-  if (status === "in-use")
-    return `<span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">In Use</span>`;
-  if (status === "maintenance")
-    return `<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">Maintenance</span>`;
-  return `<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Active</span>`;
-}
-
-/* ================= LOAD ================= */
+/* LOAD */
 async function loadEquipment() {
   const snap = await getDocs(collection(db, "equipment"));
-
-  equipmentList = snap.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  }));
-
+  equipmentList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   populateFilters();
   render();
 }
 
-/* ================= FILTER SETUP ================= */
+/* FILTERS */
 function populateFilters() {
-  const categories = new Set();
-  const departments = new Set();
-
-  equipmentList.forEach((e) => {
-    if (e.category) categories.add(e.category);
-    (e.departments || []).forEach((d) => departments.add(d));
+  const cats = new Set(), depts = new Set();
+  equipmentList.forEach(e => {
+    e.category && cats.add(e.category);
+    (e.departments || []).forEach(d => depts.add(d));
   });
 
   categoryFilter.innerHTML =
     `<option value="">All Categories</option>` +
-    [...categories].map((c) => `<option value="${c}">${c}</option>`).join("");
+    [...cats].map(c => `<option>${c}</option>`).join("");
 
   departmentFilter.innerHTML =
     `<option value="">All Departments</option>` +
-    [...departments].map((d) => `<option value="${d}">${d}</option>`).join("");
+    [...depts].map(d => `<option>${d}</option>`).join("");
 }
 
-/* ================= RENDER ================= */
+/* RENDER */
 function render() {
   tableBody.innerHTML = "";
 
-  const filtered = equipmentList.filter((e) => {
-    const searchMatch =
-      !searchInput.value ||
-      e.name?.toLowerCase().includes(searchInput.value.toLowerCase());
+  const list = equipmentList.filter(e =>
+    (!searchInput.value || e.name?.toLowerCase().includes(searchInput.value.toLowerCase())) &&
+    (!categoryFilter.value || e.category === categoryFilter.value) &&
+    (!statusFilter.value || e.status === statusFilter.value) &&
+    (!departmentFilter.value || (e.departments || []).includes(departmentFilter.value))
+  );
 
-    const categoryMatch =
-      !categoryFilter.value || e.category === categoryFilter.value;
+  updateSummary(list);
 
-    const statusMatch = !statusFilter.value || e.status === statusFilter.value;
-
-    const departmentMatch =
-      !departmentFilter.value ||
-      (e.departments || []).includes(departmentFilter.value);
-
-    return searchMatch && categoryMatch && statusMatch && departmentMatch;
-  });
-
-  updateSummary(filtered);
-
-  if (filtered.length === 0) {
+  if (!list.length) {
     emptyState.classList.remove("hidden");
     return;
   }
-
   emptyState.classList.add("hidden");
-  filtered.forEach(renderRow);
+
+  list.forEach(e => {
+    tableBody.innerHTML += `
+      <tr class="hover:bg-slate-50 transition">
+        <td class="px-4 py-3 font-semibold">${e.name}</td>
+        <td class="px-4 py-3">${e.category || "—"}</td>
+        <td class="px-4 py-3">${(e.departments || []).join(", ") || "—"}</td>
+        <td class="px-4 py-3">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold ${badge(e.status)}">
+            ${e.status}
+          </span>
+        </td>
+        <td class="px-4 py-3">${e.currentOtRoomName || "—"}</td>
+        <td class="px-4 py-3">${e.lastUsedAt?.toDate().toLocaleString() || "—"}</td>
+        <td class="px-4 py-3 text-right">
+          <a href="/admin/equipment-details.html?id=${e.id}"
+             class="text-indigo-600 font-semibold hover:underline">
+            View
+          </a>
+        </td>
+      </tr>`;
+  });
 }
 
-/* ================= ROW ================= */
-function renderRow(eq) {
-  const tr = document.createElement("tr");
-  tr.className = "border-b last:border-0";
-
-  tr.innerHTML = `
-    <td class="px-4 py-3 font-medium">${eq.name}</td>
-    <td class="px-4 py-3">${eq.category || "—"}</td>
-    <td class="px-4 py-3">${(eq.departments || []).join(", ") || "—"}</td>
-    <td class="px-4 py-3">${statusBadge(eq.status)}</td>
-    <td class="px-4 py-3">${eq.currentOtRoomName || "—"}</td>
-    <td class="px-4 py-3">${formatDate(eq.lastUsedAt)}</td>
-    <td class="px-4 py-3 font-medium">
-       <a
-        href="/admin/equipment-details.html?id=${eq.id}"
-        class="text-blue-600 hover:underline">
-        Details
-       </a>
-    </td>
-
-    <td class="px-4 py-3 text-right">
-       <a
-        href="/admin/edit-equipment.html?id=${eq.id}"
-        class="text-blue-600 hover:underline text-sm">
-        Edit
-      </a>
-    </td>
-
-  `;
-
-  tableBody.appendChild(tr);
-}
-
-/* ================= SUMMARY ================= */
+/* SUMMARY */
 function updateSummary(list) {
   totalEl.textContent = list.length;
-  inUseEl.textContent = list.filter((e) => e.status === "in-use").length;
-  maintenanceEl.textContent = list.filter(
-    (e) => e.status === "maintenance"
-  ).length;
-  availableEl.textContent = list.filter((e) => e.status === "active").length;
+  inUseEl.textContent = list.filter(e => e.status === "in-use").length;
+  maintenanceEl.textContent = list.filter(e => e.status === "maintenance").length;
+  availableEl.textContent = list.filter(e => e.status === "active").length;
 }
 
-/* ================= EVENTS ================= */
-searchInput.oninput = render;
-categoryFilter.onchange = render;
-departmentFilter.onchange = render;
-statusFilter.onchange = render;
+/* EVENTS */
+[searchInput, categoryFilter, departmentFilter, statusFilter]
+  .forEach(el => el.oninput = render);
 
-/* ================= INIT ================= */
+/* INIT */
 loadEquipment();

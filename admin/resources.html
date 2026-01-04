@@ -1,75 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resources · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/resources.js"></script>
+
+  <style>
+    .fade-up { animation: fadeUp .4s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+  </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen">
 
-  <!-- NAVBAR -->
-  <div id="adminNavbar"></div>
+<div id="adminNavbar"></div>
 
-  <main class="max-w-7xl mx-auto px-6 py-6">
+<main class="max-w-[1600px] mx-auto px-6 py-6 space-y-6 fade-up">
 
-    <!-- PAGE HEADER -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold">Resources</h1>
+  <!-- HEADER -->
+  <section class="flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold flex items-center gap-2">
+        <i data-lucide="boxes"></i>
+        Resources
+      </h1>
       <p class="text-sm text-slate-500">
-        Manage operational resources used in OT scheduling
+        Equipment used across OT operations
       </p>
     </div>
 
-    <!-- ================= EQUIPMENT SECTION ================= -->
-    <section class="bg-white border rounded-xl p-5">
+    <a href="/admin/add-equipment.html"
+       class="px-6 py-2 rounded-xl bg-indigo-600 text-white
+              font-semibold hover:bg-indigo-700 transition">
+      + Add Equipment
+    </a>
+  </section>
 
-      <!-- SECTION HEADER -->
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-lg font-semibold">Equipment</h2>
-          <p class="text-sm text-slate-500">
-            View and manage OT equipment
-          </p>
-        </div>
-        <a href="/admin/add-equipment.html"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
-          + Add Equipment
-        </a>
+  <!-- KPI STRIP -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white border rounded-xl p-4">
+      <p class="text-xs text-slate-500">TOTAL</p>
+      <h3 id="totalEquipment" class="text-2xl font-bold">0</h3>
+    </div>
+    <div class="bg-white border rounded-xl p-4">
+      <p class="text-xs text-slate-500">IN USE</p>
+      <h3 id="inUseEquipment" class="text-2xl font-bold text-amber-600">0</h3>
+    </div>
+    <div class="bg-white border rounded-xl p-4">
+      <p class="text-xs text-slate-500">AVAILABLE</p>
+      <h3 id="availableEquipment" class="text-2xl font-bold text-emerald-600">0</h3>
+    </div>
+    <div class="bg-white border rounded-xl p-4">
+      <p class="text-xs text-slate-500">MAINTENANCE</p>
+      <h3 id="maintenanceEquipment" class="text-2xl font-bold text-rose-600">0</h3>
+    </div>
+  </section>
 
+  <!-- MAIN GRID -->
+  <section class="grid grid-cols-12 gap-6">
+
+    <!-- INSIGHTS -->
+    <aside class="col-span-3 space-y-4">
+      <div class="bg-white rounded-2xl border p-5">
+        <h3 class="font-semibold flex items-center gap-2 mb-3">
+          <i data-lucide="activity"></i>
+          Operational Insights
+        </h3>
+        <ul class="text-sm text-slate-600 space-y-2">
+          <li>• Tracks real-time OT equipment usage</li>
+          <li>• Flags maintenance bottlenecks</li>
+          <li>• Supports department allocation</li>
+        </ul>
       </div>
 
-      <!-- SUMMARY -->
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
-        <div class="border rounded-lg p-3">
-          <p class="text-xs text-slate-500">Total</p>
-          <p class="text-xl font-semibold" id="totalEquipment">0</p>
-        </div>
-        <div class="border rounded-lg p-3">
-          <p class="text-xs text-slate-500">In Use</p>
-          <p class="text-xl font-semibold text-yellow-600" id="inUseEquipment">0</p>
-        </div>
-        <div class="border rounded-lg p-3">
-          <p class="text-xs text-slate-500">Available</p>
-          <p class="text-xl font-semibold text-green-600" id="availableEquipment">0</p>
-        </div>
-        <div class="border rounded-lg p-3">
-          <p class="text-xs text-slate-500">Maintenance</p>
-          <p class="text-xl font-semibold text-red-600" id="maintenanceEquipment">0</p>
-        </div>
+      <div class="bg-white rounded-2xl border p-5">
+        <h3 class="font-semibold flex items-center gap-2 mb-3">
+          <i data-lucide="shield-alert"></i>
+          Safety Rules
+        </h3>
+        <p class="text-sm text-slate-600">
+          Equipment marked <b>In Use</b> cannot be reassigned or disabled.
+        </p>
       </div>
+    </aside>
 
-      <!-- FILTERS -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <input id="searchInput" type="text" placeholder="Search equipment..."
-          class="border rounded-lg px-3 py-2 text-sm w-full" />
+    <!-- TABLE -->
+    <div class="col-span-9 bg-white rounded-2xl border overflow-hidden">
+
+      <!-- FILTER BAR -->
+      <div class="p-4 border-b grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50">
+        <input id="searchInput" placeholder="Search equipment..."
+          class="border rounded-lg px-3 py-2 text-sm"/>
 
         <select id="categoryFilter" class="border rounded-lg px-3 py-2 text-sm">
           <option value="">All Categories</option>
@@ -88,9 +119,9 @@
       </div>
 
       <!-- TABLE -->
-      <div class="border rounded-lg overflow-hidden">
-        <table class="min-w-full text-sm">
-          <thead class="bg-slate-100 text-slate-600">
+      <div class="max-h-[600px] overflow-y-auto">
+        <table class="w-full text-sm">
+          <thead class="sticky top-0 bg-white text-slate-500 z-10">
             <tr>
               <th class="px-4 py-3 text-left">Name</th>
               <th class="px-4 py-3 text-left">Category</th>
@@ -98,20 +129,24 @@
               <th class="px-4 py-3 text-left">Status</th>
               <th class="px-4 py-3 text-left">Current OT</th>
               <th class="px-4 py-3 text-left">Last Used</th>
+              <th class="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="equipmentTableBody"></tbody>
+          <tbody id="equipmentTableBody" class="divide-y"></tbody>
         </table>
 
-        <div id="emptyState" class="hidden p-6 text-center text-slate-500">
+        <div id="emptyState"
+             class="hidden p-8 text-center text-slate-400">
           No equipment found.
         </div>
       </div>
 
-    </section>
+    </div>
 
-  </main>
+  </section>
 
+</main>
+
+<script>lucide.createIcons();</script>
 </body>
-
 </html>
