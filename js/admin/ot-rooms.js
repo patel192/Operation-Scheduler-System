@@ -57,7 +57,9 @@ async function loadOtRooms() {
 
     /* ---------- OT GRID CARD ---------- */
     otGrid.innerHTML += `
-  <div class="ot-card fade-scale bg-white rounded-2xl border p-5">
+  <div
+    class="ot-card fade-scale relative bg-white rounded-2xl border p-5
+           hover:shadow-lg transition">
 
     <!-- HEADER -->
     <div class="flex justify-between items-start">
@@ -102,8 +104,9 @@ async function loadOtRooms() {
     <!-- ACTION -->
     <a
       href="/admin/ot-room-details.html?id=${id}"
-      class="group mt-5 inline-flex items-center gap-2 text-indigo-600
-             text-sm font-semibold">
+      class="relative z-10 inline-flex items-center gap-2
+             mt-5 text-indigo-600 text-sm font-semibold
+             hover:text-indigo-700 transition">
 
       View Details
       <span class="transition-transform group-hover:translate-x-1">→</span>
