@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Equipment Details · Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/equipment-details.js"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+  <div id="adminNavbar"></div>
+
+  <main class="max-w-5xl mx-auto px-6 py-6">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold" id="equipmentName">—</h1>
+        <p class="text-sm text-slate-500">
+          Equipment details & current usage
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <a
+          id="editEquipmentBtn"
+          href="#"
+          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Edit
+        </a>
+
+        <a
+          href="/admin/resources.html"
+          class="px-4 py-2 text-sm border rounded-lg">
+          Back to Resources
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <section class="bg-white border rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- LEFT -->
+      <div class="md:col-span-2 space-y-4">
+
+        <div>
+          <p class="text-sm text-slate-500">Category</p>
+          <p class="font-medium" id="equipmentCategory">—</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-slate-500">Departments</p>
+          <p class="font-medium" id="equipmentDepartments">—</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-slate-500">Description</p>
+          <p id="equipmentDescription" class="text-slate-700">
+            —
+          </p>
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="space-y-4">
+
+        <div>
+          <p class="text-sm text-slate-500">Status</p>
+          <div id="equipmentStatus"></div>
+        </div>
+
+        <div>
+          <p class="text-sm text-slate-500">Current OT Room</p>
+          <p class="font-medium" id="currentOtRoom">—</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-slate-500">Current Schedule</p>
+          <p id="currentSchedule">—</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-slate-500">Last Used</p>
+          <p id="lastUsedAt">—</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- IMAGE -->
+    <section class="mt-6">
+      <img
+        id="equipmentImage"
+        src=""
+        alt="Equipment Image"
+        class="max-w-sm rounded-xl border hidden" />
+    </section>
+
+  </main>
+
+</body>
+</html>

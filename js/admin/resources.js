@@ -111,14 +111,21 @@ function renderRow(eq) {
     <td class="px-4 py-3">${statusBadge(eq.status)}</td>
     <td class="px-4 py-3">${eq.currentOtRoomName || "—"}</td>
     <td class="px-4 py-3">${formatDate(eq.lastUsedAt)}</td>
-    
-<td class="px-4 py-3 text-right">
-  <a
-    href="/admin/edit-equipment.html?id=${eq.id}"
-    class="text-blue-600 hover:underline text-sm">
-    Edit
-  </a>
-</td>
+    <td class="px-4 py-3 font-medium">
+       <a
+        href="/admin/equipment-details.html?id=${eq.id}"
+        class="text-blue-600 hover:underline">
+        Details
+       </a>
+    </td>
+
+    <td class="px-4 py-3 text-right">
+       <a
+        href="/admin/edit-equipment.html?id=${eq.id}"
+        class="text-blue-600 hover:underline text-sm">
+        Edit
+      </a>
+    </td>
 
   `;
 
