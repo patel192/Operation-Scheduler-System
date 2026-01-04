@@ -6,7 +6,7 @@ import {
   onSnapshot,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {autoUpdateScheduleStatus} from "../utils/autoUpdateScheduleStatus.js"
+import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
 /* ================= ELEMENTS ================= */
 const rowsContainer = document.getElementById("scheduleRows");
 
@@ -30,7 +30,7 @@ function statusStyles(status) {
   if (status === "Completed")
     return "bg-green-50 border-green-200 text-green-700";
   if (status === "Ongoing")
-    return "bg-yellow-50 border-yellow-200 text-yellow-700";
+    return "bg-yellow-50 border-yellow-300 text-yellow-800 animate-pulse";
   return "bg-blue-50 border-blue-200 text-blue-700";
 }
 
@@ -46,11 +46,8 @@ async function loadOtRooms() {
 /* ================= LISTEN ================= */
 async function listenSchedules() {
   const otRooms = await loadOtRooms();
-await autoUpdateScheduleStatus();
-  const q = query(
-    collection(db, "schedules"),
-    orderBy("startTime", "asc")
-  );
+  await autoUpdateScheduleStatus();
+  const q = query(collection(db, "schedules"), orderBy("startTime", "asc"));
 
   onSnapshot(q, (snapshot) => {
     rowsContainer.innerHTML = "";
@@ -61,9 +58,7 @@ await autoUpdateScheduleStatus();
     }));
 
     otRooms.forEach((ot) => {
-      const otSchedules = schedules.filter(
-        (s) => s.otRoomId === ot.id
-      );
+      const otSchedules = schedules.filter((s) => s.otRoomId === ot.id);
 
       const row = document.createElement("div");
       row.className =
@@ -86,9 +81,7 @@ await autoUpdateScheduleStatus();
 
         const card = document.createElement("div");
         card.style.gridColumn = `span ${span}`;
-        card.className = `schedule-card border ${statusStyles(
-          sch.status
-        )}`;
+        card.className = `schedule-card border ${statusStyles(sch.status)}`;
 
         card.innerHTML = `
           <div class="schedule-title">${sch.procedure}</div>
@@ -96,12 +89,15 @@ await autoUpdateScheduleStatus();
           <div class="schedule-time">
             ${formatTime(start)} – ${formatTime(end)}
           </div>
-          <span class="schedule-status">${sch.status}</span>
+          <span class="schedule-status">
+           ${sch.status === "Ongoing" ? "●" : ""}
+           ${sch.status}
+          </span>
+
         `;
 
         card.onclick = () => {
-          window.location.href =
-            `/admin/schedule-details.html?id=${sch.id}`;
+          window.location.href = `/admin/schedule-details.html?id=${sch.id}`;
         };
 
         row.appendChild(card);
