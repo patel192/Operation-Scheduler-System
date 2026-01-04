@@ -1,224 +1,131 @@
-import { auth, db } from "../firebase.js";
+import { db } from "../firebase.js";
 import {
   collection,
   getDocs,
-  doc,
   updateDoc,
+  doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ELEMENTS */
-const tableBody = document.getElementById("usersTable");
-const emptyState = document.getElementById("emptyState");
-const searchInput = document.getElementById("searchInput");
-const roleFilter = document.getElementById("roleFilter");
-const statusFilter = document.getElementById("statusFilter");
+const usersTable = document.getElementById("usersTable");
+const attentionList = document.getElementById("attentionList");
+const attentionEmpty = document.getElementById("attentionEmpty");
 
-/* STATE */
-let allUsers = [];
+const kpiTotal = document.getElementById("kpiTotal");
+const kpiActive = document.getElementById("kpiActive");
+const kpiPending = document.getElementById("kpiPending");
+const kpiDisabled = document.getElementById("kpiDisabled");
 
-/* LOAD USERS */
-async function loadUsers() {
-  tableBody.innerHTML = "";
-  emptyState.classList.add("hidden");
+let roleChart, statusChart;
 
+async function loadDashboard() {
   const snap = await getDocs(collection(db, "users"));
+  const users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
 
-  if (snap.empty) {
-    emptyState.classList.remove("hidden");
-    return;
-  }
-
-  allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderUsers(allUsers);
+  renderKPIs(users);
+  renderCharts(users);
+  renderAttention(users);
+  renderTable(users);
 }
 
-/* RENDER */
-function renderUsers(users) {
-  tableBody.innerHTML = "";
+/* KPIs */
+function renderKPIs(users) {
+  kpiTotal.textContent = users.length;
+  kpiActive.textContent = users.filter(u => u.status === "active").length;
+  kpiPending.textContent = users.filter(u => u.status === "pending").length;
+  kpiDisabled.textContent = users.filter(u => u.status === "disabled").length;
+}
 
-  if (!users.length) {
-    emptyState.classList.remove("hidden");
+/* CHARTS */
+function renderCharts(users) {
+  const roleMap = {};
+  const statusMap = {};
+
+  users.forEach(u => {
+    roleMap[u.role] = (roleMap[u.role] || 0) + 1;
+    statusMap[u.status || "pending"] =
+      (statusMap[u.status || "pending"] || 0) + 1;
+  });
+
+  roleChart?.destroy();
+  statusChart?.destroy();
+
+  roleChart = new Chart(document.getElementById("roleChart"), {
+    type:"doughnut",
+    data:{
+      labels:Object.keys(roleMap),
+      datasets:[{
+        data:Object.values(roleMap),
+        backgroundColor:["#6366f1","#10b981","#f59e0b","#94a3b8"]
+      }]
+    },
+    options:{ cutout:"65%", plugins:{legend:{position:"bottom"}} }
+  });
+
+  statusChart = new Chart(document.getElementById("statusChart"), {
+    type:"bar",
+    data:{
+      labels:Object.keys(statusMap),
+      datasets:[{
+        data:Object.values(statusMap),
+        backgroundColor:"#0a6cff",
+        borderRadius:6
+      }]
+    },
+    options:{ plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}},y:{grid:{display:false}}}}
+  });
+}
+
+/* ATTENTION */
+function renderAttention(users) {
+  attentionList.innerHTML = "";
+  const risky = users.filter(
+    u => u.status === "pending" ||
+         (u.role === "Doctor" && u.availability === "busy")
+  );
+
+  if (!risky.length) {
+    attentionEmpty.classList.remove("hidden");
     return;
   }
 
+  attentionEmpty.classList.add("hidden");
+  risky.slice(0,6).forEach(u => {
+    attentionList.innerHTML += `
+      <li class="flex justify-between bg-amber-50 border border-amber-200 px-4 py-2 rounded">
+        <span class="font-semibold">${u.displayName || "—"}</span>
+        <span class="text-xs text-amber-700">
+          ${u.status === "pending" ? "Pending approval" : "Busy doctor"}
+        </span>
+      </li>`;
+  });
+}
+
+/* TABLE */
+function renderTable(users) {
+  usersTable.innerHTML = "";
+
   users.forEach(u => {
-    const isSelf = auth.currentUser?.uid === u.id;
-    const isPending = u.status === "pending" || u.approved === false;
-
     const tr = document.createElement("tr");
-    tr.className = "hover:bg-slate-50 transition";
-
     tr.innerHTML = `
-      <td class="px-6 py-4 font-semibold">
-        ${u.displayName || "—"}
-        ${isSelf ? `<span class="ml-1 text-xs text-blue-600">(You)</span>` : ""}
-        ${isPending ? `<span class="ml-2 text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-700">Pending</span>` : ""}
-      </td>
-
-      <td class="px-6 py-4">${u.email || "—"}</td>
-
-      <td class="px-6 py-4">
-        <select data-id="${u.id}"
-          class="roleSelect filter-input bg-white"
-          ${isSelf ? "disabled" : ""}>
-          ${renderRoleOptions(u.role)}
-        </select>
-      </td>
-
-      <td class="px-6 py-4">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold
-          ${
-            u.status === "active"
-              ? "bg-emerald-100 text-emerald-700"
-              : u.status === "disabled"
-              ? "bg-red-100 text-red-700"
-              : "bg-yellow-100 text-yellow-700"
-          }">
+      <td class="px-6 py-3 font-semibold">${u.displayName || "—"}</td>
+      <td class="px-6 py-3">${u.role}</td>
+      <td class="px-6 py-3">
+        <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+          ${u.status==="active"?"bg-emerald-100 text-emerald-700":
+            u.status==="disabled"?"bg-red-100 text-red-700":
+            "bg-amber-100 text-amber-700"}">
           ${u.status || "pending"}
         </span>
       </td>
-
-      <td class="px-6 py-4 space-y-1">
-        ${renderExtraControls(u)}
-      </td>
-
-      <td class="px-6 py-4 text-right space-x-3">
-        ${
-          !isSelf && isPending
-            ? `
-          <button data-id="${u.id}" class="approveBtn action-link text-emerald-600 text-xs">
-            Approve
-          </button>
-          <button data-id="${u.id}" class="rejectBtn action-link text-red-600 text-xs">
-            Reject
-          </button>
-        `
-            : ""
-        }
-
-        <button data-id="${u.id}"
-          class="saveBtn action-link text-[--primary] text-xs opacity-50 cursor-not-allowed"
-          disabled>
-          Save
-        </button>
+      <td class="px-6 py-3 capitalize">${u.availability || "—"}</td>
+      <td class="px-6 py-3 text-right">
+        <a href="/admin/users.html" class="text-indigo-600 font-semibold">
+          Manage →
+        </a>
       </td>
     `;
-
-    tableBody.appendChild(tr);
-  });
-
-  attachEvents();
-}
-
-/* ROLE OPTIONS */
-function renderRoleOptions(current) {
-  return ["Admin","Doctor","OT Staff","Patient"]
-    .map(r => `<option ${r === current ? "selected" : ""}>${r}</option>`)
-    .join("");
-}
-
-/* EXTRA CONTROLS */
-function renderExtraControls(u) {
-  if (u.role === "Doctor") {
-    return `
-      <input class="extraInput filter-input"
-        data-id="${u.id}" data-field="specialization"
-        placeholder="Specialization"
-        value="${u.specialization || ""}"/>
-      <select class="extraInput filter-input bg-white"
-        data-id="${u.id}" data-field="availability">
-        <option value="available" ${u.availability==="available"?"selected":""}>Available</option>
-        <option value="on-leave" ${u.availability==="on-leave"?"selected":""}>On Leave</option>
-        <option value="busy" ${u.availability==="busy"?"selected":""}>Busy</option>
-      </select>`;
-  }
-
-  if (u.role === "OT Staff") {
-    return `
-      <select class="extraInput filter-input bg-white"
-        data-id="${u.id}" data-field="shift">
-        <option value="morning" ${u.shift==="morning"?"selected":""}>Morning</option>
-        <option value="evening" ${u.shift==="evening"?"selected":""}>Evening</option>
-        <option value="night" ${u.shift==="night"?"selected":""}>Night</option>
-      </select>
-      <select class="extraInput filter-input bg-white"
-        data-id="${u.id}" data-field="availability">
-        <option value="available" ${u.availability==="available"?"selected":""}>Available</option>
-        <option value="busy" ${u.availability==="busy"?"selected":""}>Busy</option>
-      </select>`;
-  }
-
-  return `<span class="text-xs text-slate-400">—</span>`;
-}
-
-/* EVENTS */
-function attachEvents() {
-  document.querySelectorAll("tr").forEach(row => {
-    const roleSelect = row.querySelector(".roleSelect");
-    const saveBtn = row.querySelector(".saveBtn");
-    const approveBtn = row.querySelector(".approveBtn");
-    const rejectBtn = row.querySelector(".rejectBtn");
-    const extraInputs = row.querySelectorAll(".extraInput");
-
-    const enableSave = () => {
-      saveBtn.disabled = false;
-      saveBtn.classList.remove("opacity-50","cursor-not-allowed");
-    };
-
-    roleSelect?.addEventListener("change", enableSave);
-    extraInputs.forEach(i => i.addEventListener("change", enableSave));
-
-    saveBtn.addEventListener("click", async () => {
-      const id = saveBtn.dataset.id;
-      const payload = {};
-      if (roleSelect) payload.role = roleSelect.value;
-      extraInputs.forEach(i => payload[i.dataset.field] = i.value);
-
-      await updateDoc(doc(db,"users",id), payload);
-      saveBtn.disabled = true;
-      saveBtn.classList.add("opacity-50","cursor-not-allowed");
-      alert("User updated");
-    });
-
-    approveBtn && (approveBtn.onclick = async () => {
-      await updateDoc(doc(db,"users",approveBtn.dataset.id), {
-        status:"active", approved:true
-      });
-      loadUsers();
-    });
-
-    rejectBtn && (rejectBtn.onclick = async () => {
-      await updateDoc(doc(db,"users",rejectBtn.dataset.id), {
-        status:"disabled", approved:false
-      });
-      loadUsers();
-    });
+    usersTable.appendChild(tr);
   });
 }
 
-/* FILTERS */
-function applyFilters() {
-  let list = [...allUsers];
-  const q = searchInput.value.toLowerCase();
-  const role = roleFilter.value;
-  const status = statusFilter.value;
-
-  if (q) list = list.filter(u =>
-    (u.displayName||"").toLowerCase().includes(q) ||
-    (u.email||"").toLowerCase().includes(q)
-  );
-
-  if (role) list = list.filter(u => u.role === role);
-  if (status) list = list.filter(u => u.status === status);
-
-  renderUsers(list);
-}
-
-searchInput.addEventListener("input", applyFilters);
-roleFilter.addEventListener("change", applyFilters);
-statusFilter.addEventListener("change", applyFilters);
-
-/* INIT */
-auth.onAuthStateChanged(user => {
-  if (user) loadUsers();
-});
+loadDashboard();

@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase.js";
+import { db } from "../firebase.js";
 import {
   collection,
   getDocs,
@@ -6,110 +6,125 @@ import {
   updateDoc,
   query,
   where,
+  orderBy,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 /* ELEMENTS */
-const tableBody = document.getElementById("pendingUsersTable");
+const approvalList = document.getElementById("approvalList");
 const emptyState = document.getElementById("emptyState");
 
+const kpiTotal = document.getElementById("kpiTotal");
+const kpiDoctors = document.getElementById("kpiDoctors");
+const kpiOtStaff = document.getElementById("kpiOtStaff");
+const kpiOthers = document.getElementById("kpiOthers");
+
 /* LOAD */
-async function loadPendingUsers() {
-  tableBody.innerHTML = "";
+async function loadApprovals() {
+  approvalList.innerHTML = "";
   emptyState.classList.add("hidden");
 
   const q = query(
     collection(db, "users"),
     where("status", "==", "pending"),
-    where("approved", "==", false)
+    where("approved", "==", false),
+    orderBy("createdAt", "desc")
   );
 
   const snap = await getDocs(q);
+  const users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
 
-  if (snap.empty) {
+  renderKPIs(users);
+
+  if (!users.length) {
     emptyState.classList.remove("hidden");
     return;
   }
 
-  snap.forEach((docSnap) => {
-    renderRow({ id: docSnap.id, ...docSnap.data() });
-  });
+  users.forEach(renderCard);
 }
 
-/* RENDER ROW */
-function renderRow(u) {
-  const tr = document.createElement("tr");
-  tr.className = "hover:bg-slate-50 transition";
+/* KPI */
+function renderKPIs(users) {
+  kpiTotal.textContent = users.length;
+  kpiDoctors.textContent = users.filter(u => u.role === "Doctor").length;
+  kpiOtStaff.textContent = users.filter(u => u.role === "OT Staff").length;
+  kpiOthers.textContent = users.filter(
+    u => !["Doctor","OT Staff"].includes(u.role)
+  ).length;
+}
 
-  tr.innerHTML = `
-    <td class="px-6 py-4 font-semibold">
-      ${u.displayName || "—"}
-    </td>
+/* CARD */
+function renderCard(u) {
+  const div = document.createElement("div");
+  div.className = "px-6 py-4 hover:bg-slate-50 transition";
 
-    <td class="px-6 py-4">
-      ${u.email || "—"}
-    </td>
+  div.innerHTML = `
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="font-semibold text-lg">${u.displayName || "—"}</p>
+        <p class="text-sm text-slate-500">${u.email || "—"}</p>
+        <span class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold
+          ${
+            u.role === "Doctor"
+              ? "bg-indigo-100 text-indigo-700"
+              : u.role === "OT Staff"
+              ? "bg-emerald-100 text-emerald-700"
+              : "bg-slate-100 text-slate-700"
+          }">
+          ${u.role || "Unspecified"}
+        </span>
+      </div>
 
-    <td class="px-6 py-4">
-      ${u.role || "Not selected"}
-    </td>
+      <div class="flex gap-3">
+        <button
+          class="approve px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">
+          Approve
+        </button>
 
-    <td class="px-6 py-4 text-right space-x-3">
-      <button
-        class="approve action-btn approve"
-        data-id="${u.id}">
-        Approve
-      </button>
-
-      <button
-        class="reject action-btn reject"
-        data-id="${u.id}">
-        Reject
-      </button>
-    </td>
+        <button
+          class="reject px-4 py-1.5 rounded-full bg-rose-100 text-rose-700 text-xs font-semibold">
+          Reject
+        </button>
+      </div>
+    </div>
   `;
 
-  tableBody.appendChild(tr);
-  attachRowEvents(tr, u.id);
+  div.querySelector(".approve").onclick = () => approveUser(u.id, div);
+  div.querySelector(".reject").onclick = () => rejectUser(u.id, div);
+
+  approvalList.appendChild(div);
 }
 
-/* EVENTS */
-function attachRowEvents(row, userId) {
-  const approveBtn = row.querySelector(".approve");
-  const rejectBtn = row.querySelector(".reject");
+/* ACTIONS */
+async function approveUser(id, row) {
+  if (!confirm("Approve this user?")) return;
 
-  approveBtn.onclick = async () => {
-    if (!confirm("Approve this user?")) return;
+  await updateDoc(doc(db, "users", id), {
+    approved: true,
+    status: "active",
+  });
 
-    await updateDoc(doc(db, "users", userId), {
-      approved: true,
-      status: "active",
-    });
-
-    row.remove();
-    checkEmpty();
-  };
-
-  rejectBtn.onclick = async () => {
-    if (!confirm("Reject and disable this user?")) return;
-
-    await updateDoc(doc(db, "users", userId), {
-      approved: false,
-      status: "disabled",
-    });
-
-    row.remove();
-    checkEmpty();
-  };
+  row.remove();
+  checkEmpty();
 }
 
-/* EMPTY CHECK */
+async function rejectUser(id, row) {
+  if (!confirm("Reject and disable this user?")) return;
+
+  await updateDoc(doc(db, "users", id), {
+    approved: false,
+    status: "disabled",
+  });
+
+  row.remove();
+  checkEmpty();
+}
+
 function checkEmpty() {
-  if (!tableBody.children.length) {
+  if (!approvalList.children.length) {
     emptyState.classList.remove("hidden");
   }
 }
 
 /* INIT */
-auth.onAuthStateChanged((user) => {
-  if (user) loadPendingUsers();
-});
+loadApprovals();

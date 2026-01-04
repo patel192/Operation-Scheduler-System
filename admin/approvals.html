@@ -2,114 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin · Pending Approvals</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Approvals · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --card:#ffffff;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
-      --radius:18px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-
-    .action-btn {
-      padding: 6px 14px;
-      font-size: .75rem;
-      font-weight: 600;
-      border-radius: 999px;
-      transition: all .15s ease;
-    }
-
-    .approve {
-      background: #DCFCE7;
-      color: #166534;
-    }
-
-    .approve:hover {
-      background: #BBF7D0;
-    }
-
-    .reject {
-      background: #FEE2E2;
-      color: #991B1B;
-    }
-
-    .reject:hover {
-      background: #FECACA;
-    }
-  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
-  <script type="module" defer src="/js/admin/approvals.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/approvals-dashboard.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-gradient-to-br from-slate-100 via-white to-indigo-50 min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-8">
+<div id="adminNavbar"></div>
 
-  <!-- ===== HEADER ===== -->
-  <section class="card p-6">
-    <h1 class="text-3xl font-bold">Pending User Approvals</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Review and approve newly registered users
-    </p>
+<main class="max-w-[1600px] mx-auto px-6 py-8 space-y-8">
+
+  <!-- HEADER -->
+  <section class="flex justify-between items-center">
+    <div>
+      <h1 class="text-4xl font-bold tracking-tight flex items-center gap-3">
+        <i data-lucide="user-check"></i>
+        Pending Approvals
+      </h1>
+      <p class="text-slate-500 mt-1">
+        Users awaiting administrative verification
+      </p>
+    </div>
   </section>
 
-  <!-- ===== INFO BANNER ===== -->
-  <section class="card bg-yellow-50 border-yellow-200 p-4">
-    <p class="text-sm text-yellow-800">
-      Users listed here cannot access the system until approved by an administrator.
-    </p>
-  </section>
-
-  <!-- ===== TABLE ===== -->
-  <section class="card overflow-hidden">
-
-    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
-      <h2 class="font-semibold text-lg">Approval Queue</h2>
-      <span class="text-sm text-[--muted]">Awaiting action</span>
+  <!-- KPI STRIP -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">TOTAL REQUESTS</p>
+      <h3 id="kpiTotal" class="text-4xl font-bold mt-2">0</h3>
     </div>
 
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left text-[--muted]">
-        <tr>
-          <th class="px-6 py-4 font-semibold">User</th>
-          <th class="px-6 py-4 font-semibold">Email</th>
-          <th class="px-6 py-4 font-semibold">Requested Role</th>
-          <th class="px-6 py-4 font-semibold text-right">Actions</th>
-        </tr>
-      </thead>
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">DOCTORS</p>
+      <h3 id="kpiDoctors" class="text-4xl font-bold mt-2 text-indigo-600">0</h3>
+    </div>
 
-      <tbody id="pendingUsersTable" class="divide-y">
-        <!-- JS injects rows -->
-      </tbody>
-    </table>
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">OT STAFF</p>
+      <h3 id="kpiOtStaff" class="text-4xl font-bold mt-2 text-emerald-600">0</h3>
+    </div>
 
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">OTHERS</p>
+      <h3 id="kpiOthers" class="text-4xl font-bold mt-2 text-slate-600">0</h3>
+    </div>
   </section>
 
-  <!-- EMPTY STATE -->
-  <div
-    id="emptyState"
-    class="hidden card text-center py-14 text-[--muted]"
-  >
-    🎉 No pending approval requests
-  </div>
+  <!-- PRIORITY QUEUE -->
+  <section class="grid lg:grid-cols-3 gap-6">
+
+    <!-- QUEUE -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+        <h3 class="font-semibold flex items-center gap-2">
+          <i data-lucide="clock"></i>
+          Approval Queue
+        </h3>
+        <span class="text-sm text-slate-500">Newest first</span>
+      </div>
+
+      <div id="approvalList" class="divide-y"></div>
+
+      <div id="emptyState"
+        class="hidden py-16 text-center text-emerald-600 font-semibold">
+        ✓ No pending approval requests
+      </div>
+    </div>
+
+    <!-- INFO PANEL -->
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <h3 class="font-semibold flex items-center gap-2 mb-4">
+        <i data-lucide="shield-alert"></i>
+        Approval Guidelines
+      </h3>
+
+      <ul class="text-sm text-slate-600 space-y-3">
+        <li>• Verify email & role legitimacy</li>
+        <li>• Doctors require department mapping</li>
+        <li>• OT staff must match shift policy</li>
+        <li>• Reject suspicious registrations</li>
+      </ul>
+
+      <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
+        ⚠ Approving grants system-wide access
+      </div>
+    </div>
+
+  </section>
 
 </main>
 
+<script>lucide.createIcons()</script>
 </body>
 </html>

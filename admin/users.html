@@ -2,130 +2,130 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin · User Management</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --card:#ffffff;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
-      --radius:18px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-
-    .filter-input {
-      border-radius: 14px;
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      font-size: .875rem;
-    }
-
-    .filter-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(10,108,255,.15);
-    }
-
-    .action-link {
-      font-weight: 600;
-    }
-
-    .action-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/users.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-gradient-to-br from-slate-100 via-white to-indigo-50 min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+<div id="adminNavbar"></div>
 
-  <!-- ===== HERO HEADER ===== -->
-  <section class="card p-6">
-    <h1 class="text-3xl font-bold">User Management</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Control access, roles, and operational permissions
-    </p>
+<main class="max-w-[1700px] mx-auto px-6 py-8 space-y-8">
+
+  <!-- HEADER -->
+  <section class="flex justify-between items-center">
+    <div>
+      <h1 class="text-4xl font-bold tracking-tight flex items-center gap-3">
+        <i data-lucide="users"></i>
+        Users Dashboard
+      </h1>
+      <p class="text-slate-500 mt-1">
+        System-wide user operations & access control
+      </p>
+    </div>
   </section>
 
-  <!-- ===== FILTER BAR ===== -->
-  <section class="card p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+  <!-- KPI STRIP -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">TOTAL USERS</p>
+      <h3 id="kpiTotal" class="text-4xl font-bold mt-2">0</h3>
+    </div>
 
-    <input
-      id="searchInput"
-      type="text"
-      placeholder="Search by name or email"
-      class="filter-input w-full md:w-72"
-    />
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">ACTIVE</p>
+      <h3 id="kpiActive" class="text-4xl font-bold mt-2 text-emerald-600">0</h3>
+    </div>
 
-    <div class="flex gap-3">
-      <select id="roleFilter" class="filter-input bg-white">
-        <option value="">All Roles</option>
-        <option>Admin</option>
-        <option>Doctor</option>
-        <option>OT Staff</option>
-        <option>Patient</option>
-      </select>
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">PENDING</p>
+      <h3 id="kpiPending" class="text-4xl font-bold mt-2 text-amber-600">0</h3>
+    </div>
 
-      <select id="statusFilter" class="filter-input bg-white">
-        <option value="">All Status</option>
-        <option value="active">Active</option>
-        <option value="disabled">Disabled</option>
-      </select>
+    <div class="bg-white rounded-2xl p-6 border shadow-sm">
+      <p class="text-xs text-slate-500 font-semibold">DISABLED</p>
+      <h3 id="kpiDisabled" class="text-4xl font-bold mt-2 text-rose-600">0</h3>
+    </div>
+  </section>
+
+  <!-- ANALYTICS -->
+  <section class="grid lg:grid-cols-3 gap-6">
+
+    <!-- ROLE DISTRIBUTION -->
+    <div class="bg-white rounded-2xl border p-6">
+      <h3 class="font-semibold mb-3 flex items-center gap-2">
+        <i data-lucide="pie-chart"></i>
+        Role Distribution
+      </h3>
+      <canvas id="roleChart" height="200"></canvas>
+    </div>
+
+    <!-- STATUS BREAKDOWN -->
+    <div class="bg-white rounded-2xl border p-6">
+      <h3 class="font-semibold mb-3 flex items-center gap-2">
+        <i data-lucide="activity"></i>
+        Status Overview
+      </h3>
+      <canvas id="statusChart" height="200"></canvas>
+    </div>
+
+    <!-- ATTENTION QUEUE -->
+    <div class="bg-white rounded-2xl border p-6">
+      <h3 class="font-semibold mb-3 flex items-center gap-2 text-amber-600">
+        <i data-lucide="alert-triangle"></i>
+        Needs Attention
+      </h3>
+
+      <ul id="attentionList" class="space-y-3 text-sm"></ul>
+
+      <p id="attentionEmpty"
+        class="hidden text-sm text-emerald-600 font-semibold">
+        ✓ No issues detected
+      </p>
     </div>
 
   </section>
 
-  <!-- ===== USERS TABLE ===== -->
-  <section class="card overflow-hidden">
+  <!-- LIVE USERS TABLE -->
+  <section class="bg-white rounded-2xl border shadow-sm overflow-hidden">
 
-    <div class="px-6 py-4 border-b border-[--border] flex justify-between items-center">
-      <h2 class="font-semibold text-lg">Users Directory</h2>
-      <span class="text-sm text-[--muted]">Administrative access</span>
+    <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+      <h3 class="font-semibold flex items-center gap-2">
+        <i data-lucide="database"></i>
+        Live Users
+      </h3>
+      <span class="text-sm text-slate-500">
+        Real-time directory
+      </span>
     </div>
 
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-left text-[--muted]">
-        <tr>
-          <th class="px-6 py-4 font-semibold">User</th>
-          <th class="px-6 py-4 font-semibold">Email</th>
-          <th class="px-6 py-4 font-semibold">Role</th>
-          <th class="px-6 py-4 font-semibold">Status</th>
-          <th class="px-6 py-4 font-semibold">Extra</th>
-          <th class="px-6 py-4 font-semibold text-right">Actions</th>
-        </tr>
-      </thead>
-
-      <tbody id="usersTable" class="divide-y">
-        <!-- injected by JS -->
-      </tbody>
-    </table>
+    <div class="max-h-[520px] overflow-y-auto">
+      <table class="w-full text-sm">
+        <thead class="sticky top-0 bg-white text-slate-500">
+          <tr>
+            <th class="px-6 py-3 text-left">User</th>
+            <th class="px-6 py-3">Role</th>
+            <th class="px-6 py-3">Status</th>
+            <th class="px-6 py-3">Availability</th>
+            <th class="px-6 py-3 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable" class="divide-y"></tbody>
+      </table>
+    </div>
 
   </section>
-
-  <!-- EMPTY STATE -->
-  <div id="emptyState"
-    class="hidden card text-center py-12 text-[--muted]">
-    No users found.
-  </div>
 
 </main>
 
+<script>lucide.createIcons()</script>
 </body>
 </html>
