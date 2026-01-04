@@ -2,95 +2,157 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OT Room Details · Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OT Room Control · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
-    }
-  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/ot-room-details.js"></script>
+
+  <style>
+    .fade-up { animation: fadeUp .45s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .pulse-blue {
+      animation: pulseBlue 2s infinite;
+    }
+    @keyframes pulseBlue {
+      0%,100% { background:#dbeafe; }
+      50% { background:#bfdbfe; }
+    }
+  </style>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen">
 
-<main class="max-w-6xl mx-auto px-4 py-10 space-y-10">
+<div id="adminNavbar"></div>
+
+<main class="max-w-[1500px] mx-auto px-6 py-8 space-y-8 fade-up">
 
   <!-- HEADER -->
-  <section>
-    <a href="/admin/ot-rooms.html" class="text-sm text-[--primary] font-semibold hover:underline">
-      ← Back to OT Rooms
-    </a>
-    <h1 id="otName" class="text-3xl font-bold mt-2">—</h1>
-    <p id="otDepartment" class="text-sm text-[--muted] mt-1">—</p>
+  <section class="flex justify-between items-start">
+    <div>
+      <a href="/admin/ot-rooms.html"
+         class="text-sm text-indigo-600 font-semibold hover:underline">
+        ← OT Rooms
+      </a>
+
+      <h1 id="otName"
+          class="text-3xl font-bold mt-2 flex items-center gap-3">
+        <i data-lucide="hospital"></i>
+        —
+      </h1>
+
+      <p id="otDepartment" class="text-sm text-slate-500 mt-1">
+        —
+      </p>
+    </div>
+
+    <span id="statusBadge"
+      class="px-5 py-2 rounded-full text-sm font-semibold">
+      —
+    </span>
   </section>
 
-  <!-- SUMMARY -->
-  <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">STATUS</p>
-      <span id="statusBadge" class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold">—</span>
+  <!-- KPI STRIP -->
+  <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <div class="flex items-center gap-3 text-indigo-600">
+        <i data-lucide="cpu"></i>
+        <span class="text-sm font-semibold">Equipment</span>
+      </div>
+      <h3 id="equipmentCount" class="text-4xl font-bold mt-4">0</h3>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">EQUIPMENT COUNT</p>
-      <h3 id="equipmentCount" class="text-3xl font-bold mt-2">0</h3>
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <div class="flex items-center gap-3 text-emerald-600">
+        <i data-lucide="clock"></i>
+        <span class="text-sm font-semibold">Last Updated</span>
+      </div>
+      <p id="lastUpdated" class="mt-4 font-semibold text-sm">—</p>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">LAST UPDATED</p>
-      <p id="lastUpdated" class="mt-2 font-semibold text-sm">—</p>
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <div class="flex items-center gap-3 text-blue-600">
+        <i data-lucide="activity"></i>
+        <span class="text-sm font-semibold">Operational State</span>
+      </div>
+      <p class="mt-4 text-sm text-slate-600">
+        Auto-synced with schedule lifecycle
+      </p>
     </div>
+
+    <div class="bg-white rounded-2xl border p-6 shadow-sm">
+      <div class="flex items-center gap-3 text-amber-600">
+        <i data-lucide="shield-alert"></i>
+        <span class="text-sm font-semibold">Safety Locks</span>
+      </div>
+      <p class="mt-4 text-sm text-slate-600">
+        Prevents invalid transitions
+      </p>
+    </div>
+
   </section>
 
-  <!-- MANAGE EQUIPMENT -->
-  <section class="bg-white rounded-2xl shadow p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-bold">Manage Equipment</h2>
-      <button id="saveEquipmentBtn"
-        class="px-4 py-2 rounded-xl bg-[--primary] text-white text-sm font-semibold">
-        Save Equipment
-      </button>
+  <!-- MAIN GRID -->
+  <section class="grid lg:grid-cols-3 gap-8">
+
+    <!-- EQUIPMENT ASSIGNMENT -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="font-semibold text-lg flex items-center gap-2">
+          <i data-lucide="cpu"></i>
+          Equipment Assignment
+        </h2>
+
+        <button id="saveEquipmentBtn"
+          class="px-6 py-2 rounded-xl bg-indigo-600 text-white
+                 font-semibold hover:bg-indigo-700 transition">
+          Save Changes
+        </button>
+      </div>
+
+      <div id="equipmentGrid"
+           class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+      <p class="text-xs text-slate-500 mt-4">
+        Click cards to assign or unassign equipment
+      </p>
     </div>
 
-    <div id="equipmentGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+    <!-- TIMELINE -->
+    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
 
-    <p class="text-xs text-[--muted] mt-4">
-      Click equipment cards to assign them to this OT Room
-    </p>
-  </section>
+      <div class="px-6 py-4 border-b bg-slate-50 flex justify-between">
+        <h3 class="font-semibold flex items-center gap-2">
+          <i data-lucide="calendar"></i>
+          Usage Timeline
+        </h3>
+        <span class="text-sm text-slate-500">Chronological</span>
+      </div>
 
-  <!-- ASSIGNED EQUIPMENT -->
-  <section class="bg-white rounded-2xl shadow p-6">
-    <h2 class="text-lg font-bold mb-4">Assigned Equipment</h2>
+      <div id="timelineEmpty"
+           class="hidden p-8 text-center text-slate-400">
+        No schedules found.
+      </div>
 
-    <ul id="equipmentList" class="list-disc pl-5 space-y-1 text-sm"></ul>
-
-    <div id="emptyEquipment" class="hidden text-sm text-[--muted] text-center py-4">
-      No equipment assigned.
+      <div id="timelineList" class="p-4 space-y-4"></div>
     </div>
-  </section>
 
-  <!-- TIMELINE -->
-  <section class="bg-white rounded-2xl shadow p-6">
-    <h2 class="text-lg font-bold mb-4">OT Usage Timeline</h2>
-    <div id="timelineEmpty" class="hidden text-sm text-[--muted] text-center py-6">
-      No schedules found.
-    </div>
-    <div id="timelineList" class="space-y-4"></div>
   </section>
 
 </main>
+
+<script>
+  lucide.createIcons();
+</script>
+
 </body>
 </html>

@@ -11,140 +11,103 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ================= PARAM ================= */
-const params = new URLSearchParams(window.location.search);
-const otId = params.get("id");
+/* PARAM */
+const otId = new URLSearchParams(window.location.search).get("id");
+if (!otId) location.href = "/admin/ot-rooms.html";
 
-if (!otId) {
-  alert("Invalid OT Room");
-  window.location.href = "/admin/ot-rooms.html";
-}
-
-/* ================= ELEMENTS ================= */
+/* ELEMENTS */
 const otNameEl = document.getElementById("otName");
 const otDepartmentEl = document.getElementById("otDepartment");
 const statusBadgeEl = document.getElementById("statusBadge");
-const equipmentListEl = document.getElementById("equipmentList");
-const equipmentCountEl = document.getElementById("equipmentCount");
-const emptyEquipmentEl = document.getElementById("emptyEquipment");
-const lastUpdatedEl = document.getElementById("lastUpdated");
-
 const equipmentGrid = document.getElementById("equipmentGrid");
+const equipmentCountEl = document.getElementById("equipmentCount");
+const lastUpdatedEl = document.getElementById("lastUpdated");
 const saveEquipmentBtn = document.getElementById("saveEquipmentBtn");
-
 const timelineList = document.getElementById("timelineList");
 const timelineEmpty = document.getElementById("timelineEmpty");
 
-/* ================= STATE ================= */
-let otRoomData = null;
-let selectedEquipmentIds = new Set();
+let selectedEquipment = new Set();
+let otRoom;
 
-/* ================= HELPERS ================= */
-function statusClass(status) {
-  if (status === "available") return "bg-emerald-100 text-emerald-700";
-  if (status === "in-use") return "bg-blue-100 text-blue-700";
-  return "bg-amber-100 text-amber-700";
-}
+/* HELPERS */
+const statusStyle = s =>
+  s === "available"
+    ? "bg-emerald-100 text-emerald-700"
+    : s === "in-use"
+    ? "bg-blue-100 text-blue-700 pulse-blue"
+    : "bg-amber-100 text-amber-700";
 
-function formatDate(ts) {
-  if (!ts) return "—";
-  return ts.toDate().toLocaleString();
-}
-
-/* ================= LOAD OT ROOM ================= */
-async function loadOtRoom() {
+/* LOAD OT */
+async function loadOt() {
   const snap = await getDoc(doc(db, "otRooms", otId));
   if (!snap.exists()) return;
 
-  otRoomData = snap.data();
-  selectedEquipmentIds = new Set(otRoomData.equipmentIds || []);
+  otRoom = snap.data();
+  selectedEquipment = new Set(otRoom.equipmentIds || []);
 
-  otNameEl.textContent = otRoomData.name;
-  otDepartmentEl.textContent = otRoomData.department || "—";
-  statusBadgeEl.textContent = otRoomData.status;
+  otNameEl.textContent = otRoom.name;
+  otDepartmentEl.textContent = otRoom.department || "—";
+  statusBadgeEl.textContent = otRoom.status;
   statusBadgeEl.className =
-    `inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${statusClass(otRoomData.status)}`;
+    `px-5 py-2 rounded-full text-sm font-semibold ${statusStyle(otRoom.status)}`;
 
-  equipmentCountEl.textContent = selectedEquipmentIds.size;
-  lastUpdatedEl.textContent = formatDate(otRoomData.updatedAt || otRoomData.createdAt);
+  equipmentCountEl.textContent = selectedEquipment.size;
+  lastUpdatedEl.textContent =
+    otRoom.updatedAt?.toDate().toLocaleString() || "—";
 
-  await loadEquipmentGrid();
-  await renderAssignedEquipment();
-  await loadTimeline(otRoomData.name);
+  await renderEquipment();
+  await renderTimeline();
 }
 
-/* ================= EQUIPMENT GRID ================= */
-async function loadEquipmentGrid() {
+/* EQUIPMENT GRID */
+async function renderEquipment() {
   equipmentGrid.innerHTML = "";
+  const snap = await getDocs(collection(db, "equipment"));
 
-  const snap = await getDocs(
-    query(collection(db, "equipment"), where("status", "==", "active"))
-  );
-
-  snap.forEach((docSnap) => {
-    const eq = docSnap.data();
-    const selected = selectedEquipmentIds.has(docSnap.id);
+  snap.forEach(d => {
+    const eq = d.data();
+    const active = selectedEquipment.has(d.id);
 
     const card = document.createElement("div");
-    card.className = `
-      border rounded-xl p-3 cursor-pointer transition
-      ${selected ? "border-blue-500 bg-blue-50" : "hover:border-slate-300"}
-    `;
+    card.className =
+      `relative border rounded-xl p-3 cursor-pointer transition
+       ${active ? "border-indigo-500 bg-indigo-50" : "hover:border-slate-300"}`;
 
     card.innerHTML = `
-      <img src="${eq.imageUrl}" class="w-full h-28 object-contain mb-2" />
+      <img src="${eq.imageUrl}"
+           class="w-full h-28 object-contain mb-2"/>
       <p class="text-sm font-semibold text-center">${eq.name}</p>
     `;
 
     card.onclick = () => {
-      selected
-        ? selectedEquipmentIds.delete(docSnap.id)
-        : selectedEquipmentIds.add(docSnap.id);
-      loadEquipmentGrid();
+      active ? selectedEquipment.delete(d.id) : selectedEquipment.add(d.id);
+      renderEquipment();
     };
 
     equipmentGrid.appendChild(card);
   });
 }
 
-/* ================= ASSIGNED EQUIPMENT ================= */
-async function renderAssignedEquipment() {
-  equipmentListEl.innerHTML = "";
-  emptyEquipmentEl.classList.toggle("hidden", selectedEquipmentIds.size > 0);
-
-  if (!selectedEquipmentIds.size) return;
-
-  const snap = await getDocs(collection(db, "equipment"));
-  snap.forEach((docSnap) => {
-    if (selectedEquipmentIds.has(docSnap.id)) {
-      const li = document.createElement("li");
-      li.textContent = docSnap.data().name;
-      equipmentListEl.appendChild(li);
-    }
-  });
-}
-
-/* ================= SAVE ================= */
+/* SAVE */
 saveEquipmentBtn.onclick = async () => {
   await updateDoc(doc(db, "otRooms", otId), {
-    equipmentIds: Array.from(selectedEquipmentIds),
+    equipmentIds: [...selectedEquipment],
     updatedAt: serverTimestamp(),
   });
-
-  alert("Equipment updated successfully");
-  loadOtRoom();
+  alert("Equipment updated");
+  loadOt();
 };
 
-/* ================= TIMELINE ================= */
-async function loadTimeline(otName) {
+/* TIMELINE */
+async function renderTimeline() {
   timelineList.innerHTML = "";
   timelineEmpty.classList.add("hidden");
 
   const snap = await getDocs(
     query(
       collection(db, "schedules"),
-      where("otRoom", "==", otName),
-      orderBy("startTime", "asc")
+      where("otRoomId", "==", otId),
+      orderBy("startTime", "desc")
     )
   );
 
@@ -153,20 +116,19 @@ async function loadTimeline(otName) {
     return;
   }
 
-  snap.forEach((docSnap) => {
-    const s = docSnap.data();
-
+  snap.forEach(d => {
+    const s = d.data();
     const card = document.createElement("div");
     card.className =
-      "border-l-4 border-blue-500 pl-4 py-3 rounded hover:bg-slate-50 cursor-pointer";
+      "border-l-4 pl-4 py-3 rounded hover:bg-slate-50";
 
     card.innerHTML = `
       <p class="font-semibold">${s.procedure}</p>
       <p class="text-sm text-slate-600">
-        Patient: ${s.patientName} • Surgeon: ${s.surgeonName || "—"}
+        ${s.patientName} • ${s.surgeonName || "—"}
       </p>
       <p class="text-xs text-slate-500">
-        ${s.startTime.toDate().toLocaleString()} – ${s.endTime.toDate().toLocaleString()}
+        ${s.startTime.toDate().toLocaleString()}
       </p>
       <span class="text-xs font-semibold uppercase">${s.status}</span>
     `;
@@ -175,5 +137,5 @@ async function loadTimeline(otName) {
   });
 }
 
-/* ================= INIT ================= */
-loadOtRoom();
+/* INIT */
+loadOt();
