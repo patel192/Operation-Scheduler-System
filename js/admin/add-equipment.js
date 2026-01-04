@@ -6,7 +6,7 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ================= ELEMENTS ================= */
+/* ELEMENTS */
 const form = document.getElementById("addEquipmentForm");
 const nameInput = document.getElementById("nameInput");
 const categoryInput = document.getElementById("categoryInput");
@@ -14,19 +14,21 @@ const departmentsSelect = document.getElementById("departmentsSelect");
 const descriptionInput = document.getElementById("descriptionInput");
 const imageUrlInput = document.getElementById("imageUrlInput");
 
-/* ================= LOAD DEPARTMENTS ================= */
+/* LOAD DEPARTMENTS */
 async function loadDepartments() {
   const snap = await getDocs(collection(db, "departments"));
 
+  departmentsSelect.innerHTML = "";
   snap.forEach((doc) => {
+    const d = doc.data();
     const opt = document.createElement("option");
-    opt.value = doc.data().name;
-    opt.textContent = doc.data().name;
+    opt.value = d.name;
+    opt.textContent = d.name;
     departmentsSelect.appendChild(opt);
   });
 }
 
-/* ================= SUBMIT ================= */
+/* SUBMIT */
 form.onsubmit = async (e) => {
   e.preventDefault();
 
@@ -46,10 +48,10 @@ form.onsubmit = async (e) => {
     name,
     category,
     departments,
-    description: descriptionInput.value.trim() || "",
-    imageUrl: imageUrlInput.value.trim() || "",
+    description: descriptionInput.value.trim(),
+    imageUrl: imageUrlInput.value.trim(),
 
-    // 🔒 SYSTEM-CONTROLLED FIELDS
+    // SYSTEM FIELDS
     status: "active",
     currentOtRoomId: null,
     currentOtRoomName: null,
@@ -63,5 +65,5 @@ form.onsubmit = async (e) => {
   window.location.href = "/admin/resources.html";
 };
 
-/* ================= INIT ================= */
+/* INIT */
 loadDepartments();

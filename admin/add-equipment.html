@@ -2,105 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Equipment · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/add-equipment.js"></script>
+
+  <style>
+    .fade-up { animation: fadeUp .4s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+  </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen text-slate-900">
 
-  <div id="adminNavbar"></div>
+<div id="adminNavbar"></div>
 
-  <main class="max-w-3xl mx-auto px-6 py-6">
+<main class="max-w-[1100px] mx-auto px-6 py-8 fade-up space-y-8">
 
-    <!-- HEADER -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold">Add Equipment</h1>
-      <p class="text-sm text-slate-500">
-        Register new OT equipment
+  <!-- HEADER -->
+  <section class="flex justify-between items-center">
+    <div>
+      <a href="/admin/resources.html"
+         class="text-sm text-indigo-600 font-semibold hover:underline">
+        ← Resources
+      </a>
+      <h1 class="text-3xl font-bold mt-2 flex items-center gap-2">
+        <i data-lucide="cpu"></i>
+        Add Equipment
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Register new operational equipment for OT scheduling
       </p>
     </div>
+  </section>
 
-    <!-- FORM -->
-    <form id="addEquipmentForm" class="bg-white border rounded-xl p-6 space-y-5">
+  <!-- FORM -->
+  <form id="addEquipmentForm"
+        class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- LEFT : MAIN INFO -->
+    <section class="lg:col-span-2 bg-white rounded-2xl border p-6 space-y-6">
+
+      <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+        <i data-lucide="file-text"></i>
+        Equipment Information
+      </h3>
 
       <!-- NAME -->
       <div>
-        <label class="block text-sm font-medium mb-1">Equipment Name *</label>
+        <label class="text-sm font-semibold block mb-1">
+          Equipment Name <span class="text-rose-500">*</span>
+        </label>
         <input
           id="nameInput"
-          type="text"
           required
-          class="w-full border rounded-lg px-3 py-2 text-sm"
-          placeholder="Heart Monitor" />
+          placeholder="e.g. Heart Monitor"
+          class="w-full border rounded-xl px-4 py-3 text-sm
+                 focus:ring-2 focus:ring-indigo-500 outline-none"/>
       </div>
 
       <!-- CATEGORY -->
       <div>
-        <label class="block text-sm font-medium mb-1">Category *</label>
+        <label class="text-sm font-semibold block mb-1">
+          Category <span class="text-rose-500">*</span>
+        </label>
         <input
           id="categoryInput"
-          type="text"
           required
-          class="w-full border rounded-lg px-3 py-2 text-sm"
-          placeholder="Monitoring" />
-      </div>
-
-      <!-- DEPARTMENTS -->
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          Departments (Select all applicable)
-        </label>
-        <select
-          id="departmentsSelect"
-          multiple
-          class="w-full border rounded-lg px-3 py-2 text-sm h-32">
-          <!-- populated by JS -->
-        </select>
+          placeholder="Monitoring / Surgical / Imaging"
+          class="w-full border rounded-xl px-4 py-3 text-sm
+                 focus:ring-2 focus:ring-indigo-500 outline-none"/>
       </div>
 
       <!-- DESCRIPTION -->
       <div>
-        <label class="block text-sm font-medium mb-1">Description</label>
+        <label class="text-sm font-semibold block mb-1">
+          Description
+        </label>
         <textarea
           id="descriptionInput"
           rows="3"
-          class="w-full border rounded-lg px-3 py-2 text-sm"
-          placeholder="Real-Time Cardiac Monitoring Device"></textarea>
+          placeholder="Describe the equipment purpose and usage"
+          class="w-full border rounded-xl px-4 py-3 text-sm
+                 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
       </div>
 
-      <!-- IMAGE URL -->
+      <!-- IMAGE -->
       <div>
-        <label class="block text-sm font-medium mb-1">Image URL</label>
+        <label class="text-sm font-semibold block mb-1">
+          Image URL
+        </label>
         <input
           id="imageUrlInput"
           type="url"
-          class="w-full border rounded-lg px-3 py-2 text-sm"
-          placeholder="https://example.com/image.jpg" />
+          placeholder="https://example.com/equipment.jpg"
+          class="w-full border rounded-xl px-4 py-3 text-sm"/>
+        <p class="text-xs text-slate-500 mt-1">
+          Optional — shown in OT room details
+        </p>
       </div>
 
-      <!-- ACTIONS -->
-      <div class="flex justify-end gap-3 pt-4">
-        <a
-          href="/admin/resources.html"
-          class="px-4 py-2 text-sm border rounded-lg">
-          Cancel
-        </a>
-        <button
-          type="submit"
-          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          Save Equipment
-        </button>
-      </div>
+    </section>
 
-    </form>
+    <!-- RIGHT : ASSIGNMENT -->
+    <aside class="bg-white rounded-2xl border p-6 space-y-6">
 
-  </main>
+      <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+        <i data-lucide="layers"></i>
+        Department Access
+      </h3>
 
+      <p class="text-sm text-slate-500">
+        Select departments where this equipment can be used
+      </p>
+
+      <select
+        id="departmentsSelect"
+        multiple
+        class="w-full border rounded-xl px-4 py-3 text-sm h-52
+               focus:ring-2 focus:ring-indigo-500 outline-none">
+      </select>
+
+      <p class="text-xs text-slate-500">
+        Hold Ctrl / Cmd to select multiple departments
+      </p>
+
+    </aside>
+
+    <!-- ACTIONS -->
+    <div class="lg:col-span-3 flex justify-end gap-4 pt-2">
+      <a href="/admin/resources.html"
+         class="px-6 py-2 rounded-xl border font-semibold text-slate-700">
+        Cancel
+      </a>
+
+      <button
+        type="submit"
+        class="px-8 py-2 rounded-xl bg-indigo-600 text-white
+               font-semibold hover:bg-indigo-700 transition
+               flex items-center gap-2">
+        <i data-lucide="save"></i>
+        Save Equipment
+      </button>
+    </div>
+
+  </form>
+
+</main>
+
+<script>
+  lucide.createIcons();
+</script>
 </body>
 </html>
