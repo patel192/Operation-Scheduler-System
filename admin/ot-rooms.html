@@ -1,107 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <title>OT Rooms · Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OT Operations · Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/ot-rooms.js"></script>
 
   <style>
-    :root {
-      --primary:#0A6CFF;
-      --bg:#F8FAFC;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+    .glass {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ===== OT CARD ANIMATION ===== */
+    .ot-card {
+      position: relative;
+      overflow: hidden;
+      transition:
+        transform .35s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .35s ease,
+        border-color .35s ease;
+    }
+
+    .ot-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg,
+          transparent,
+          rgba(99, 102, 241, .08),
+          transparent);
+      opacity: 0;
+      transition: opacity .35s ease;
+    }
+
+    .ot-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .12);
+      border-color: #c7d2fe;
+    }
+
+    .ot-card:hover::after {
+      opacity: 1;
+    }
+
+    /* ===== STATUS PULSE ===== */
+    .status-pulse {
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, .35);
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+      }
+    }
+
+    /* ===== ENTRY ANIMATION ===== */
+    .fade-scale {
+      animation: fadeScale .45s ease forwards;
+    }
+
+    @keyframes fadeScale {
+      from {
+        opacity: 0;
+        transform: scale(.96) translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .table-row {
+      transition: background-color .2s ease, box-shadow .2s ease;
+    }
+
+    .table-row:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Left status indicator */
+    .row-indicator {
+      width: 4px;
+      border-radius: 999px;
+    }
+
+    /* Action button */
+    .action-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      transition: background-color .15s ease, color .15s ease;
+    }
+
+    .action-btn:hover {
+      background: rgba(245, 158, 11, .1);
     }
   </style>
-
-  <!-- Auth + Layout -->
-  <script type="module" defer src="/middleware/auth-guard.js"></script>
-  <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
-
-  <!-- Page Logic -->
-  <script type="module" defer src="/js/admin/ot-rooms.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+  <div id="adminNavbar"></div>
 
-  <!-- HEADER -->
-  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold">OT Rooms</h1>
-      <p class="text-sm text-[--muted] mt-1">
-        Manage operation theatres and availability
+  <main class="max-w-[1700px] mx-auto px-6 py-6 space-y-8">
+
+    <!-- HERO -->
+    <section class="rounded-3xl p-8 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xl">
+      <h1 class="text-3xl font-bold flex items-center gap-3">
+        <i data-lucide="activity"></i>
+        OT Operations Control Center
+      </h1>
+      <p class="text-sm opacity-90 mt-2">
+        Live theatre utilization, availability & risk monitoring
       </p>
-    </div>
+    </section>
+    <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+          OT Rooms
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">
+          Real-time operation theatre availability & control
+        </p>
+      </div>
 
-    <a href="/admin/add-ot-room.html"
-       class="px-6 py-2 rounded-xl bg-[--primary] text-white font-semibold hover:opacity-90">
-      + Add OT Room
-    </a>
-  </section>
+      <a href="/admin/add-ot-room.html" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl
+           bg-indigo-600 text-white text-sm font-semibold
+           hover:bg-indigo-700 active:scale-[0.98] transition">
+        + Add OT Room
+      </a>
+    </section>
 
-  <!-- KPI STRIP -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-5">
 
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">TOTAL OT ROOMS</p>
-      <h3 id="kpiTotal" class="text-3xl font-bold mt-2">0</h3>
-    </div>
+    <!-- ANALYTICS STRIP -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">AVAILABLE</p>
-      <h3 id="kpiAvailable" class="text-3xl font-bold mt-2 text-emerald-600">0</h3>
-    </div>
+      <!-- CAPACITY -->
+      <div class="glass rounded-2xl p-6 border">
+        <h3 class="font-semibold flex items-center gap-2 mb-4">
+          <i data-lucide="pie-chart"></i>
+          Capacity Utilization
+        </h3>
+        <canvas id="capacityChart" height="180"></canvas>
+      </div>
 
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">IN USE</p>
-      <h3 id="kpiInUse" class="text-3xl font-bold mt-2 text-blue-600">0</h3>
-    </div>
+      <!-- LIVE LOAD -->
+      <div class="glass rounded-2xl p-6 border">
+        <h3 class="font-semibold flex items-center gap-2 mb-4">
+          <i data-lucide="clock"></i>
+          Active OT Load
+        </h3>
 
-    <div class="bg-white rounded-xl shadow p-5">
-      <p class="text-xs text-[--muted] font-semibold">MAINTENANCE</p>
-      <h3 id="kpiMaintenance" class="text-3xl font-bold mt-2 text-amber-600">0</h3>
-    </div>
+        <ul id="activeOtList" class="space-y-3 text-sm">
+          <!-- JS inject -->
+        </ul>
+      </div>
 
-  </section>
+      <!-- RISK PANEL -->
+      <div class="glass rounded-2xl p-6 border">
+        <h3 class="font-semibold flex items-center gap-2 mb-4 text-rose-600">
+          <i data-lucide="alert-triangle"></i>
+          Operational Risks
+        </h3>
 
-  <!-- TABLE -->
-  <section class="bg-white rounded-2xl shadow overflow-hidden">
+        <ul id="riskList" class="space-y-3 text-sm text-slate-700">
+          <!-- JS inject -->
+        </ul>
+      </div>
 
-    <div class="px-6 py-4 border-b flex justify-between items-center">
-      <h2 class="font-semibold text-lg">OT Room List</h2>
-      <span class="text-sm text-[--muted]">Administrative view</span>
-    </div>
+    </section>
 
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-[--muted]">
-        <tr>
-          <th class="px-6 py-4 text-left">OT Room</th>
-          <th class="px-6 py-4 text-left">Department</th>
-          <th class="px-6 py-4 text-left">Equipment</th>
-          <th class="px-6 py-4 text-left">Status</th>
-          <th class="px-6 py-4 text-right">Actions</th>
-        </tr>
-      </thead>
+    <!-- OT VISUAL GRID -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <i data-lucide="layout-grid"></i>
+        OT Rooms – Live Status
+      </h2>
 
-      <tbody id="otTableBody" class="divide-y">
-        <!-- injected by JS -->
-      </tbody>
-    </table>
+      <div id="otGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- JS inject cards -->
+      </div>
+    </section>
 
-    <div id="emptyState"
-         class="hidden text-center text-[--muted] py-10">
-      No OT Rooms found.
-    </div>
+    <!-- DETAILED TABLE -->
+    <section class="bg-white rounded-2xl border shadow-sm overflow-hidden">
 
-  </section>
+      <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+        <h3 class="font-semibold flex items-center gap-2">
+          <i data-lucide="list"></i>
+          Detailed OT Registry
+        </h3>
+        <span class="text-sm text-slate-500">
+          Scalable administrative view
+        </span>
+      </div>
 
-</main>
+      <div class="max-h-[520px] overflow-y-auto">
+        <table class="w-full text-sm">
+          <thead class="sticky top-0 bg-white text-slate-500">
+            <tr>
+              <th class="px-6 py-3 text-left">OT Room</th>
+              <th class="px-6 py-3 text-left">Department</th>
+              <th class="px-6 py-3 text-left">Equipment</th>
+              <th class="px-6 py-3 text-left">Status</th>
+              <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="otTableBody" class="divide-y"></tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
 
 </body>
+
 </html>
