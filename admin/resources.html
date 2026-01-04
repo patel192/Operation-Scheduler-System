@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resources · Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/resources.js"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+  <!-- NAVBAR -->
+  <div id="adminNavbar"></div>
+
+  <main class="max-w-7xl mx-auto px-6 py-6">
+
+    <!-- PAGE HEADER -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold">Resources</h1>
+      <p class="text-sm text-slate-500">
+        Manage operational resources used in OT scheduling
+      </p>
+    </div>
+
+    <!-- ================= EQUIPMENT SECTION ================= -->
+    <section class="bg-white border rounded-xl p-5">
+
+      <!-- SECTION HEADER -->
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-semibold">Equipment</h2>
+          <p class="text-sm text-slate-500">
+            View and manage OT equipment
+          </p>
+        </div>
+        <a href="/admin/add-equipment.html"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+          + Add Equipment
+        </a>
+
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+        <div class="border rounded-lg p-3">
+          <p class="text-xs text-slate-500">Total</p>
+          <p class="text-xl font-semibold" id="totalEquipment">0</p>
+        </div>
+        <div class="border rounded-lg p-3">
+          <p class="text-xs text-slate-500">In Use</p>
+          <p class="text-xl font-semibold text-yellow-600" id="inUseEquipment">0</p>
+        </div>
+        <div class="border rounded-lg p-3">
+          <p class="text-xs text-slate-500">Available</p>
+          <p class="text-xl font-semibold text-green-600" id="availableEquipment">0</p>
+        </div>
+        <div class="border rounded-lg p-3">
+          <p class="text-xs text-slate-500">Maintenance</p>
+          <p class="text-xl font-semibold text-red-600" id="maintenanceEquipment">0</p>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <input id="searchInput" type="text" placeholder="Search equipment..."
+          class="border rounded-lg px-3 py-2 text-sm w-full" />
+
+        <select id="categoryFilter" class="border rounded-lg px-3 py-2 text-sm">
+          <option value="">All Categories</option>
+        </select>
+
+        <select id="departmentFilter" class="border rounded-lg px-3 py-2 text-sm">
+          <option value="">All Departments</option>
+        </select>
+
+        <select id="statusFilter" class="border rounded-lg px-3 py-2 text-sm">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="in-use">In Use</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+      </div>
+
+      <!-- TABLE -->
+      <div class="border rounded-lg overflow-hidden">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-100 text-slate-600">
+            <tr>
+              <th class="px-4 py-3 text-left">Name</th>
+              <th class="px-4 py-3 text-left">Category</th>
+              <th class="px-4 py-3 text-left">Departments</th>
+              <th class="px-4 py-3 text-left">Status</th>
+              <th class="px-4 py-3 text-left">Current OT</th>
+              <th class="px-4 py-3 text-left">Last Used</th>
+            </tr>
+          </thead>
+          <tbody id="equipmentTableBody"></tbody>
+        </table>
+
+        <div id="emptyState" class="hidden p-6 text-center text-slate-500">
+          No equipment found.
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+
+</html>

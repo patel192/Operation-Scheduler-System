@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Equipment · Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
+  <script type="module" defer src="/js/admin/add-equipment.js"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+  <div id="adminNavbar"></div>
+
+  <main class="max-w-3xl mx-auto px-6 py-6">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold">Add Equipment</h1>
+      <p class="text-sm text-slate-500">
+        Register new OT equipment
+      </p>
+    </div>
+
+    <!-- FORM -->
+    <form id="addEquipmentForm" class="bg-white border rounded-xl p-6 space-y-5">
+
+      <!-- NAME -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Equipment Name *</label>
+        <input
+          id="nameInput"
+          type="text"
+          required
+          class="w-full border rounded-lg px-3 py-2 text-sm"
+          placeholder="Heart Monitor" />
+      </div>
+
+      <!-- CATEGORY -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Category *</label>
+        <input
+          id="categoryInput"
+          type="text"
+          required
+          class="w-full border rounded-lg px-3 py-2 text-sm"
+          placeholder="Monitoring" />
+      </div>
+
+      <!-- DEPARTMENTS -->
+      <div>
+        <label class="block text-sm font-medium mb-1">
+          Departments (Select all applicable)
+        </label>
+        <select
+          id="departmentsSelect"
+          multiple
+          class="w-full border rounded-lg px-3 py-2 text-sm h-32">
+          <!-- populated by JS -->
+        </select>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Description</label>
+        <textarea
+          id="descriptionInput"
+          rows="3"
+          class="w-full border rounded-lg px-3 py-2 text-sm"
+          placeholder="Real-Time Cardiac Monitoring Device"></textarea>
+      </div>
+
+      <!-- IMAGE URL -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Image URL</label>
+        <input
+          id="imageUrlInput"
+          type="url"
+          class="w-full border rounded-lg px-3 py-2 text-sm"
+          placeholder="https://example.com/image.jpg" />
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex justify-end gap-3 pt-4">
+        <a
+          href="/admin/resources.html"
+          class="px-4 py-2 text-sm border rounded-lg">
+          Cancel
+        </a>
+        <button
+          type="submit"
+          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Save Equipment
+        </button>
+      </div>
+
+    </form>
+
+  </main>
+
+</body>
+</html>
