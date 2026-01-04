@@ -2,6 +2,7 @@ import { db } from "../firebase.js";
 import {
   doc,
   getDoc,
+  updateDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 /* ================= PARAMS ================= */
@@ -26,6 +27,10 @@ const lastUsedEl = document.getElementById("lastUsedAt");
 
 const imageEl = document.getElementById("equipmentImage");
 const editBtn = document.getElementById("editEquipmentBtn");
+
+const markMaintenanceBtn = document.getElementById("markMaintenanceBtn");
+const restoreActiveBtn = document.getElementById("restoreActiveBtn");
+const maintenanceHint = document.getElementById("maintenanceHint");
 
 /* ================= HELPERS ================= */
 function statusBadge(status) {
@@ -61,6 +66,7 @@ async function loadEquipment() {
 
   statusEl.innerHTML = statusBadge(e.status);
   currentOtEl.textContent = e.currentOtRoomName || "—";
+  lastUsedEl.textContent = formatDate(e.lastUsedAt);
 
   if (e.currentScheduleId) {
     currentScheduleEl.innerHTML = `
@@ -74,15 +80,55 @@ async function loadEquipment() {
     currentScheduleEl.textContent = "—";
   }
 
-  lastUsedEl.textContent = formatDate(e.lastUsedAt);
-
+  // IMAGE
   if (e.imageUrl) {
     imageEl.src = e.imageUrl;
     imageEl.classList.remove("hidden");
   }
 
   editBtn.href = `/admin/edit-equipment.html?id=${equipmentId}`;
+
+  // ===== MAINTENANCE BUTTON VISIBILITY RULES =====
+  markMaintenanceBtn.classList.add("hidden");
+  restoreActiveBtn.classList.add("hidden");
+  maintenanceHint.classList.add("hidden");
+
+  if (e.status === "active") {
+    markMaintenanceBtn.classList.remove("hidden");
+  }
+
+  if (e.status === "maintenance") {
+    restoreActiveBtn.classList.remove("hidden");
+  }
+
+  if (e.status === "in-use") {
+    maintenanceHint.classList.remove("hidden");
+  }
 }
+
+/* ================= ACTIONS ================= */
+
+// ➕ Put under maintenance
+markMaintenanceBtn.onclick = async () => {
+  if (!confirm("Put this equipment under maintenance?")) return;
+
+  await updateDoc(doc(db, "equipment", equipmentId), {
+    status: "maintenance",
+  });
+
+  await loadEquipment();
+};
+
+// ➖ Restore to active
+restoreActiveBtn.onclick = async () => {
+  if (!confirm("Restore this equipment to active state?")) return;
+
+  await updateDoc(doc(db, "equipment", equipmentId), {
+    status: "active",
+  });
+
+  await loadEquipment();
+};
 
 /* ================= INIT ================= */
 loadEquipment();

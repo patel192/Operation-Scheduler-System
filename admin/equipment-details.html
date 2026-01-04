@@ -23,7 +23,7 @@
       <div>
         <h1 class="text-2xl font-bold" id="equipmentName">—</h1>
         <p class="text-sm text-slate-500">
-          Equipment details & current usage
+          Equipment details & operational status
         </p>
       </div>
 
@@ -61,9 +61,7 @@
 
         <div>
           <p class="text-sm text-slate-500">Description</p>
-          <p id="equipmentDescription" class="text-slate-700">
-            —
-          </p>
+          <p id="equipmentDescription" class="text-slate-700">—</p>
         </div>
 
       </div>
@@ -73,7 +71,26 @@
 
         <div>
           <p class="text-sm text-slate-500">Status</p>
-          <div id="equipmentStatus"></div>
+          <div id="equipmentStatus" class="mb-2"></div>
+
+          <!-- MAINTENANCE ACTIONS -->
+          <button
+            id="markMaintenanceBtn"
+            class="hidden px-3 py-1 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700">
+            Put Under Maintenance
+          </button>
+
+          <button
+            id="restoreActiveBtn"
+            class="hidden px-3 py-1 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700">
+            Restore to Active
+          </button>
+
+          <p
+            id="maintenanceHint"
+            class="hidden text-xs text-slate-500 mt-1">
+            Equipment currently in use cannot be put under maintenance.
+          </p>
         </div>
 
         <div>
