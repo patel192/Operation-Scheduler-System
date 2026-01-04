@@ -107,7 +107,17 @@ async function loadDepartmentDoctorsList(departmentName) {
     tr.innerHTML = `
       <td class="px-6 py-4 font-semibold">${u.displayName || "—"}</td>
       <td class="px-6 py-4">${u.email || "—"}</td>
-      <td class="px-6 py-4 capitalize">${u.availability || "unknown"}</td>
+      <td class="px-6 py-4">
+  <span class="px-3 py-1 rounded-full text-xs font-semibold
+    ${
+      u.availability === "busy"
+        ? "bg-amber-100 text-amber-700"
+        : "bg-emerald-100 text-emerald-700"
+    }">
+    ${u.availability || "unknown"}
+  </span>
+</td>
+
     `;
 
     doctorsTable.appendChild(tr);
