@@ -3,7 +3,7 @@ import {
   collection,
   query,
   where,
-  onSnapshot
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 /* ================= ELEMENTS ================= */
@@ -26,10 +26,9 @@ let selectedPatientId = null;
 let unsubscribe = null;
 
 /* ================= HELPERS ================= */
-const t = ts => ts.toDate();
+const t = (ts) => ts.toDate();
 
-const sameDay = (a, b) =>
-  a.toDateString() === b.toDateString();
+const sameDay = (a, b) => a.toDateString() === b.toDateString();
 
 /* ================= REALTIME ================= */
 function listenToSchedules() {
@@ -42,10 +41,10 @@ function listenToSchedules() {
 
   if (unsubscribe) unsubscribe();
 
-  unsubscribe = onSnapshot(q, snap => {
-    schedules = snap.docs.map(d => ({
+  unsubscribe = onSnapshot(q, (snap) => {
+    schedules = snap.docs.map((d) => ({
       id: d.id,
-      ...d.data()
+      ...d.data(),
     }));
     render();
   });
@@ -55,14 +54,14 @@ function listenToSchedules() {
 function derivePatients() {
   const map = {};
 
-  schedules.forEach(s => {
+  schedules.forEach((s) => {
     if (!map[s.patientId]) {
       map[s.patientId] = {
         patientId: s.patientId,
         name: s.patientName,
         department: s.department,
         schedules: [],
-        hasRisk: false
+        hasRisk: false,
       };
     }
 
@@ -83,57 +82,63 @@ function render() {
 
   /* ---------- STATS ---------- */
   statTotal.textContent = patients.length;
-  statToday.textContent =
-    patients.filter(p =>
-      p.schedules.some(s => sameDay(t(s.startTime), today))
-    ).length;
+  statToday.textContent = patients.filter((p) =>
+    p.schedules.some((s) => sameDay(t(s.startTime), today))
+  ).length;
 
-  statActive.textContent =
-    patients.filter(p =>
-      p.schedules.some(s => s.status === "Ongoing")
-    ).length;
+  statActive.textContent = patients.filter((p) =>
+    p.schedules.some((s) => s.status === "Ongoing")
+  ).length;
 
-  statCompleted.textContent =
-    patients.filter(p =>
-      p.schedules.every(s => s.status === "Completed")
-    ).length;
+  statCompleted.textContent = patients.filter((p) =>
+    p.schedules.every((s) => s.status === "Completed")
+  ).length;
 
-  statRisk.textContent =
-    patients.filter(p => p.hasRisk).length;
+  statRisk.textContent = patients.filter((p) => p.hasRisk).length;
 
   /* ---------- LIST ---------- */
   patientList.innerHTML = "";
 
-  patients.forEach(p => {
-    const latest =
-      p.schedules
-        .slice()
-        .sort((a, b) => t(b.startTime) - t(a.startTime))[0];
+  patients.forEach((p) => {
+    const latest = p.schedules
+      .slice()
+      .sort((a, b) => t(b.startTime) - t(a.startTime))[0];
 
     const row = document.createElement("div");
     row.className = `
-      grid grid-cols-[1fr_90px_90px] gap-3 py-2 cursor-pointer
-      hover:bg-slate-50 transition
-      ${p.patientId === selectedPatientId ? "bg-slate-100" : ""}
-      ${p.hasRisk ? "border-l-4 border-red-600 bg-red-50" : ""}
-    `;
+    grid grid-cols-[1fr_90px_120px_90px] gap-3 py-2 cursor-pointer
+    hover:bg-slate-50 transition
+    ${p.patientId === selectedPatientId ? "bg-slate-100" : ""}
+    ${p.hasRisk ? "border-l-4 border-red-600 bg-red-50" : ""}
+  `;
 
     row.innerHTML = `
-      <div>
-        <div class="font-semibold">${p.name}</div>
-        <div class="text-xs text-slate-500">${p.department}</div>
-      </div>
+    <!-- PATIENT -->
+    <div>
+      <div class="font-semibold">${p.name}</div>
+      <div class="text-xs text-slate-500">${p.department}</div>
+    </div>
 
-      <div class="text-xs font-semibold">
-        ${latest.status}
-      </div>
+    <!-- STATUS -->
+    <div class="text-xs font-semibold">
+      ${latest.status}
+    </div>
 
-      <div class="text-xs text-slate-500">
-        ${latest.procedure}
-      </div>
-    `;
+    <!-- LATEST PROCEDURE -->
+    <div class="text-xs text-slate-500 truncate">
+      ${latest.procedure}
+    </div>
 
+    <!-- ACTION -->
+    <div class="text-right">
+    </div>
+  `;
+
+    /* INLINE INSPECT (row click) */
     row.onclick = () => inspectPatient(p.patientId);
+
+
+
     patientList.appendChild(row);
   });
 
@@ -143,7 +148,7 @@ function render() {
 /* ================= INSPECT ================= */
 function inspectPatient(patientId) {
   selectedPatientId = patientId;
-  const p = derivePatients().find(x => x.patientId === patientId);
+  const p = derivePatients().find((x) => x.patientId === patientId);
   if (!p) return;
 
   patientEmpty.classList.add("hidden");
@@ -179,7 +184,7 @@ function inspectPatient(patientId) {
 
   patientTimeline.innerHTML = "";
 
-  sorted.forEach(s => {
+  sorted.forEach((s) => {
     const div = document.createElement("div");
     div.className = "border rounded-lg p-2 bg-slate-50";
 
@@ -199,7 +204,7 @@ function inspectPatient(patientId) {
 }
 
 /* ================= INIT ================= */
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged((user) => {
   if (!user) return;
   listenToSchedules();
 });
