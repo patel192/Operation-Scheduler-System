@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Schedule Details · Doctor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
-      --primary:#0A6CFF;
-      --bg:#F1F5F9;
-      --card:#ffffff;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --primary: #2563eb;
+      --bg: #F1F5F9;
+      --text: #1E293B;
+      --muted: #64748B;
+      --border: #E5E7EB;
     }
 
     .glass {
-      background: rgba(255,255,255,.96);
+      background: rgba(255, 255, 255, .96);
       backdrop-filter: blur(10px);
     }
 
-    .fade-in {
-      animation: fade .35s ease;
+    .pulse {
+      animation: pulse 2s infinite;
     }
 
-    @keyframes fade {
-      from { opacity:0; transform: translateY(8px); }
-      to { opacity:1; transform:none; }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, .35);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
     }
   </style>
 
-  <!-- Auth + Navbar + Logic -->
+  <!-- Guards & Nav -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/schedule-details.js"></script>
@@ -41,123 +49,98 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-5xl mx-auto px-4 py-10 space-y-8 fade-in">
+  <main class="max-w-[1600px] mx-auto px-4 py-5 space-y-4">
 
-  <!-- ================= HEADER ================= -->
-  <section>
-    <a href="/doctor/my-schedule.html"
-       class="text-sm font-semibold text-[--primary] hover:underline">
-      ← Back to My Schedule
-    </a>
-
-    <h1 class="text-3xl font-bold mt-2">Surgery Schedule Details</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Complete overview of the assigned operation
-    </p>
-  </section>
-
-  <!-- ================= STATUS CARD ================= -->
-  <section
-    class="glass rounded-2xl shadow border border-[--border]
-           p-6 flex flex-col sm:flex-row sm:items-center
-           sm:justify-between gap-4">
-
-    <div>
-      <p class="text-sm text-[--muted]">Current Status</p>
-      <span
-        id="statusBadge"
-        class="inline-block mt-2 px-4 py-1.5 rounded-full
-               text-sm font-semibold">
-        —
-      </span>
-    </div>
-
-    <button
-      id="markCompleted"
-      class="px-6 py-2.5 rounded-xl bg-green-600
-             text-white font-semibold hover:bg-green-700 transition">
-      Mark as Completed
-    </button>
-
-  </section>
-
-  <!-- ================= DETAILS GRID ================= -->
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <!-- PATIENT INFO -->
-    <div class="glass rounded-2xl shadow border border-[--border] p-6">
-      <h3 class="font-bold text-lg mb-4">Patient Information</h3>
-
-      <div class="space-y-4 text-sm">
-        <div>
-          <p class="text-[--muted]">Patient Name</p>
-          <p id="patientName" class="font-semibold text-base">—</p>
-        </div>
-
-        <div>
-          <p class="text-[--muted]">Patient ID</p>
-          <p id="patientId" class="font-semibold">—</p>
-        </div>
-
-        <div>
-          <p class="text-[--muted]">Department</p>
-          <p id="department" class="font-semibold">—</p>
-        </div>
+    <!-- HEADER -->
+    <section class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold">Schedule Details</h1>
+        <p class="text-xs text-[--muted]">
+          Procedure execution & clinical context
+        </p>
       </div>
-    </div>
 
-    <!-- SURGERY INFO -->
-    <div class="glass rounded-2xl shadow border border-[--border] p-6">
-      <h3 class="font-bold text-lg mb-4">Surgery Information</h3>
+      <a href="/doctor/my-schedule.html" class="text-sm font-semibold text-blue-600 hover:underline">
+        ← Back to My Schedule
+      </a>
+    </section>
 
-      <div class="space-y-4 text-sm">
-        <div>
-          <p class="text-[--muted]">Procedure</p>
-          <p id="procedure" class="font-semibold text-base">—</p>
+    <!-- TOP SUMMARY -->
+    <section id="topSummary" class="glass rounded-xl border px-4 py-3
+           grid grid-cols-2 md:grid-cols-6 gap-3 text-xs font-semibold">
+
+      <!-- injected -->
+    </section>
+
+    <!-- MAIN GRID -->
+    <section class="grid grid-cols-12 gap-4">
+
+      <!-- LEFT: CORE DETAILS -->
+      <section class="col-span-12 md:col-span-7 glass rounded-2xl border p-4 space-y-4">
+
+        <h2 class="font-semibold text-sm">Procedure Overview</h2>
+
+        <div id="coreDetails" class="grid grid-cols-2 gap-4 text-sm">
+          <!-- injected -->
         </div>
 
+        <!-- NOTES -->
         <div>
-          <p class="text-[--muted]">Date & Time</p>
-          <p id="timeRange" class="font-semibold">—</p>
+          <p class="text-xs text-slate-500 mb-1">Procedure Notes</p>
+          <div id="notesList" class="space-y-2 mb-2"></div>
+
+          <textarea id="noteInput" rows="2" placeholder="Add intra-operative or post-op note…" class="w-full border rounded-lg px-3 py-2 text-sm
+                 focus:ring-2 focus:ring-blue-200"></textarea>
+
+          <button id="addNoteBtn" class="mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg
+                 bg-slate-800 text-white hover:bg-slate-900">
+            Add Note
+          </button>
         </div>
 
-        <div>
-          <p class="text-[--muted]">OT Room</p>
-          <p id="otRoom" class="font-semibold">—</p>
+      </section>
+
+      <!-- RIGHT: STATUS + CONTEXT -->
+      <aside class="col-span-12 md:col-span-5 glass rounded-2xl border p-4 space-y-4">
+
+        <h2 class="font-semibold text-sm">Live Status</h2>
+
+        <div id="statusPanel" class="space-y-3 text-sm">
+          <!-- injected -->
         </div>
-      </div>
-    </div>
+        <!-- LIVE SURGERY TIMER -->
+        <div id="liveTimer" class="hidden space-y-2 pt-3 border-t">
+          <p class="text-xs text-slate-500">Live Surgery Timer</p>
 
-    <!-- DOCTOR INFO -->
-    <div class="glass rounded-2xl shadow border border-[--border] p-6">
-      <h3 class="font-bold text-lg mb-4">Assigned Doctors</h3>
+          <div class="flex justify-between text-sm font-semibold">
+            <span id="elapsedTime">00m</span>
+            <span id="remainingTime" class="text-slate-500">–</span>
+          </div>
 
-      <div class="space-y-4 text-sm">
-        <div>
-          <p class="text-[--muted]">Surgeon</p>
-          <p id="surgeon" class="font-semibold">—</p>
+          <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+            <div id="progressBar" class="h-full bg-blue-600 transition-all duration-500" style="width: 0%">
+            </div>
+          </div>
+
+          <p id="overrunLabel" class="hidden text-xs font-semibold text-red-600">
+            Overrun detected
+          </p>
         </div>
 
-        <div>
-          <p class="text-[--muted]">Anesthesiologist</p>
-          <p id="anesthesiologist" class="font-semibold">—</p>
+
+        <div class="pt-3 border-t flex justify-end">
+          <button id="markCompletedBtn" class="hidden px-4 py-2 rounded-lg text-sm font-semibold
+                 bg-green-600 text-white hover:bg-green-700">
+            Mark Completed
+          </button>
         </div>
-      </div>
-    </div>
 
-    <!-- NOTES -->
-    <div class="glass rounded-2xl shadow border border-[--border] p-6">
-      <h3 class="font-bold text-lg mb-4">Clinical Notes</h3>
-      <p
-        id="notes"
-        class="text-sm bg-slate-50 p-4 rounded-xl leading-relaxed">
-        —
-      </p>
-    </div>
+      </aside>
 
-  </section>
+    </section>
 
-</main>
+  </main>
 
 </body>
+
 </html>

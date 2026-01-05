@@ -133,12 +133,18 @@ function render() {
 
   /* ---------- STATS ---------- */
   statTotal.textContent = dayList.length;
-  statOngoing.textContent = dayList.filter(s => s.status === "Ongoing").length;
-  statUpcoming.textContent = dayList.filter(s => s.status === "Scheduled").length;
-  statCompleted.textContent = dayList.filter(s => s.status === "Completed").length;
+  statOngoing.textContent = dayList.filter(
+    (s) => s.status === "Ongoing"
+  ).length;
+  statUpcoming.textContent = dayList.filter(
+    (s) => s.status === "Scheduled"
+  ).length;
+  statCompleted.textContent = dayList.filter(
+    (s) => s.status === "Completed"
+  ).length;
 
-  statOT.textContent = new Set(dayList.map(s => s.otRoomId)).size;
-  statPatients.textContent = new Set(dayList.map(s => s.patientId)).size;
+  statOT.textContent = new Set(dayList.map((s) => s.otRoomId)).size;
+  statPatients.textContent = new Set(dayList.map((s) => s.patientId)).size;
 
   /* ---------- TIMELINE ---------- */
   timeline.innerHTML = "";
@@ -163,42 +169,72 @@ function render() {
 
       const row = document.createElement("div");
       row.className = `
-        grid grid-cols-[80px_1fr_90px_60px_70px] gap-3 py-2 cursor-pointer
-        hover:bg-slate-50 transition
-        ${s.id === selectedId ? "bg-slate-100" : ""}
-        ${riskClass}
-        ${risk.overrun ? "pulse" : ""}
-      `;
+      grid grid-cols-[80px_1fr_100px_70px_90px] gap-3 py-2 cursor-pointer
+      hover:bg-slate-50 transition
+      ${s.id === selectedId ? "bg-slate-100" : ""}
+      ${riskClass}
+      ${risk.overrun ? "pulse" : ""}
+    `;
 
       row.innerHTML = `
-        <div class="text-xs text-slate-500">${time(s.startTime)}</div>
+      <!-- TIME -->
+      <div class="text-xs text-slate-500">
+        ${time(s.startTime)}
+      </div>
 
-        <div>
-          <div class="font-semibold">${s.procedure}</div>
-          <div class="text-xs text-slate-500">
-            ${s.patientName} · OT ${s.otRoomName}
-          </div>
+      <!-- PROCEDURE -->
+      <div>
+        <div class="font-semibold">${s.procedure}</div>
+        <div class="text-xs text-slate-500">
+          ${s.patientName} · OT ${s.otRoomName}
         </div>
+      </div>
 
-        <div class="text-xs font-semibold">
-          ${s.status}
-          ${
-            riskLabel
-              ? `<span class="ml-1 text-[10px] px-2 py-0.5 rounded-full
-                 ${risk.overlap || risk.overrun
+      <!-- STATUS + RISK -->
+      <div class="text-xs font-semibold">
+        ${s.status}
+        ${
+          riskLabel
+            ? `<span class="ml-1 text-[10px] px-2 py-0.5 rounded-full
+               ${
+                 risk.overlap || risk.overrun
                    ? "bg-red-100 text-red-700"
-                   : "bg-yellow-100 text-yellow-700"}">
-                 ${riskLabel}
-               </span>`
-              : ""
-          }
-        </div>
+                   : "bg-yellow-100 text-yellow-700"
+               }">
+               ${riskLabel}
+             </span>`
+            : ""
+        }
+      </div>
 
-        <div class="text-xs">${s.department}</div>
-        <div class="text-xs">${s.otRoomName}</div>
-      `;
+      <!-- DEPARTMENT -->
+      <div class="text-xs">
+        ${s.department}
+      </div>
 
+      <!-- ACTION -->
+      <div class="text-right">
+        <button
+          data-id="${s.id}"
+          class="details-btn text-xs font-semibold
+                 px-3 py-1 rounded-lg
+                 border border-slate-200
+                 text-blue-600 hover:bg-blue-50
+                 transition">
+          Details →
+        </button>
+      </div>
+    `;
+
+      /* ROW CLICK → INLINE INSPECT */
       row.onclick = () => inspect(s.id);
+
+      /* DETAILS BUTTON → FULL PAGE */
+      row.querySelector(".details-btn").onclick = (e) => {
+        e.stopPropagation();
+        window.location.href = `/doctor/schedule-details.html?id=${s.id}`;
+      };
+
       timeline.appendChild(row);
     });
 
@@ -208,19 +244,31 @@ function render() {
 /* ================= INSPECT ================= */
 function inspect(id) {
   selectedId = id;
-  const s = schedules.find(x => x.id === id);
+  const s = schedules.find((x) => x.id === id);
   if (!s) return;
 
   inspectEmpty.classList.add("hidden");
   inspectPanel.classList.remove("hidden");
 
   inspectDetails.innerHTML = `
-    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${s.procedure}</p></div>
-    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${s.patientName}</p></div>
-    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${s.otRoomName}</p></div>
-    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${s.department}</p></div>
-    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(s.startTime)} – ${time(s.endTime)}</p></div>
-    <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${s.status}</p></div>
+    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${
+      s.procedure
+    }</p></div>
+    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${
+      s.patientName
+    }</p></div>
+    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${
+      s.otRoomName
+    }</p></div>
+    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${
+      s.department
+    }</p></div>
+    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(
+      s.startTime
+    )} – ${time(s.endTime)}</p></div>
+    <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${
+      s.status
+    }</p></div>
   `;
 
   markCompletedBtn.classList.toggle("hidden", s.status !== "Ongoing");
