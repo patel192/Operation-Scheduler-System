@@ -48,6 +48,18 @@ function minutesBetween(a, b) {
   return Math.round((b - a) / 60000);
 }
 
+function formatDurationShort(ms) {
+  const min = Math.floor(ms / 60000);
+  return `${min}m`;
+}
+
+function progressPercent(start, end) {
+  const now = new Date();
+  const planned = end - start;
+  const elapsed = now - start;
+  return Math.min((elapsed / planned) * 100, 100);
+}
+
 /* ================= RISK DETECTION ================= */
 function detectRisks(dayList) {
   const risks = {};
@@ -184,11 +196,46 @@ function render() {
 
       <!-- PROCEDURE -->
       <div>
-        <div class="font-semibold">${s.procedure}</div>
-        <div class="text-xs text-slate-500">
-          ${s.patientName} · OT ${s.otRoomName}
-        </div>
-      </div>
+  <div class="font-semibold">${s.procedure}</div>
+
+  <div class="text-xs text-slate-500">
+    ${s.patientName} · OT ${s.otRoomName}
+  </div>
+
+  ${
+    s.status === "Ongoing"
+      ? (() => {
+          const start = t(s.startTime);
+          const end = t(s.endTime);
+          const elapsed = new Date() - start;
+          const planned = end - start;
+          const pct = progressPercent(start, end);
+          const overrun = elapsed > planned;
+
+          return `
+            <div class="mt-1">
+              <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  class="h-full transition-all
+                    ${overrun ? "bg-red-600" : "bg-blue-600"}"
+                  style="width:${pct}%">
+                </div>
+              </div>
+
+              <div class="flex justify-between text-[10px] mt-0.5
+                   ${
+                     overrun ? "text-red-600 font-semibold" : "text-slate-500"
+                   }">
+                <span>${formatDurationShort(elapsed)}</span>
+                <span>${formatDurationShort(planned)}</span>
+              </div>
+            </div>
+          `;
+        })()
+      : ""
+  }
+</div>
+
 
       <!-- STATUS + RISK -->
       <div class="text-xs font-semibold">
