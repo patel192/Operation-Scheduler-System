@@ -5,21 +5,16 @@
   <title>Insights · Doctor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
-      --primary:#2563eb;
       --bg:#F1F5F9;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
+      --primary:#2563eb;
     }
-
     .glass {
       background: rgba(255,255,255,.96);
       backdrop-filter: blur(10px);
@@ -37,67 +32,44 @@
 <main class="max-w-[1700px] mx-auto px-4 py-5 space-y-4">
 
   <!-- HEADER -->
-  <section class="flex items-center justify-between">
-    <div>
-      <h1 class="text-xl font-bold">Performance Insights</h1>
-      <p class="text-xs text-[--muted]">
-        Personal surgical analytics & trends
-      </p>
-    </div>
-
-    <select id="rangeSelect"
-      class="border rounded-lg px-3 py-1.5 text-sm">
-      <option value="7">Last 7 days</option>
-      <option value="30">Last 30 days</option>
-      <option value="90">Last 90 days</option>
-    </select>
+  <section>
+    <h1 class="text-xl font-bold">Doctor Insights</h1>
+    <p class="text-xs text-[--muted]">
+      Performance, workload & efficiency analytics
+    </p>
   </section>
 
   <!-- KPI STRIP -->
-  <section
-    class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-semibold">
-
-    <div>Total Surgeries<br><span id="kpiTotal" class="text-lg">0</span></div>
-    <div>Avg Duration<br><span id="kpiAvg" class="text-lg">–</span></div>
-    <div>On-Time %<br><span id="kpiOnTime" class="text-lg">–</span></div>
-    <div class="text-red-600">Overruns<br><span id="kpiOverrun" class="text-lg">0</span></div>
-    <div>Active Days<br><span id="kpiDays" class="text-lg">0</span></div>
-
+  <section id="kpiStrip"
+    class="glass rounded-xl border px-4 py-3
+           grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-semibold">
+    <!-- injected -->
   </section>
 
   <!-- MAIN GRID -->
   <section class="grid grid-cols-12 gap-4">
 
-    <!-- WORKLOAD -->
-    <section class="col-span-12 md:col-span-6 glass rounded-2xl border p-3">
-      <h2 class="font-semibold text-sm mb-2">Daily Workload</h2>
-      <canvas id="workloadChart" height="140"></canvas>
+    <!-- LEFT: PERFORMANCE -->
+    <section class="col-span-12 md:col-span-7 glass rounded-2xl border p-4 space-y-4">
+
+      <h2 class="text-sm font-semibold">Procedure Performance</h2>
+
+      <div id="durationTable" class="divide-y text-sm">
+        <!-- injected -->
+      </div>
+
     </section>
 
-    <!-- DURATION -->
-    <section class="col-span-12 md:col-span-6 glass rounded-2xl border p-3">
-      <h2 class="font-semibold text-sm mb-2">Average Duration Trend</h2>
-      <canvas id="durationChart" height="140"></canvas>
-    </section>
+    <!-- RIGHT: DISTRIBUTION -->
+    <aside class="col-span-12 md:col-span-5 glass rounded-2xl border p-4 space-y-4">
 
-    <!-- DEPARTMENT -->
-    <section class="col-span-12 md:col-span-4 glass rounded-2xl border p-3">
-      <h2 class="font-semibold text-sm mb-2">By Department</h2>
-      <canvas id="deptChart" height="160"></canvas>
-    </section>
+      <h2 class="text-sm font-semibold">Distribution & Load</h2>
 
-    <!-- OT USAGE -->
-    <section class="col-span-12 md:col-span-4 glass rounded-2xl border p-3">
-      <h2 class="font-semibold text-sm mb-2">OT Utilization</h2>
-      <canvas id="otChart" height="160"></canvas>
-    </section>
+      <div id="distribution" class="space-y-3 text-sm">
+        <!-- injected -->
+      </div>
 
-    <!-- INSIGHTS -->
-    <section class="col-span-12 md:col-span-4 glass rounded-2xl border p-3">
-      <h2 class="font-semibold text-sm mb-2">Insights</h2>
-      <ul id="insightList" class="text-sm space-y-2 text-slate-700"></ul>
-    </section>
+    </aside>
 
   </section>
 
