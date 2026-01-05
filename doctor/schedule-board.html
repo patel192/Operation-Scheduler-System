@@ -5,35 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Doctor · Schedule Board</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F1F5F9;
-      --card:#ffffff;
+      --bg:#F4F7FB;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
+      --danger:#DC2626;
+      --warn:#D97706;
+      --ok:#16A34A;
     }
 
-    .glass {
-      background: rgba(255,255,255,.95);
-      backdrop-filter: blur(10px);
-    }
-
-    .fade-in {
-      animation: fade .35s ease;
-    }
-
+    .fade-in { animation: fade .35s ease; }
     @keyframes fade {
-      from { opacity:0; transform: translateY(8px); }
+      from { opacity:0; transform: translateY(10px); }
       to { opacity:1; transform:none; }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); }
+      70% { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
     }
   </style>
 
-  <!-- Guards & Layout -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/schedule-board.js"></script>
@@ -41,69 +42,44 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-8 fade-in">
+<main class="max-w-[1600px] mx-auto px-6 py-6 space-y-6 fade-in">
 
-  <!-- ================= HEADER ================= -->
+  <!-- HEADER -->
   <section>
-    <h1 class="text-3xl font-bold">My Schedule Board</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      All surgeries assigned to you — updated in real time
-    </p>
+    <h1 class="text-2xl font-bold">Schedule Board</h1>
+    <p class="text-sm text-[--muted]">Operational view by date & time</p>
   </section>
 
-  <!-- ================= FILTER BAR ================= -->
-  <section
-    class="glass rounded-2xl shadow border border-[--border] p-5">
+  <!-- STICKY COMMAND BAR -->
+  <section class="sticky top-16 z-20 bg-white rounded-2xl shadow border p-4 flex flex-wrap items-end gap-4">
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-
-      <div>
-        <label class="block text-xs font-semibold text-[--muted] mb-1">
-          Filter by Date
-        </label>
-        <input
-          id="filterDate"
-          type="date"
-          class="w-full border rounded-xl px-4 py-2 text-sm
-                 focus:ring-2 focus:ring-blue-200 outline-none"
-        />
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-[--muted] mb-1">
-          Filter by Status
-        </label>
-        <select
-          id="filterStatus"
-          class="w-full border rounded-xl px-3 py-2 text-sm
-                 focus:ring-2 focus:ring-blue-200 outline-none">
-          <option value="">All Status</option>
-          <option>Upcoming</option>
-          <option>Ongoing</option>
-          <option>Completed</option>
-          <option>Cancelled</option>
-        </select>
-      </div>
-
+    <div>
+      <label class="text-xs font-semibold text-[--muted]">Date</label>
+      <input id="selectedDate" type="date"
+        class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-200"/>
     </div>
+
+    <div class="flex gap-2">
+      <button data-status="all" class="status-btn">All</button>
+      <button data-status="Ongoing" class="status-btn text-red-600">Ongoing</button>
+      <button data-status="Scheduled" class="status-btn text-blue-600">Scheduled</button>
+      <button data-status="Completed" class="status-btn text-green-600">Completed</button>
+    </div>
+
   </section>
 
-  <!-- ================= EMPTY STATE ================= -->
-  <div
-    id="emptyState"
-    class="hidden glass rounded-2xl shadow border border-[--border]
-           p-12 text-center">
+  <!-- NOW / NEXT / LATER -->
+  <section id="contextStrip" class="grid grid-cols-3 gap-4"></section>
 
-    <div class="text-4xl mb-3">📭</div>
-    <p class="font-semibold">No schedules found</p>
-    <p class="text-sm text-[--muted] mt-1">
-      Try adjusting filters or check again later
-    </p>
-  </div>
+  <!-- TIMELINE -->
+  <section class="grid grid-cols-[80px_1fr] gap-6">
 
-  <!-- ================= SCHEDULE LIST ================= -->
-  <section id="scheduleList" class="space-y-4">
-    <!-- Cards injected by JS -->
+    <!-- TIME SPINE -->
+    <div id="timeSpine" class="space-y-10 text-xs text-[--muted]"></div>
+
+    <!-- SCHEDULE LIST -->
+    <div id="scheduleList" class="space-y-4"></div>
+
   </section>
 
 </main>

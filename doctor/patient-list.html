@@ -2,192 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Patients · Doctor</title>
+  <title>Patient Operations · Doctor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F1F5F9;
+      --bg:#F4F7FB;
       --card:#ffffff;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
+      --danger:#DC2626;
+      --warn:#D97706;
+      --ok:#16A34A;
     }
 
-    .glass {
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(10px);
-    }
-
-    .fade-in {
-      animation: fade .35s ease;
-    }
-
+    .fade-in { animation: fade .4s ease; }
     @keyframes fade {
-      from { opacity:0; transform: translateY(8px); }
+      from { opacity:0; transform: translateY(12px); }
+      to { opacity:1; transform:none; }
+    }
+
+    .card-enter {
+      animation: cardIn .35s ease both;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(10px) scale(.97); }
       to { opacity:1; transform:none; }
     }
   </style>
 
-  <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/patient-list.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-7xl mx-auto px-4 py-10 space-y-8 fade-in">
+<main class="max-w-[1500px] mx-auto px-4 py-10 space-y-10 fade-in">
 
-  <!-- ================= HEADER ================= -->
-  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-    <div>
-      <h1 class="text-3xl font-bold">My Patients</h1>
-      <p class="text-sm text-[--muted] mt-1">
-        Patients assigned to your scheduled procedures
-      </p>
-    </div>
-
-    <!-- FILTERS -->
-    <div class="flex flex-wrap gap-3 bg-white rounded-xl shadow px-4 py-3">
-
-      <div class="flex flex-col">
-        <label class="text-xs font-semibold text-[--muted] mb-1">
-          Search
-        </label>
-        <input
-          type="text"
-          placeholder="Patient name"
-          class="border rounded-lg px-3 py-2 text-sm
-                 focus:ring-2 focus:ring-[--primary]"
-        />
-      </div>
-
-      <div class="flex flex-col">
-        <label class="text-xs font-semibold text-[--muted] mb-1">
-          Status
-        </label>
-        <select
-          class="border rounded-lg px-3 py-2 text-sm
-                 focus:ring-2 focus:ring-[--primary]">
-          <option>All</option>
-          <option>Stable</option>
-          <option>Recovering</option>
-          <option>Under Treatment</option>
-          <option>Discharged</option>
-        </select>
-      </div>
-
-    </div>
-
+  <!-- HEADER -->
+  <section>
+    <h1 class="text-3xl font-bold">Patient Operations</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Live patient workload, priorities and schedule context
+    </p>
   </section>
 
-  <!-- ================= TABLE ================= -->
-  <section
-    class="glass rounded-2xl shadow border border-[--border]
-           overflow-x-auto">
-
-    <table class="w-full text-sm">
-
-      <thead class="bg-slate-50 text-slate-600 border-b">
-        <tr>
-          <th class="px-5 py-4 text-left">Patient</th>
-          <th class="px-5 py-4 text-left">Procedure</th>
-          <th class="px-5 py-4 text-left">Department</th>
-          <th class="px-5 py-4 text-left">Last Visit</th>
-          <th class="px-5 py-4 text-left">Status</th>
-          <th class="px-5 py-4 text-right">Action</th>
-        </tr>
-      </thead>
-
-      <tbody class="divide-y">
-
-        <!-- ROW -->
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-5 py-4 font-semibold">
-            Ramesh Kumar
-          </td>
-          <td class="px-5 py-4">Heart Bypass</td>
-          <td class="px-5 py-4">Cardiology</td>
-          <td class="px-5 py-4">Today</td>
-          <td class="px-5 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-green-100 text-green-700">
-              Stable
-            </span>
-          </td>
-          <td class="px-5 py-4 text-right">
-            <a
-              href="#"
-              class="text-sm font-semibold text-[--primary] hover:underline">
-              View Profile
-            </a>
-          </td>
-        </tr>
-
-        <!-- ROW -->
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-5 py-4 font-semibold">
-            Neha Verma
-          </td>
-          <td class="px-5 py-4">Angioplasty</td>
-          <td class="px-5 py-4">Cardiology</td>
-          <td class="px-5 py-4">Yesterday</td>
-          <td class="px-5 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-blue-100 text-blue-700">
-              Recovering
-            </span>
-          </td>
-          <td class="px-5 py-4 text-right">
-            <a
-              href="#"
-              class="text-sm font-semibold text-[--primary] hover:underline">
-              View Profile
-            </a>
-          </td>
-        </tr>
-
-        <!-- ROW -->
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-5 py-4 font-semibold">
-            Amit Shah
-          </td>
-          <td class="px-5 py-4">Knee Replacement</td>
-          <td class="px-5 py-4">Orthopedics</td>
-          <td class="px-5 py-4">2 days ago</td>
-          <td class="px-5 py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                         bg-yellow-100 text-yellow-700">
-              Under Treatment
-            </span>
-          </td>
-          <td class="px-5 py-4 text-right">
-            <a
-              href="#"
-              class="text-sm font-semibold text-[--primary] hover:underline">
-              View Profile
-            </a>
-          </td>
-        </tr>
-
-      </tbody>
-
-    </table>
-
+  <!-- TODAY WORKLOAD -->
+  <section id="todayStrip"
+    class="grid grid-cols-2 sm:grid-cols-4 gap-4">
   </section>
 
-  <!-- ================= EMPTY STATE (FUTURE) ================= -->
-  <!--
-  <div class="glass rounded-2xl shadow border p-12 text-center text-[--muted]">
-    <div class="text-4xl mb-3">🧑‍⚕️</div>
-    <p class="font-semibold">No patients found</p>
-  </div>
-  -->
+  <!-- PRIORITY LANE -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">⚠ Priority Patients</h2>
+    <div id="priorityLane"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    </div>
+  </section>
+
+  <!-- STATUS LEGEND -->
+  <section class="flex flex-wrap gap-3">
+    <button data-filter="all" class="filter-btn">All</button>
+    <button data-filter="Ongoing" class="filter-btn text-red-600">Ongoing</button>
+    <button data-filter="Scheduled" class="filter-btn text-blue-600">Scheduled</button>
+    <button data-filter="Completed" class="filter-btn text-green-600">Completed</button>
+  </section>
+
+  <!-- PATIENT GRID -->
+  <section id="patientGrid"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+  </section>
+
+  <!-- EMPTY STATE -->
+  <section id="emptyState" class="hidden bg-white rounded-3xl shadow border p-12 text-center">
+    <p class="text-lg font-semibold">No active patients today</p>
+    <p class="text-sm text-[--muted] mt-1">
+      Upcoming schedules will appear here automatically
+    </p>
+  </section>
 
 </main>
 

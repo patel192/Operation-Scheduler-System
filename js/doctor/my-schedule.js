@@ -3,127 +3,189 @@ import {
   collection,
   query,
   where,
-  orderBy,
-  getDocs,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {autoUpdateScheduleStatus} from "../utils/autoUpdateScheduleStatus.js"
-// ------------------
-// ELEMENTS
-// ------------------
-const listEl = document.getElementById("scheduleList");
-const emptyState = document.getElementById("emptyState");
+
+const grid = document.getElementById("scheduleGrid");
+const detailsPanel = document.getElementById("detailsPanel");
+const detailsEmpty = document.getElementById("detailsEmpty");
+
 const filterDate = document.getElementById("filterDate");
 const filterStatus = document.getElementById("filterStatus");
 
-// ------------------
-// HELPERS
-// ------------------
-function formatTime(ts) {
-  return ts.toDate().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+const todayCount = document.getElementById("todayCount");
+const ongoingCount = document.getElementById("ongoingCount");
 
-function statusBadge(status) {
-  if (status === "Completed")
-    return "bg-green-100 text-green-700";
-  if (status === "Ongoing")
-    return "bg-yellow-100 text-yellow-700";
+let schedules = [];
+let selectedId = null;
+
+/* HELPERS */
+const t = ts => ts.toDate();
+const time = ts => t(ts).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+const date = ts => t(ts).toLocaleDateString();
+
+function badge(status) {
+  if (status === "Ongoing") return "bg-red-100 text-red-700";
+  if (status === "Completed") return "bg-green-100 text-green-700";
   return "bg-blue-100 text-blue-700";
 }
 
-// ------------------
-// LOAD SCHEDULES
-// ------------------
-async function loadMySchedules() {
-  listEl.innerHTML = "";
-  emptyState.classList.add("hidden");
+function minutesLeft(end) {
+  return Math.round((t(end) - Date.now()) / 60000);
+}
 
-  const user = auth.currentUser;
-  if (!user) return;
+/* LOAD */
+async function load() {
+  if (!auth.currentUser) return;
 
-  let q = query(
-    collection(db, "schedules"),
-    where("surgeonId", "==", user.uid)
+  const snap = await getDocs(
+    query(collection(db, "schedules"),
+      where("surgeonId", "==", auth.currentUser.uid))
   );
 
-  const snap = await getDocs(q);
+  schedules = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  render();
+}
 
-  let schedules = snap.docs.map(d => ({
-    id: d.id,
-    ...d.data(),
-  }));
+/* RENDER */
+function render() {
+  grid.innerHTML = "";
 
-  // DATE FILTER
+  let list = [...schedules];
+
+  if (filterStatus.value)
+    list = list.filter(s => s.status === filterStatus.value);
+
   if (filterDate.value) {
-    schedules = schedules.filter(s => {
-      const d = s.startTime.toDate().toISOString().slice(0, 10);
-      return d === filterDate.value;
-    });
+    const d = new Date(filterDate.value).toDateString();
+    list = list.filter(s => t(s.startTime).toDateString() === d);
   }
 
-  // STATUS FILTER
-  if (filterStatus.value) {
-    schedules = schedules.filter(s => s.status === filterStatus.value);
-  }
+  todayCount.textContent =
+    list.filter(s =>
+      t(s.startTime).toDateString() === new Date().toDateString()
+    ).length;
 
-  if (!schedules.length) {
-    emptyState.classList.remove("hidden");
-    return;
-  }
+  ongoingCount.textContent =
+    list.filter(s => s.status === "Ongoing").length;
 
-  schedules.forEach(s => {
+  list.forEach(s => {
     const card = document.createElement("div");
-    card.className =
-      "bg-white rounded-xl shadow-sm border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4";
+    card.className = `
+      glass rounded-xl border p-3 cursor-pointer hover:shadow transition
+      ${s.status === "Ongoing" ? "pulse" : ""}
+      ${s.id === selectedId ? "ring-2 ring-blue-400" : ""}
+    `;
 
     card.innerHTML = `
-      <div>
-        <h3 class="font-semibold text-lg text-[--primary]">
-          ${s.procedure}
-        </h3>
-        <p class="text-sm text-[--muted] mt-1">
-          Patient: ${s.patientName} • ${s.otRoom}
-        </p>
-        <p class="text-sm text-[--muted]">
-          ${formatTime(s.startTime)} – ${formatTime(s.endTime)}
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span class="px-3 py-1 text-xs rounded-full font-semibold ${statusBadge(
-          s.status
-        )}">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="font-semibold text-sm">${s.patientName}</h3>
+          <p class="text-xs text-[--muted]">${s.procedure}</p>
+        </div>
+        <span class="text-xs font-semibold ${badge(s.status)} px-2 py-0.5 rounded-full">
           ${s.status}
         </span>
+      </div>
 
-        <a
-          href="/doctor/schedule-details.html?id=${s.id}"
-          class="text-sm font-semibold text-[--primary] hover:underline">
-          View
-        </a>
+      <div class="mt-2 text-xs text-[--muted] grid grid-cols-2 gap-1">
+        <span>OT ${s.otRoomName}</span>
+        <span>${time(s.startTime)}</span>
       </div>
     `;
 
-    listEl.appendChild(card);
+    card.onclick = () => selectSchedule(s.id);
+    grid.appendChild(card);
   });
+
+  if (selectedId) selectSchedule(selectedId);
 }
 
-// ------------------
-// EVENTS
-// ------------------
-filterDate.addEventListener("change", loadMySchedules);
-filterStatus.addEventListener("change", loadMySchedules);
+/* DETAILS */
+function selectSchedule(id) {
+  selectedId = id;
+  const s = schedules.find(x => x.id === id);
+  if (!s) return;
 
-// INITIAL LOAD
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
+  detailsEmpty.classList.add("hidden");
+  detailsPanel.classList.remove("hidden");
 
-  // ✅ AUTO UPDATE STATUS (ONCE)
-  await autoUpdateScheduleStatus();
+  const remaining = minutesLeft(s.endTime);
 
-  // ✅ THEN LOAD DOCTOR SCHEDULES
-  await loadMySchedules();
-});
+  detailsPanel.innerHTML = `
+    <!-- PRIMARY -->
+    <div class="${s.status === "Ongoing" ? "pulse" : ""}">
+      <p class="text-xs font-semibold text-[--muted]">Procedure</p>
+      <p class="text-xl font-bold">${s.procedure}</p>
+      <p class="text-sm text-[--muted]">${s.department}</p>
+    </div>
 
+    <!-- PATIENT -->
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div>
+        <p class="text-xs text-[--muted]">Patient</p>
+        <p class="font-semibold">${s.patientName}</p>
+      </div>
+      <div>
+        <p class="text-xs text-[--muted]">Patient ID</p>
+        <p class="font-semibold">${s.patientId}</p>
+      </div>
+    </div>
+
+    <!-- TIME -->
+    <div class="grid grid-cols-3 gap-3 text-sm">
+      <div>
+        <p class="text-xs text-[--muted]">Start</p>
+        <p class="font-semibold">${time(s.startTime)}</p>
+      </div>
+      <div>
+        <p class="text-xs text-[--muted]">End</p>
+        <p class="font-semibold">${time(s.endTime)}</p>
+      </div>
+      <div>
+        <p class="text-xs text-[--muted]">Remaining</p>
+        <p class="font-semibold ${remaining < 0 ? "text-red-600" : ""}">
+          ${remaining > 0 ? remaining + " min" : "Overrun"}
+        </p>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="grid grid-cols-3 gap-3 text-sm">
+      <div>
+        <p class="text-xs text-[--muted]">OT Room</p>
+        <p class="font-semibold">${s.otRoomName}</p>
+      </div>
+      <div>
+        <p class="text-xs text-[--muted]">Staff</p>
+        <p class="font-semibold">${s.otStaffIds?.length || 0}</p>
+      </div>
+      <div>
+        <p class="text-xs text-[--muted]">Equipment</p>
+        <p class="font-semibold">${s.equipmentIds?.length || 0}</p>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div>
+      <p class="text-xs text-[--muted]">Notes</p>
+      <p class="text-sm">${s.notes || "No notes recorded"}</p>
+    </div>
+
+    <!-- STATUS -->
+    <div>
+      <span class="px-3 py-1 rounded-full text-xs font-semibold ${badge(s.status)}">
+        ${s.status}
+      </span>
+    </div>
+  `;
+
+  render();
+}
+
+/* EVENTS */
+filterDate.addEventListener("change", render);
+filterStatus.addEventListener("change", render);
+
+/* INIT */
+auth.onAuthStateChanged(u => u && load());
