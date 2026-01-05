@@ -2,39 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Patient Operations · Doctor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Patients · Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
-      --primary:#0A6CFF;
-      --bg:#F4F7FB;
-      --card:#ffffff;
+      --primary:#2563eb;
+      --bg:#F1F5F9;
       --text:#1E293B;
       --muted:#64748B;
       --border:#E5E7EB;
-      --danger:#DC2626;
-      --warn:#D97706;
-      --ok:#16A34A;
     }
 
-    .fade-in { animation: fade .4s ease; }
-    @keyframes fade {
-      from { opacity:0; transform: translateY(12px); }
-      to { opacity:1; transform:none; }
-    }
-
-    .card-enter {
-      animation: cardIn .35s ease both;
-    }
-    @keyframes cardIn {
-      from { opacity:0; transform: translateY(10px) scale(.97); }
-      to { opacity:1; transform:none; }
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
     }
   </style>
 
+  <!-- Guards & Layout -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/patient-list.js"></script>
@@ -42,48 +30,70 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1500px] mx-auto px-4 py-10 space-y-10 fade-in">
+<main class="max-w-[1700px] mx-auto px-4 py-5 space-y-3">
 
   <!-- HEADER -->
-  <section>
-    <h1 class="text-3xl font-bold">Patient Operations</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      Live patient workload, priorities and schedule context
-    </p>
-  </section>
-
-  <!-- TODAY WORKLOAD -->
-  <section id="todayStrip"
-    class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-  </section>
-
-  <!-- PRIORITY LANE -->
-  <section>
-    <h2 class="text-lg font-bold mb-4">⚠ Priority Patients</h2>
-    <div id="priorityLane"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <section class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold">My Patients</h1>
+      <p class="text-xs text-[--muted]">
+        Patients derived from your surgical schedules
+      </p>
     </div>
   </section>
 
-  <!-- STATUS LEGEND -->
-  <section class="flex flex-wrap gap-3">
-    <button data-filter="all" class="filter-btn">All</button>
-    <button data-filter="Ongoing" class="filter-btn text-red-600">Ongoing</button>
-    <button data-filter="Scheduled" class="filter-btn text-blue-600">Scheduled</button>
-    <button data-filter="Completed" class="filter-btn text-green-600">Completed</button>
+  <!-- SUMMARY STRIP -->
+  <section
+    class="glass rounded-xl border px-4 py-2
+           grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-semibold">
+
+    <div>Total Patients: <span id="statTotal">0</span></div>
+    <div class="text-blue-600">Today: <span id="statToday">0</span></div>
+    <div class="text-red-600">Active: <span id="statActive">0</span></div>
+    <div class="text-green-600">Completed: <span id="statCompleted">0</span></div>
+    <div class="text-yellow-600">Risk Flagged: <span id="statRisk">0</span></div>
+
   </section>
 
-  <!-- PATIENT GRID -->
-  <section id="patientGrid"
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-  </section>
+  <!-- MAIN GRID -->
+  <section class="grid grid-cols-12 gap-4">
 
-  <!-- EMPTY STATE -->
-  <section id="emptyState" class="hidden bg-white rounded-3xl shadow border p-12 text-center">
-    <p class="text-lg font-semibold">No active patients today</p>
-    <p class="text-sm text-[--muted] mt-1">
-      Upcoming schedules will appear here automatically
-    </p>
+    <!-- LEFT: PATIENT LIST -->
+    <section class="col-span-12 md:col-span-7 glass rounded-2xl border p-3">
+
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-semibold text-sm">Patient List</h2>
+        <span class="text-xs text-[--muted]">Click to inspect</span>
+      </div>
+
+      <div id="patientList" class="divide-y text-sm">
+        <!-- rows injected -->
+      </div>
+
+    </section>
+
+    <!-- RIGHT: PATIENT INSPECTOR -->
+    <aside class="col-span-12 md:col-span-5 glass rounded-2xl border p-4 space-y-3">
+
+      <h2 class="font-semibold text-sm">Patient Inspector</h2>
+
+      <div id="patientEmpty" class="text-sm text-[--muted]">
+        Select a patient to view details
+      </div>
+
+      <div id="patientPanel" class="hidden space-y-4 text-sm">
+
+        <div id="patientDetails" class="grid grid-cols-2 gap-3"></div>
+
+        <div>
+          <p class="text-xs text-slate-500 mb-1">Procedure History</p>
+          <div id="patientTimeline" class="space-y-2"></div>
+        </div>
+
+      </div>
+
+    </aside>
+
   </section>
 
 </main>

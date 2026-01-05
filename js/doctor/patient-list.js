@@ -3,161 +3,203 @@ import {
   collection,
   query,
   where,
-  getDocs,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-const grid = document.getElementById("patientGrid");
-const priorityLane = document.getElementById("priorityLane");
-const todayStrip = document.getElementById("todayStrip");
-const emptyState = document.getElementById("emptyState");
+/* ================= ELEMENTS ================= */
+const patientList = document.getElementById("patientList");
 
-let patients = [];
-let filterStatus = "all";
+const statTotal = document.getElementById("statTotal");
+const statToday = document.getElementById("statToday");
+const statActive = document.getElementById("statActive");
+const statCompleted = document.getElementById("statCompleted");
+const statRisk = document.getElementById("statRisk");
 
-/* HELPERS */
-const avatar = id => `https://picsum.photos/seed/${id}/120`;
+const patientEmpty = document.getElementById("patientEmpty");
+const patientPanel = document.getElementById("patientPanel");
+const patientDetails = document.getElementById("patientDetails");
+const patientTimeline = document.getElementById("patientTimeline");
 
-function statusBadge(s) {
-  return s === "Ongoing"
-    ? "bg-red-100 text-red-700"
-    : s === "Scheduled"
-    ? "bg-blue-100 text-blue-700"
-    : "bg-green-100 text-green-700";
-}
+/* ================= STATE ================= */
+let schedules = [];
+let selectedPatientId = null;
+let unsubscribe = null;
 
-function relativeTime(ts) {
-  const diff = ts.toMillis() - Date.now();
-  const min = Math.round(diff / 60000);
-  if (min < 0) return `Started ${Math.abs(min)} min ago`;
-  return `Starts in ${min} min`;
-}
+/* ================= HELPERS ================= */
+const t = ts => ts.toDate();
 
-/* LOAD */
-async function loadPatients() {
-  const user = auth.currentUser;
-  if (!user) return;
+const sameDay = (a, b) =>
+  a.toDateString() === b.toDateString();
 
-  const snap = await getDocs(
-    query(
-      collection(db, "schedules"),
-      where("surgeonId", "==", user.uid)
-    )
+/* ================= REALTIME ================= */
+function listenToSchedules() {
+  if (!auth.currentUser) return;
+
+  const q = query(
+    collection(db, "schedules"),
+    where("surgeonId", "==", auth.currentUser.uid)
   );
 
-  const map = new Map();
+  if (unsubscribe) unsubscribe();
 
-  snap.docs.forEach(d => {
-    const s = d.data();
-    if (!map.has(s.patientId)) {
-      map.set(s.patientId, {
-        patientId: s.patientId,
-        patientName: s.patientName,
-        department: s.department,
-        schedules: [],
-      });
-    }
-    map.get(s.patientId).schedules.push(s);
+  unsubscribe = onSnapshot(q, snap => {
+    schedules = snap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+    render();
   });
-
-  patients = [...map.values()];
-  render();
 }
 
-/* RENDER */
+/* ================= DERIVE PATIENTS ================= */
+function derivePatients() {
+  const map = {};
+
+  schedules.forEach(s => {
+    if (!map[s.patientId]) {
+      map[s.patientId] = {
+        patientId: s.patientId,
+        name: s.patientName,
+        department: s.department,
+        schedules: [],
+        hasRisk: false
+      };
+    }
+
+    if (s.status === "Ongoing" && new Date() > t(s.endTime)) {
+      map[s.patientId].hasRisk = true;
+    }
+
+    map[s.patientId].schedules.push(s);
+  });
+
+  return Object.values(map);
+}
+
+/* ================= RENDER ================= */
 function render() {
-  grid.innerHTML = "";
-  priorityLane.innerHTML = "";
-  todayStrip.innerHTML = "";
+  const patients = derivePatients();
+  const today = new Date();
 
-  if (!patients.length) {
-    emptyState.classList.remove("hidden");
-    return;
-  }
-  emptyState.classList.add("hidden");
+  /* ---------- STATS ---------- */
+  statTotal.textContent = patients.length;
+  statToday.textContent =
+    patients.filter(p =>
+      p.schedules.some(s => sameDay(t(s.startTime), today))
+    ).length;
 
-  const now = Date.now();
+  statActive.textContent =
+    patients.filter(p =>
+      p.schedules.some(s => s.status === "Ongoing")
+    ).length;
 
-  /* TODAY STRIP */
-  const today = patients.flatMap(p => p.schedules)
-    .filter(s => new Date(s.startTime.toMillis()).toDateString() === new Date().toDateString());
+  statCompleted.textContent =
+    patients.filter(p =>
+      p.schedules.every(s => s.status === "Completed")
+    ).length;
 
-  todayStrip.innerHTML = `
-    <div class="bg-white rounded-2xl p-4 shadow border">
-      <p class="text-xs text-[--muted]">Today</p>
-      <p class="text-2xl font-bold">${today.length}</p>
+  statRisk.textContent =
+    patients.filter(p => p.hasRisk).length;
+
+  /* ---------- LIST ---------- */
+  patientList.innerHTML = "";
+
+  patients.forEach(p => {
+    const latest =
+      p.schedules
+        .slice()
+        .sort((a, b) => t(b.startTime) - t(a.startTime))[0];
+
+    const row = document.createElement("div");
+    row.className = `
+      grid grid-cols-[1fr_90px_90px] gap-3 py-2 cursor-pointer
+      hover:bg-slate-50 transition
+      ${p.patientId === selectedPatientId ? "bg-slate-100" : ""}
+      ${p.hasRisk ? "border-l-4 border-red-600 bg-red-50" : ""}
+    `;
+
+    row.innerHTML = `
+      <div>
+        <div class="font-semibold">${p.name}</div>
+        <div class="text-xs text-slate-500">${p.department}</div>
+      </div>
+
+      <div class="text-xs font-semibold">
+        ${latest.status}
+      </div>
+
+      <div class="text-xs text-slate-500">
+        ${latest.procedure}
+      </div>
+    `;
+
+    row.onclick = () => inspectPatient(p.patientId);
+    patientList.appendChild(row);
+  });
+
+  if (selectedPatientId) inspectPatient(selectedPatientId);
+}
+
+/* ================= INSPECT ================= */
+function inspectPatient(patientId) {
+  selectedPatientId = patientId;
+  const p = derivePatients().find(x => x.patientId === patientId);
+  if (!p) return;
+
+  patientEmpty.classList.add("hidden");
+  patientPanel.classList.remove("hidden");
+
+  const sorted = p.schedules
+    .slice()
+    .sort((a, b) => t(b.startTime) - t(a.startTime));
+
+  patientDetails.innerHTML = `
+    <div>
+      <p class="text-xs text-slate-500">Patient</p>
+      <p class="font-semibold">${p.name}</p>
     </div>
-    <div class="bg-white rounded-2xl p-4 shadow border">
-      <p class="text-xs text-[--muted]">Ongoing</p>
-      <p class="text-2xl font-bold text-red-600">
-        ${today.filter(s => s.status === "Ongoing").length}
-      </p>
+
+    <div>
+      <p class="text-xs text-slate-500">Department</p>
+      <p class="font-semibold">${p.department}</p>
     </div>
-    <div class="bg-white rounded-2xl p-4 shadow border">
-      <p class="text-xs text-[--muted]">Next</p>
-      <p class="text-2xl font-bold">
-        ${today.filter(s => s.status === "Scheduled").length}
-      </p>
+
+    <div>
+      <p class="text-xs text-slate-500">Total Procedures</p>
+      <p class="font-semibold">${p.schedules.length}</p>
     </div>
-    <div class="bg-white rounded-2xl p-4 shadow border">
-      <p class="text-xs text-[--muted]">OT Rooms</p>
-      <p class="text-2xl font-bold">
-        ${new Set(today.map(s => s.otRoomName)).size}
+
+    <div>
+      <p class="text-xs text-slate-500">Risk Flag</p>
+      <p class="font-semibold ${p.hasRisk ? "text-red-600" : "text-green-600"}">
+        ${p.hasRisk ? "Yes" : "No"}
       </p>
     </div>
   `;
 
-  /* PATIENT CARDS */
-  patients.forEach(p => {
-    const latest = p.schedules.sort(
-      (a, b) => b.startTime.toMillis() - a.startTime.toMillis()
-    )[0];
+  patientTimeline.innerHTML = "";
 
-    if (filterStatus !== "all" && latest.status !== filterStatus) return;
+  sorted.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "border rounded-lg p-2 bg-slate-50";
 
-    const card = document.createElement("div");
-    card.className = "card-enter bg-white rounded-3xl shadow border p-5";
-
-    card.innerHTML = `
-      <div class="flex gap-4">
-        <img src="${avatar(p.patientId)}"
-             class="w-14 h-14 rounded-2xl border object-cover" />
-        <div class="flex-1">
-          <h3 class="font-bold">${p.patientName}</h3>
-          <p class="text-xs text-[--muted]">${p.department}</p>
-          <p class="text-xs mt-1">${latest.procedure} · ${latest.otRoomName}</p>
-
-          <div class="mt-3 flex items-center justify-between">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(latest.status)}">
-              ${latest.status}
-            </span>
-            <span class="text-xs text-[--muted]">
-              ${relativeTime(latest.startTime)}
-            </span>
-          </div>
-        </div>
+    div.innerHTML = `
+      <div class="flex justify-between text-xs text-slate-500 mb-1">
+        <span>${t(s.startTime).toLocaleDateString()}</span>
+        <span>${s.status}</span>
+      </div>
+      <div class="font-semibold text-sm">${s.procedure}</div>
+      <div class="text-xs text-slate-500">
+        OT ${s.otRoomName}
       </div>
     `;
 
-    if (
-      latest.status === "Ongoing" ||
-      (latest.status === "Scheduled" &&
-        latest.startTime.toMillis() - now < 30 * 60000)
-    ) {
-      priorityLane.appendChild(card.cloneNode(true));
-    }
-
-    grid.appendChild(card);
+    patientTimeline.appendChild(div);
   });
 }
 
-/* FILTER */
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.className += " px-4 py-2 rounded-full border bg-white text-sm font-semibold";
-  btn.onclick = () => {
-    filterStatus = btn.dataset.filter;
-    render();
-  };
+/* ================= INIT ================= */
+auth.onAuthStateChanged(user => {
+  if (!user) return;
+  listenToSchedules();
 });
-
-/* INIT */
-auth.onAuthStateChanged(u => u && loadPatients());
