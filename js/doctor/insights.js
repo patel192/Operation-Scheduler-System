@@ -8,12 +8,17 @@ import {
 
 /* ELEMENTS */
 const kpiStrip = document.getElementById("kpiStrip");
-const durationTable = document.getElementById("durationTable");
-const distribution = document.getElementById("distribution");
+const efficiencyList = document.getElementById("efficiencyList");
+
+let workloadChart, statusChart, otChart;
 
 /* HELPERS */
 const t = ts => ts.toDate();
-const minutes = ms => Math.round(ms / 60000);
+const mins = ms => Math.round(ms / 60000);
+
+function dayKey(d) {
+  return d.toISOString().slice(0,10);
+}
 
 /* LOAD */
 async function loadInsights() {
@@ -34,102 +39,131 @@ async function loadInsights() {
 function render(list) {
   if (!list.length) return;
 
-  let completed = 0;
+  const now = new Date();
+  const last7 = {};
+  const otMap = {};
+  const statusCount = { Completed: 0, Ongoing: 0, Scheduled: 0 };
+
   let overruns = 0;
-  let totalActual = 0;
-  const otSet = new Set();
-  const byDay = {};
-  const statusCount = {};
+  let totalDuration = 0;
 
   list.forEach(s => {
-    const planned = t(s.endTime) - t(s.startTime);
+    const start = t(s.startTime);
+    const end = t(s.endTime);
+    const planned = mins(end - start);
+
+    totalDuration += planned;
+    statusCount[s.status] = (statusCount[s.status] || 0) + 1;
+
+    // last 7 days
+    const diff = Math.floor((now - start) / 86400000);
+    if (diff <= 6) {
+      const key = dayKey(start);
+      last7[key] = (last7[key] || 0) + 1;
+    }
+
+    // overrun
+    if (s.status === "Ongoing" && now > end) overruns++;
+
+    // OT usage
+    otMap[s.otRoomName] = (otMap[s.otRoomName] || 0) + planned;
+  });
+
+  /* KPI STRIP */
+  kpiStrip.innerHTML = `
+    <div>Total Procedures<br><span class="text-sm">${list.length}</span></div>
+    <div>Last 7 Days<br><span class="text-sm">${Object.values(last7).reduce((a,b)=>a+b,0)}</span></div>
+    <div>Avg Duration<br><span class="text-sm">${Math.round(totalDuration / list.length)}m</span></div>
+    <div class="text-red-600">Overruns<br><span class="text-sm">${overruns}</span></div>
+    <div>OT Rooms Used<br><span class="text-sm">${Object.keys(otMap).length}</span></div>
+    <div>Departments<br><span class="text-sm">${new Set(list.map(s=>s.department)).size}</span></div>
+  `;
+
+  /* WORKLOAD CHART */
+  const days = Object.keys(last7).sort();
+  const counts = days.map(d => last7[d]);
+
+  workloadChart?.destroy();
+  workloadChart = new Chart(
+    document.getElementById("workloadChart"),
+    {
+      type: "bar",
+      data: {
+        labels: days,
+        datasets: [{
+          label: "Procedures",
+          data: counts
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+      }
+    }
+  );
+
+  /* STATUS CHART */
+  statusChart?.destroy();
+  statusChart = new Chart(
+    document.getElementById("statusChart"),
+    {
+      type: "doughnut",
+      data: {
+        labels: Object.keys(statusCount),
+        datasets: [{
+          data: Object.values(statusCount)
+        }]
+      },
+      options: {
+        plugins: { legend: { position: "bottom" } }
+      }
+    }
+  );
+
+  /* OT UTILIZATION */
+  const otNames = Object.keys(otMap);
+  const otValues = Object.values(otMap);
+
+  otChart?.destroy();
+  otChart = new Chart(
+    document.getElementById("otChart"),
+    {
+      type: "bar",
+      data: {
+        labels: otNames,
+        datasets: [{
+          data: otValues
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        plugins: { legend: { display: false } }
+      }
+    }
+  );
+
+  /* EFFICIENCY LIST */
+  efficiencyList.innerHTML = "";
+  list.slice(-5).reverse().forEach(s => {
+    const planned = mins(t(s.endTime)-t(s.startTime));
     const actual =
       s.status === "Completed"
         ? planned
-        : Math.min(Date.now() - t(s.startTime), planned);
+        : mins(Math.min(Date.now()-t(s.startTime), t(s.endTime)-t(s.startTime)));
 
-    totalActual += actual;
-    otSet.add(s.otRoomId);
+    const over = actual > planned;
 
-    if (s.status === "Completed") completed++;
-    if (actual > planned) overruns++;
-
-    const day = t(s.startTime).toLocaleDateString("en-US",{ weekday:"short" });
-    byDay[day] = (byDay[day] || 0) + 1;
-
-    statusCount[s.status] = (statusCount[s.status] || 0) + 1;
+    const row = document.createElement("div");
+    row.innerHTML = `
+      <div class="flex justify-between">
+        <span>${s.procedure}</span>
+        <span class="${over ? "text-red-600 font-semibold" : ""}">
+          ${actual}m / ${planned}m
+        </span>
+      </div>
+    `;
+    efficiencyList.appendChild(row);
   });
-
-  /* KPIs */
-  kpiStrip.innerHTML = `
-    <div>Total Surgeries<br><span class="text-sm">${list.length}</span></div>
-    <div>Completed<br><span class="text-sm">
-      ${Math.round((completed / list.length) * 100)}%
-    </span></div>
-    <div>Avg Duration<br><span class="text-sm">
-      ${minutes(totalActual / list.length)}m
-    </span></div>
-    <div class="text-red-600">Overruns<br><span class="text-sm">
-      ${overruns}
-    </span></div>
-    <div>OT Used<br><span class="text-sm">${otSet.size}</span></div>
-  `;
-
-  /* DURATION TABLE */
-  durationTable.innerHTML = "";
-  list
-    .slice()
-    .sort((a,b)=> t(b.startTime)-t(a.startTime))
-    .slice(0,10)
-    .forEach(s => {
-      const planned = minutes(t(s.endTime)-t(s.startTime));
-      const actual = minutes(
-        Math.min(Date.now()-t(s.startTime), t(s.endTime)-t(s.startTime))
-      );
-      const over = actual > planned;
-
-      const row = document.createElement("div");
-      row.className = "grid grid-cols-[1fr_80px_80px] gap-3 py-2";
-
-      row.innerHTML = `
-        <div>
-          <div class="font-semibold">${s.procedure}</div>
-          <div class="text-xs text-slate-500">
-            ${s.patientName} · ${s.otRoomName}
-          </div>
-        </div>
-
-        <div class="text-xs">${planned}m</div>
-        <div class="text-xs ${over ? "text-red-600 font-semibold" : ""}">
-          ${actual}m
-        </div>
-      `;
-
-      durationTable.appendChild(row);
-    });
-
-  /* DISTRIBUTION */
-  distribution.innerHTML = `
-    <div>
-      <p class="text-xs text-slate-500 mb-1">Weekly Load</p>
-      ${Object.entries(byDay)
-        .map(([d,v])=>`
-          <div class="flex justify-between">
-            <span>${d}</span><span>${v}</span>
-          </div>
-        `).join("")}
-    </div>
-
-    <div class="pt-2 border-t">
-      <p class="text-xs text-slate-500 mb-1">Status Breakdown</p>
-      ${Object.entries(statusCount)
-        .map(([s,v])=>`
-          <div class="flex justify-between">
-            <span>${s}</span><span>${v}</span>
-          </div>
-        `).join("")}
-    </div>
-  `;
 }
 
 /* INIT */

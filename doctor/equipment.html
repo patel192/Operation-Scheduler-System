@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Equipment · Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --bg:#F1F5F9;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); }
+      70% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+    }
+  </style>
+
+  <!-- Guards & Nav -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/equipment.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-[1700px] mx-auto px-4 py-5 space-y-4">
+
+  <!-- HEADER -->
+  <section>
+    <h1 class="text-xl font-bold">Equipment & Resources</h1>
+    <p class="text-xs text-[--muted]">
+      Equipment availability & surgical usage context
+    </p>
+  </section>
+
+  <!-- KPI STRIP -->
+  <section
+    id="equipmentSummary"
+    class="glass rounded-xl border px-4 py-2
+           grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-semibold">
+    <!-- injected -->
+  </section>
+
+  <!-- EQUIPMENT GRID -->
+  <section
+    id="equipmentGrid"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <!-- cards injected -->
+  </section>
+
+</main>
+
+</body>
+</html>
