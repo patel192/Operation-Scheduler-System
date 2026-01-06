@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Activity · Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary:#2563eb;
+      --bg:#F1F5F9;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+
+  <!-- Guards & Nav -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/activity.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-[1500px] mx-auto px-4 py-5 space-y-4">
+
+  <!-- HEADER -->
+  <section class="flex justify-between items-center">
+    <div>
+      <h1 class="text-xl font-bold">My Activity</h1>
+      <p class="text-xs text-[--muted]">
+        Clinical actions & schedule lifecycle
+      </p>
+    </div>
+
+    <input
+      id="dateFilter"
+      type="date"
+      class="border rounded-lg px-3 py-1.5 text-sm"
+    />
+  </section>
+
+  <!-- SUMMARY -->
+  <section
+    id="activitySummary"
+    class="glass rounded-xl border px-4 py-2
+           grid grid-cols-2 md:grid-cols-4 gap-2
+           text-xs font-semibold">
+    <!-- injected -->
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="glass rounded-2xl border p-4">
+
+    <h2 class="font-semibold text-sm mb-3">Activity Timeline</h2>
+
+    <div
+      id="activityTimeline"
+      class="relative pl-6 space-y-4 text-sm">
+
+      <!-- vertical line -->
+      <div class="absolute left-2 top-0 bottom-0 w-px bg-slate-200"></div>
+
+      <!-- items injected -->
+
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
