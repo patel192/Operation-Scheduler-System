@@ -28,6 +28,7 @@ const inspectDetails = document.getElementById("inspectDetails");
 const noteInput = document.getElementById("noteInput");
 const addNoteBtn = document.getElementById("addNoteBtn");
 const markCompletedBtn = document.getElementById("markCompletedBtn");
+const exportBtn = document.getElementById("exportBtn");
 
 /* ================= STATE ================= */
 let schedules = [];
@@ -58,6 +59,63 @@ function progressPercent(start, end) {
   const planned = end - start;
   const elapsed = now - start;
   return Math.min((elapsed / planned) * 100, 100);
+}
+function exportDayCSV() {
+  const selectedDate = datePicker.value
+    ? new Date(datePicker.value)
+    : new Date();
+
+  const dayList = schedules.filter((s) =>
+    sameDay(t(s.startTime), selectedDate)
+  );
+
+  const filtered =
+    activeFilter === "All"
+      ? dayList
+      : dayList.filter((s) => s.status === activeFilter);
+
+  if (!filtered.length) {
+    alert("No schedules to export for this date.");
+    return;
+  }
+
+  const rows = [
+    [
+      "Date",
+      "Start Time",
+      "End Time",
+      "Procedure",
+      "Patient",
+      "Department",
+      "OT Room",
+      "Status",
+    ],
+  ];
+
+  filtered.forEach((s) => {
+    rows.push([
+      t(s.startTime).toLocaleDateString(),
+      time(s.startTime),
+      time(s.endTime),
+      s.procedure,
+      s.patientName,
+      s.department,
+      s.otRoomName,
+      s.status,
+    ]);
+  });
+
+  const csv = rows.map((r) => r.join(",")).join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `schedule_${selectedDate.toISOString().slice(0, 10)}.csv`;
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
 
 /* ================= RISK DETECTION ================= */
@@ -353,6 +411,7 @@ document.querySelectorAll(".filter-btn").forEach((btn) => {
     render();
   };
 });
+exportBtn.onclick = exportDayCSV;
 
 /* ================= INIT ================= */
 auth.onAuthStateChanged((user) => {

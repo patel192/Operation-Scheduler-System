@@ -64,7 +64,7 @@
   <main class="max-w-[1700px] mx-auto px-4 py-5 space-y-3">
 
     <!-- HEADER -->
-    <section class="flex items-center justify-between">
+    <section class="flex items-center justify-between gap-4">
       <div>
         <h1 class="text-xl font-bold">My Schedule</h1>
         <p class="text-xs text-[--muted]">
@@ -72,8 +72,17 @@
         </p>
       </div>
 
-      <input id="datePicker" type="date" class="border rounded-lg px-3 py-1.5 text-sm" />
+      <div class="flex items-center gap-3">
+        <input id="datePicker" type="date" class="border rounded-lg px-3 py-1.5 text-sm" />
+
+        <button id="exportBtn" class="text-xs font-semibold px-3 py-1.5 rounded-lg
+             border border-slate-300
+             text-slate-700 hover:bg-slate-100 transition">
+          Export Day
+        </button>
+      </div>
     </section>
+
 
     <!-- INLINE DAY STATS -->
     <section class="glass rounded-xl border px-4 py-2
