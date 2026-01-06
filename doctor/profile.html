@@ -3,23 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>Profile · Doctor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
-    }
-
-    .glass {
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(10px);
-    }
-  </style>
 
   <!-- Guards & Nav -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
@@ -27,67 +13,122 @@
   <script type="module" defer src="/js/doctor/profile.js"></script>
 </head>
 
-<body class="bg-[--bg] text-[--text] min-h-screen">
+<body class="bg-slate-100 min-h-screen text-slate-800">
 
-<main class="max-w-[1600px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
 
   <!-- HEADER -->
   <section>
-    <h1 class="text-xl font-bold">My Profile</h1>
-    <p class="text-xs text-[--muted]">
-      Professional identity & operational summary
+    <h1 class="text-xl font-bold">Doctor Profile</h1>
+    <p class="text-sm text-slate-500">
+      Personal preferences & operational settings
     </p>
   </section>
 
-  <!-- TOP GRID -->
-  <section class="grid grid-cols-12 gap-4">
+  <!-- PREFERENCES CARD -->
+  <section class="bg-white border rounded-2xl p-5 space-y-6">
 
-    <!-- IDENTITY -->
-    <section class="col-span-12 md:col-span-5 glass rounded-2xl border p-4 space-y-3">
-      <h2 class="font-semibold text-sm">Professional Identity</h2>
+    <h2 class="font-semibold text-sm">Scheduling Preferences</h2>
 
-      <div id="identityPanel" class="grid grid-cols-2 gap-3 text-sm">
-        <!-- injected -->
+    <div class="grid md:grid-cols-2 gap-4 text-sm">
+
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">
+          Minimum gap between surgeries (minutes)
+        </label>
+        <input id="minGapMinutes" type="number" min="0"
+          class="w-full border rounded-lg px-3 py-2" />
       </div>
-    </section>
 
-    <!-- PERFORMANCE -->
-    <section class="col-span-12 md:col-span-7 glass rounded-2xl border p-4">
-      <h2 class="font-semibold text-sm mb-3">Performance Snapshot</h2>
-
-      <div
-        id="performanceStrip"
-        class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-semibold">
-        <!-- injected -->
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">
+          Max surgeries per day
+        </label>
+        <input id="maxDailySurgeries" type="number" min="1"
+          class="w-full border rounded-lg px-3 py-2" />
       </div>
-    </section>
 
-  </section>
+    </div>
 
-  <!-- LOWER GRID -->
-  <section class="grid grid-cols-12 gap-4">
+    <hr />
 
-    <!-- OPERATIONAL CONTEXT -->
-    <section class="col-span-12 md:col-span-6 glass rounded-2xl border p-4">
-      <h2 class="font-semibold text-sm mb-3">Operational Context</h2>
+    <!-- WORKING HOURS -->
+    <div class="space-y-3">
+      <h3 class="font-semibold text-sm">Working Hours</h3>
 
-      <div id="opsPanel" class="space-y-2 text-sm">
-        <!-- injected -->
+      <div class="flex flex-wrap gap-2">
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Mon" class="workday" /> Mon
+        </label>
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Tue" class="workday" /> Tue
+        </label>
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Wed" class="workday" /> Wed
+        </label>
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Thu" class="workday" /> Thu
+        </label>
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Fri" class="workday" /> Fri
+        </label>
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Sat" class="workday" /> Sat
+        </label>
+        <label class="flex items-center gap-1 text-xs">
+          <input type="checkbox" value="Sun" class="workday" /> Sun
+        </label>
       </div>
-    </section>
 
-    <!-- RECENT ACTIVITY -->
-    <section class="col-span-12 md:col-span-6 glass rounded-2xl border p-4">
-      <h2 class="font-semibold text-sm mb-3">Recent Activity</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">Start time</label>
+          <input id="workStart" type="time"
+            class="w-full border rounded-lg px-3 py-2" />
+        </div>
 
-      <div id="activityFeed" class="space-y-2 text-sm">
-        <!-- injected -->
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">End time</label>
+          <input id="workEnd" type="time"
+            class="w-full border rounded-lg px-3 py-2" />
+        </div>
       </div>
-    </section>
+    </div>
+
+    <hr />
+
+    <!-- ALERT SETTINGS -->
+    <div class="space-y-3">
+      <h3 class="font-semibold text-sm">Alert Preferences</h3>
+
+      <label class="flex items-center gap-2 text-sm">
+        <input id="alertOverrun" type="checkbox" />
+        Notify on surgery overrun
+      </label>
+
+      <label class="flex items-center gap-2 text-sm">
+        <input id="alertTightGap" type="checkbox" />
+        Notify on tight gap
+      </label>
+
+      <div class="flex items-center gap-2 text-sm">
+        <input id="alertUpcoming" type="checkbox" />
+        Notify before upcoming surgery
+        <input id="alertUpcomingMinutes" type="number" min="1"
+          class="w-20 border rounded px-2 py-1 text-xs" />
+        <span class="text-xs">minutes</span>
+      </div>
+    </div>
+
+    <div class="pt-4 flex justify-end">
+      <button id="saveBtn"
+        class="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">
+        Save Preferences
+      </button>
+    </div>
 
   </section>
 
 </main>
-
 </body>
 </html>
