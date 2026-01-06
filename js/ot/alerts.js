@@ -10,32 +10,20 @@ import {
 /* ================= HELPERS ================= */
 
 function formatTime(ts) {
+  if (!ts) return "";
   return new Date(ts.toMillis()).toLocaleString();
 }
 
-function alertStyle(type) {
-  switch (type) {
-    case "overrun":
+function severityStyle(severity) {
+  switch (severity) {
+    case "critical":
       return "border-red-500 bg-red-50 text-red-700";
-    case "upcoming":
-      return "border-blue-500 bg-blue-50 text-blue-700";
-    case "schedule_update":
+    case "warning":
       return "border-orange-500 bg-orange-50 text-orange-700";
+    case "info":
+      return "border-blue-500 bg-blue-50 text-blue-700";
     default:
       return "border-slate-300 bg-slate-50 text-slate-700";
-  }
-}
-
-function alertTitle(type) {
-  switch (type) {
-    case "overrun":
-      return "Surgery Overrun";
-    case "upcoming":
-      return "Upcoming Surgery";
-    case "schedule_update":
-      return "Schedule Update";
-    default:
-      return "Alert";
   }
 }
 
@@ -63,27 +51,32 @@ auth.onAuthStateChanged(async (user) => {
     return;
   }
 
-  snapshot.forEach(doc => {
-    const a = doc.data();
+  snapshot.forEach(docSnap => {
+    const a = docSnap.data();
 
     const div = document.createElement("div");
     div.className = `
       border-l-4 p-4 rounded-lg bg-white shadow-sm
-      ${alertStyle(a.type)}
+      ${severityStyle(a.severity)}
     `;
 
     div.innerHTML = `
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="font-semibold">
-            ${alertTitle(a.type)}
+            ${a.title || "Alert"}
           </p>
           <p class="text-sm mt-1">
-            ${a.message}
+            ${a.message || ""}
           </p>
+          ${
+            a.meta
+              ? `<p class="text-xs mt-1 text-slate-500">${a.meta}</p>`
+              : ""
+          }
         </div>
         <div class="text-xs text-slate-500 whitespace-nowrap">
-          ${a.createdAt ? formatTime(a.createdAt) : ""}
+          ${formatTime(a.createdAt)}
         </div>
       </div>
     `;

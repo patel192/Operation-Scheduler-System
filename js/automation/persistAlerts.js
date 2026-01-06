@@ -68,7 +68,7 @@ export async function persistAlerts(schedules) {
 
     /* 🔵 UPCOMING (30 min) */
     if (
-      s.status === "Scheduled" &&
+      s.status === "Upcoming" &&
       start - now <= 30 * 60000 &&
       start - now > 0
     ) {
