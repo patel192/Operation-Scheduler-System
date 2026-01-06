@@ -14,6 +14,13 @@ async function loadNavbar() {
     // Mobile menu toggle
     const menuBtn = document.getElementById("menuBtn");
     const mobileMenu = document.getElementById("mobileMenu");
+    const alertBtn = document.getElementById("alertBtn");
+
+    if (alertBtn) {
+      alertBtn.addEventListener("click", () => {
+        window.location.href = "/doctor/alerts.html";
+      });
+    }
 
     menuBtn?.addEventListener("click", () => {
       mobileMenu.classList.toggle("hidden");

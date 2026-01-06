@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Alerts · Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --bg:#F1F5F9;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+
+  <!-- Guards & Nav -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/alerts.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-6xl mx-auto px-4 py-6 space-y-4">
+
+  <!-- HEADER -->
+  <section>
+    <h1 class="text-2xl font-bold">Alerts & Warnings</h1>
+    <p class="text-sm text-[--muted]">
+      Real-time clinical and schedule-related alerts
+    </p>
+  </section>
+
+  <!-- SUMMARY STRIP -->
+  <section
+    id="alertSummary"
+    class="glass rounded-xl border px-4 py-3
+           grid grid-cols-2 md:grid-cols-4 gap-3 text-sm font-semibold">
+    <!-- injected -->
+  </section>
+
+  <!-- ALERT LIST -->
+  <section
+    class="glass rounded-2xl border p-4">
+
+    <h2 class="font-semibold text-sm mb-3">Active Alerts</h2>
+
+    <div id="alertList" class="divide-y">
+      <!-- injected -->
+    </div>
+
+    <div
+      id="emptyState"
+      class="hidden text-center py-10 text-sm text-[--muted]">
+      No active alerts 🎉
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
