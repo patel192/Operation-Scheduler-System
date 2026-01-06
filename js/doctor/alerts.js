@@ -1,141 +1,97 @@
+// /js/doctor/alerts.js
+
 import { auth, db } from "../firebase.js";
 import {
   collection,
   query,
   where,
-  onSnapshot
+  orderBy,
+  onSnapshot,
+  updateDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ELEMENTS */
 const alertList = document.getElementById("alertList");
-const alertSummary = document.getElementById("alertSummary");
 const emptyState = document.getElementById("emptyState");
 
-/* HELPERS */
-const t = ts => ts.toDate();
-const mins = ms => Math.round(ms / 60000);
-
-/* ALERT ENGINE */
-function generateAlerts(schedules) {
-  const alerts = [];
-  const now = new Date();
-
-  schedules.forEach(s => {
-    const start = s.startTime?.toDate();
-    const end = s.endTime?.toDate();
-    if (!start || !end) return;
-
-    const planned = mins(end - start);
-    const elapsed = mins(Math.min(now - start, end - start));
-
-    /* 🔴 Overrun */
-    if (s.status === "Ongoing" && now > end) {
-      alerts.push({
-        level: "critical",
-        title: "Surgery Overrun",
-        message: `${s.procedure} has exceeded planned duration`,
-        meta: `${s.patientName} · OT ${s.otRoomName}`,
-        action: `/doctor/schedule-details.html?id=${s.id}`
-      });
-    }
-
-    /* 🟡 Ending soon */
-    if (
-      s.status === "Ongoing" &&
-      now < end &&
-      mins(end - now) <= 15
-    ) {
-      alerts.push({
-        level: "warning",
-        title: "Surgery Near Completion",
-        message: `${s.procedure} ending in ${mins(end - now)} minutes`,
-        meta: `${s.patientName} · OT ${s.otRoomName}`,
-        action: `/doctor/schedule-details.html?id=${s.id}`
-      });
-    }
-
-    /* 🔵 Upcoming */
-    if (
-      s.status === "Scheduled" &&
-      mins(start - now) <= 30 &&
-      mins(start - now) > 0
-    ) {
-      alerts.push({
-        level: "info",
-        title: "Upcoming Surgery",
-        message: `${s.procedure} starts in ${mins(start - now)} minutes`,
-        meta: `${s.patientName} · OT ${s.otRoomName}`,
-        action: `/doctor/schedule-details.html?id=${s.id}`
-      });
-    }
-  });
-
-  return alerts;
-}
-
-/* RENDER */
-function render(alerts) {
-  alertList.innerHTML = "";
-  emptyState.classList.toggle("hidden", alerts.length !== 0);
-
-  const stats = {
-    critical: alerts.filter(a => a.level === "critical").length,
-    warning: alerts.filter(a => a.level === "warning").length,
-    info: alerts.filter(a => a.level === "info").length
-  };
-
-  alertSummary.innerHTML = `
-    <div class="text-red-600">Critical: ${stats.critical}</div>
-    <div class="text-yellow-600">Warnings: ${stats.warning}</div>
-    <div class="text-blue-600">Info: ${stats.info}</div>
-    <div>Total: ${alerts.length}</div>
-  `;
-
-  alerts.forEach(a => {
-    const row = document.createElement("div");
-    row.className = "py-3 flex justify-between items-start gap-4";
-
-    row.innerHTML = `
-      <div>
-        <div class="font-semibold ${
-          a.level === "critical"
-            ? "text-red-600"
-            : a.level === "warning"
-            ? "text-yellow-600"
-            : "text-blue-600"
-        }">
-          ${a.title}
-        </div>
-        <div class="text-sm">${a.message}</div>
-        <div class="text-xs text-slate-500 mt-1">${a.meta}</div>
-      </div>
-
-      <a href="${a.action}"
-         class="text-xs font-semibold text-blue-600 hover:underline">
-        View →
-      </a>
-    `;
-
-    alertList.appendChild(row);
-  });
-}
-
-/* INIT */
 auth.onAuthStateChanged(user => {
   if (!user) return;
 
   const q = query(
-    collection(db, "schedules"),
-    where("surgeonId", "==", user.uid)
+    collection(db, "alerts"),
+    where("doctorId", "==", user.uid),
+    orderBy("createdAt", "desc")
   );
 
   onSnapshot(q, snap => {
-    const schedules = snap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
+    if (snap.empty) {
+      emptyState.classList.remove("hidden");
+      alertList.innerHTML = "";
+      return;
+    }
 
-    const alerts = generateAlerts(schedules);
-    render(alerts);
+    emptyState.classList.add("hidden");
+    alertList.innerHTML = "";
+
+    snap.docs.forEach(d => {
+      const a = { id: d.id, ...d.data() };
+      renderAlert(a);
+    });
   });
 });
+
+function renderAlert(a) {
+  const row = document.createElement("div");
+
+  row.className = `
+    border rounded-xl p-4 flex justify-between items-start gap-4
+    ${a.read ? "bg-white" : "bg-red-50 border-red-200"}
+  `;
+
+  row.innerHTML = `
+    <div>
+      <p class="font-semibold text-sm">
+        ${a.type === "OVERRUN" ? "⏱ Surgery Overrun" : "⚠ Alert"}
+      </p>
+      <p class="text-xs text-slate-600 mt-1">${a.message}</p>
+      <p class="text-[11px] text-slate-500 mt-1">
+        Patient name: ${a.meta}
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-2 text-right">
+      <button
+        class="text-xs text-blue-600 hover:underline"
+        data-id="${a.id}"
+      >
+        View
+      </button>
+
+      ${!a.read ? `
+        <button
+          class="text-[11px] text-slate-500 hover:underline"
+          data-read="${a.id}"
+        >
+          Mark read
+        </button>
+      ` : ""}
+    </div>
+  `;
+
+  // View details
+  row.querySelector("[data-id]").onclick = async () => {
+    await markRead(a.id);
+    window.location.href = `/doctor/schedule-details.html?id=${a.scheduleId}`;
+  };
+
+  // Mark read only
+  row.querySelector("[data-read]")?.addEventListener("click", async () => {
+    await markRead(a.id);
+  });
+
+  alertList.appendChild(row);
+}
+
+async function markRead(id) {
+  await updateDoc(doc(db, "alerts", id), { read: true });
+}

@@ -10,6 +10,7 @@ import {
   arrayUnion,
   Timestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {persistAlerts} from "../doctor/alert-generator.js"
 
 /* ================= ELEMENTS ================= */
 const datePicker = document.getElementById("datePicker");
@@ -175,11 +176,12 @@ function listenToSchedules() {
 
   if (unsubscribe) unsubscribe();
 
-  unsubscribe = onSnapshot(q, (snapshot) => {
+  unsubscribe = onSnapshot(q,async (snapshot) => {
     schedules = snapshot.docs.map((d) => ({
       id: d.id,
       ...d.data(),
     }));
+    await persistAlerts(schedules,auth.currentUser.uid);
     render();
   });
 }
