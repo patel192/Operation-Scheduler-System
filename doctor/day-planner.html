@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Day Planner · Doctor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --bg:#F1F5F9;
+      --text:#1E293B;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .hour-line {
+      border-top: 1px dashed #e5e7eb;
+    }
+  </style>
+
+  <!-- Guards & Nav -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
+  <script type="module" defer src="/js/doctor/day-planner.js"></script>
+</head>
+
+<body class="bg-[--bg] text-[--text] min-h-screen">
+
+<main class="max-w-[1800px] mx-auto px-4 py-5 space-y-4">
+
+  <!-- HEADER -->
+  <section class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold">Day Planner</h1>
+      <p class="text-xs text-[--muted]">
+        Visual timeline of surgeries by time
+      </p>
+    </div>
+
+    <input
+      id="datePicker"
+      type="date"
+      class="border rounded-lg px-3 py-1.5 text-sm"
+    />
+  </section>
+
+  <!-- LEGEND -->
+  <section class="flex flex-wrap gap-4 text-xs text-slate-600">
+    <div class="flex items-center gap-1">
+      <span class="w-3 h-3 rounded bg-blue-500"></span> Upcoming
+    </div>
+    <div class="flex items-center gap-1">
+      <span class="w-3 h-3 rounded bg-green-500"></span> Ongoing
+    </div>
+    <div class="flex items-center gap-1">
+      <span class="w-3 h-3 rounded bg-slate-400"></span> Completed
+    </div>
+    <div class="flex items-center gap-1">
+      <span class="w-3 h-3 rounded bg-red-500"></span> Overrun
+    </div>
+  </section>
+
+  <!-- PLANNER GRID -->
+  <section class="glass rounded-2xl border overflow-hidden">
+
+    <div class="grid grid-cols-[80px_1fr]">
+
+      <!-- HOURS -->
+      <div id="hourColumn" class="bg-slate-50 text-xs text-slate-500">
+        <!-- injected -->
+      </div>
+
+      <!-- TIMELINE -->
+      <div id="plannerCanvas" class="relative">
+        <!-- injected -->
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>

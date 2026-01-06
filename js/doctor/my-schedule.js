@@ -9,13 +9,10 @@ import {
   serverTimestamp,
   arrayUnion,
   Timestamp,
+  getDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { persistAlerts } from "../doctor/alert-generator.js";
-
-/* ================= CONFIG ================= */
-const UPCOMING_WINDOW_MIN = 15;
-const MIN_GAP_MINUTES = 30;
 
 /* ================= ELEMENTS ================= */
 const datePicker = document.getElementById("datePicker");
@@ -42,6 +39,11 @@ let schedules = [];
 let activeFilter = "All";
 let selectedId = null;
 let unsubscribe = null;
+let doctorPrefs = {
+  upcomingWindowMinutes: 15,
+  minGapMinutes: 30,
+  workingHours: null,
+};
 
 /* ================= HELPERS ================= */
 const t = (ts) => ts.toDate();
@@ -59,7 +61,7 @@ function isUpcoming(schedule) {
   const now = new Date();
   const start = t(schedule.startTime);
   const diffMin = (start - now) / 60000;
-  return diffMin > 0 && diffMin <= UPCOMING_WINDOW_MIN;
+  return diffMin > 0 && diffMin <= doctorPrefs.upcomingWindowMinutes;
 }
 
 function minutesBetween(a, b) {
@@ -83,7 +85,16 @@ function exportDayCSV() {
     : new Date();
 
   const rows = [
-    ["Date", "Start", "End", "Procedure", "Patient", "Department", "OT", "Status"],
+    [
+      "Date",
+      "Start",
+      "End",
+      "Procedure",
+      "Patient",
+      "Department",
+      "OT",
+      "Status",
+    ],
   ];
 
   schedules
@@ -118,13 +129,24 @@ function exportDayCSV() {
 
   URL.revokeObjectURL(url);
 }
+async function loadDoctorPreferences(uid) {
+  const snap = await getDoc(doc(db, "doctorProfiles", uid));
+  if (!snap.exists()) return;
+
+  const p = snap.data();
+
+  doctorPrefs.upcomingWindowMinutes =
+    p.upcomingWindowMinutes ?? doctorPrefs.upcomingWindowMinutes;
+
+  doctorPrefs.minGapMinutes = p.minGapMinutes ?? doctorPrefs.minGapMinutes;
+
+  doctorPrefs.workingHours = p.workingHours || null;
+}
 
 /* ================= RISK DETECTION ================= */
 function detectRisks(dayList) {
   const risks = {};
-  const sorted = [...dayList].sort(
-    (a, b) => t(a.startTime) - t(b.startTime)
-  );
+  const sorted = [...dayList].sort((a, b) => t(a.startTime) - t(b.startTime));
 
   for (let i = 0; i < sorted.length; i++) {
     const curr = sorted[i];
@@ -141,7 +163,8 @@ function detectRisks(dayList) {
 
     const gap = minutesBetween(currEnd, t(next.startTime));
     if (currEnd > t(next.startTime)) risks[curr.id].overlap = true;
-    if (gap >= 0 && gap < MIN_GAP_MINUTES) risks[next.id] = { tightGap: true };
+    if (gap >= 0 && gap < doctorPrefs.minGapMinutes)
+      risks[next.id] = { tightGap: true };
   }
 
   return risks;
@@ -201,9 +224,7 @@ function render() {
   timeline.innerHTML = "";
 
   dayList
-    .filter(
-      (s) => activeFilter === "All" || resolvedStatus(s) === activeFilter
-    )
+    .filter((s) => activeFilter === "All" || resolvedStatus(s) === activeFilter)
     .sort((a, b) => t(a.startTime) - t(b.startTime))
     .forEach((s) => {
       const risk = riskMap[s.id] || {};
@@ -257,18 +278,27 @@ function inspect(id) {
   inspectPanel.classList.remove("hidden");
 
   inspectDetails.innerHTML = `
-    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${s.procedure}</p></div>
-    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${s.patientName}</p></div>
-    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${s.otRoomName}</p></div>
-    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${s.department}</p></div>
-    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(s.startTime)} – ${time(s.endTime)}</p></div>
-    <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${resolvedStatus(s)}</p></div>
+    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${
+      s.procedure
+    }</p></div>
+    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${
+      s.patientName
+    }</p></div>
+    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${
+      s.otRoomName
+    }</p></div>
+    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${
+      s.department
+    }</p></div>
+    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(
+      s.startTime
+    )} – ${time(s.endTime)}</p></div>
+    <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${resolvedStatus(
+      s
+    )}</p></div>
   `;
 
-  markCompletedBtn.classList.toggle(
-    "hidden",
-    resolvedStatus(s) !== "Ongoing"
-  );
+  markCompletedBtn.classList.toggle("hidden", resolvedStatus(s) !== "Ongoing");
 
   addNoteBtn.onclick = async () => {
     if (!noteInput.value.trim()) return;
@@ -305,8 +335,11 @@ document.querySelectorAll(".filter-btn").forEach((btn) => {
 
 exportBtn.onclick = exportDayCSV;
 
-auth.onAuthStateChanged((u) => {
+auth.onAuthStateChanged(async (u) => {
   if (!u) return;
+
+  await loadDoctorPreferences(u.uid);
+
   datePicker.valueAsDate = new Date();
   listenToSchedules();
 });

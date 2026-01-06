@@ -36,11 +36,11 @@ let selectedId = null;
 
 /* ================= HELPERS ================= */
 const t = ts => ts.toDate();
+
 const time = ts =>
   t(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-const sameDay = (a, b) =>
-  a.toDateString() === b.toDateString();
+const sameDay = (a, b) => a.toDateString() === b.toDateString();
 
 function minutesBetween(a, b) {
   return Math.round((b - a) / 60000);
@@ -71,21 +71,33 @@ function renderDashboard() {
   );
 
   const ongoing = todayList.filter(s => s.status === "Ongoing");
-  const upcoming = todayList.filter(s => s.status === "Scheduled");
+  const upcoming = todayList.filter(s => s.status === "Upcoming");
   const completed = todayList.filter(s => s.status === "Completed");
 
-  /* ---------- SUMMARY STRIP ---------- */
+  /* ---------- SUMMARY ---------- */
   sumToday.textContent = todayList.length;
   sumOngoing.textContent = ongoing.length;
   sumUpcoming.textContent = upcoming.length;
   sumCompleted.textContent = completed.length;
 
-  const otMinutes = completed.reduce((sum, s) =>
-    sum + minutesBetween(t(s.startTime), t(s.endTime)), 0
-  );
+  /* ---------- OT USAGE (ACTUAL) ---------- */
+  let otMinutes = 0;
+
+  todayList.forEach(s => {
+    const start = t(s.startTime);
+    const end = t(s.endTime);
+
+    if (s.status === "Completed") {
+      otMinutes += minutesBetween(start, end);
+    } else if (s.status === "Ongoing") {
+      otMinutes += Math.max(0, minutesBetween(start, now));
+    }
+  });
+
   sumOtTime.textContent =
     `${Math.floor(otMinutes / 60)}h ${otMinutes % 60}m`;
 
+  /* ---------- WEEK PATIENTS ---------- */
   const weekStart = new Date(now);
   weekStart.setDate(now.getDate() - 6);
 
@@ -111,9 +123,7 @@ function renderDashboard() {
          ${s.id === selectedId ? "bg-slate-100" : ""}`;
 
       row.innerHTML = `
-        <div class="text-xs text-slate-500">
-          ${time(s.startTime)}
-        </div>
+        <div class="text-xs text-slate-500">${time(s.startTime)}</div>
 
         <div>
           <div class="font-semibold">${s.procedure}</div>
@@ -122,13 +132,11 @@ function renderDashboard() {
           </div>
         </div>
 
-        <div class="text-xs font-semibold">
-          ${s.status}
-        </div>
+        <div class="text-xs font-semibold">${s.status}</div>
 
         <div class="text-xs ${
           s.status === "Ongoing" && remaining < 0
-            ? "text-red-600"
+            ? "text-red-600 font-semibold"
             : "text-slate-500"
         }">
           ${s.status === "Ongoing"
@@ -149,17 +157,20 @@ function renderDashboard() {
 
   if (completed.length) {
     const avg =
-      otMinutes / completed.length;
+      completed.reduce((sum, s) =>
+        sum + minutesBetween(t(s.startTime), t(s.endTime)), 0
+      ) / completed.length;
+
     contriAvg.textContent =
       `${Math.floor(avg / 60)}h ${Math.round(avg % 60)}m`;
   } else {
     contriAvg.textContent = "—";
   }
 
-  const onTime =
-    completed.filter(s =>
-      t(s.endTime) >= t(s.endTime)
-    ).length;
+  const onTime = completed.filter(s =>
+    t(s.endTime) <= t(s.endTime)
+  ).length;
+
   contriOnTime.textContent =
     completed.length
       ? `${Math.round((onTime / completed.length) * 100)}%`
@@ -167,21 +178,19 @@ function renderDashboard() {
 
   /* ---------- FOCUS ---------- */
   if (ongoing[0]) {
-    const start = t(ongoing[0].startTime);
     focusWork.textContent =
-      `${minutesBetween(start, now)} min`;
+      `${minutesBetween(t(ongoing[0].startTime), now)} min`;
   } else {
     focusWork.textContent = "—";
   }
 
-  focusBreak.textContent = "45 min ago";
+  focusBreak.textContent = "—";
   focusRemaining.textContent = upcoming.length;
 
-  /* ---------- DETAILS ---------- */
   if (selectedId) selectSchedule(selectedId);
 }
 
-/* ================= DETAILS PANEL ================= */
+/* ================= DETAILS ================= */
 function selectSchedule(id) {
   selectedId = id;
   const s = schedules.find(x => x.id === id);
@@ -193,52 +202,27 @@ function selectSchedule(id) {
   const remaining =
     minutesBetween(new Date(), t(s.endTime));
 
+  const notes =
+    Array.isArray(s.notes)
+      ? s.notes.map(n => `• ${n.text}`).join("<br>")
+      : "No notes available";
+
   detailsPanel.innerHTML = `
-    <div>
-      <p class="text-xs text-slate-500">Procedure</p>
-      <p class="font-semibold">${s.procedure}</p>
-    </div>
-
-    <div>
-      <p class="text-xs text-slate-500">Patient</p>
-      <p class="font-semibold">${s.patientName}</p>
-    </div>
-
-    <div>
-      <p class="text-xs text-slate-500">OT Room</p>
-      <p class="font-semibold">${s.otRoomName}</p>
-    </div>
-
-    <div>
-      <p class="text-xs text-slate-500">Department</p>
-      <p class="font-semibold">${s.department}</p>
-    </div>
-
-    <div>
-      <p class="text-xs text-slate-500">Time</p>
-      <p class="font-semibold">
-        ${time(s.startTime)} – ${time(s.endTime)}
-      </p>
-    </div>
-
-    <div>
-      <p class="text-xs text-slate-500">Remaining</p>
-      <p class="font-semibold ${
-        remaining < 0 ? "text-red-600" : ""
-      }">
+    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${s.procedure}</p></div>
+    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${s.patientName}</p></div>
+    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${s.otRoomName}</p></div>
+    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${s.department}</p></div>
+    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(s.startTime)} – ${time(s.endTime)}</p></div>
+    <div><p class="text-xs text-slate-500">Remaining</p>
+      <p class="font-semibold ${remaining < 0 ? "text-red-600" : ""}">
         ${remaining > 0 ? `${remaining} min` : "Overrun"}
       </p>
     </div>
-
     <div class="col-span-2">
       <p class="text-xs text-slate-500">Notes</p>
-      <p class="text-sm">
-        ${s.notes || "No notes available"}
-      </p>
+      <p class="text-sm">${notes}</p>
     </div>
   `;
-
-  renderDashboard();
 }
 
 /* ================= INIT ================= */

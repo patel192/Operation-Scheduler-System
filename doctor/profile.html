@@ -7,128 +7,120 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Guards & Nav -->
+  <!-- Guards & Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/profile.js"></script>
 </head>
 
-<body class="bg-slate-100 min-h-screen text-slate-800">
+<body class="bg-slate-100 text-slate-800 min-h-screen">
 
 <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
 
   <!-- HEADER -->
   <section>
     <h1 class="text-xl font-bold">Doctor Profile</h1>
-    <p class="text-sm text-slate-500">
-      Personal preferences & operational settings
+    <p class="text-xs text-slate-500">
+      Account information & scheduling preferences
     </p>
   </section>
 
-  <!-- PREFERENCES CARD -->
-  <section class="bg-white border rounded-2xl p-5 space-y-6">
+  <!-- BASIC INFO -->
+  <section class="bg-white rounded-2xl border p-6 space-y-4">
+    <h2 class="text-sm font-semibold">Basic Information</h2>
 
-    <h2 class="font-semibold text-sm">Scheduling Preferences</h2>
-
-    <div class="grid md:grid-cols-2 gap-4 text-sm">
-
+    <div class="grid grid-cols-2 gap-4 text-sm">
       <div>
-        <label class="block text-xs text-slate-500 mb-1">
-          Minimum gap between surgeries (minutes)
-        </label>
-        <input id="minGapMinutes" type="number" min="0"
-          class="w-full border rounded-lg px-3 py-2" />
+        <p class="text-xs text-slate-500">Name</p>
+        <p id="doctorName" class="font-semibold">—</p>
       </div>
 
       <div>
-        <label class="block text-xs text-slate-500 mb-1">
-          Max surgeries per day
-        </label>
-        <input id="maxDailySurgeries" type="number" min="1"
-          class="w-full border rounded-lg px-3 py-2" />
+        <p class="text-xs text-slate-500">Email</p>
+        <p id="doctorEmail" class="font-semibold">—</p>
       </div>
 
+      <div>
+        <p class="text-xs text-slate-500">Department</p>
+        <p id="doctorDepartment" class="font-semibold">—</p>
+      </div>
+
+      <div>
+        <p class="text-xs text-slate-500">Role</p>
+        <p class="font-semibold">Doctor</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREFERENCES -->
+  <section class="bg-white rounded-2xl border p-6 space-y-6">
+
+    <h2 class="text-sm font-semibold">Scheduling Preferences</h2>
+
+    <!-- UPCOMING WINDOW -->
+    <div>
+      <label class="text-xs text-slate-500">
+        Upcoming surgery window (minutes before start)
+      </label>
+      <input
+        id="upcomingWindow"
+        type="number"
+        min="5"
+        max="120"
+        class="mt-1 w-32 border rounded-lg px-3 py-1.5 text-sm"
+      />
     </div>
 
-    <hr />
+    <!-- GAP -->
+    <div>
+      <label class="text-xs text-slate-500">
+        Minimum gap between surgeries (minutes)
+      </label>
+      <input
+        id="minGap"
+        type="number"
+        min="0"
+        max="180"
+        class="mt-1 w-32 border rounded-lg px-3 py-1.5 text-sm"
+      />
+    </div>
 
     <!-- WORKING HOURS -->
-    <div class="space-y-3">
-      <h3 class="font-semibold text-sm">Working Hours</h3>
+    <div>
+      <label class="text-xs text-slate-500">
+        Preferred working hours
+      </label>
 
-      <div class="flex flex-wrap gap-2">
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Mon" class="workday" /> Mon
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Tue" class="workday" /> Tue
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Wed" class="workday" /> Wed
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Thu" class="workday" /> Thu
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Fri" class="workday" /> Fri
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Sat" class="workday" /> Sat
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          <input type="checkbox" value="Sun" class="workday" /> Sun
-        </label>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">Start time</label>
-          <input id="workStart" type="time"
-            class="w-full border rounded-lg px-3 py-2" />
-        </div>
-
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">End time</label>
-          <input id="workEnd" type="time"
-            class="w-full border rounded-lg px-3 py-2" />
-        </div>
+      <div class="flex gap-3 mt-1">
+        <input id="workStart" type="time" class="border rounded-lg px-3 py-1.5 text-sm" />
+        <span class="text-sm text-slate-500 self-center">to</span>
+        <input id="workEnd" type="time" class="border rounded-lg px-3 py-1.5 text-sm" />
       </div>
     </div>
 
-    <hr />
-
-    <!-- ALERT SETTINGS -->
-    <div class="space-y-3">
-      <h3 class="font-semibold text-sm">Alert Preferences</h3>
-
-      <label class="flex items-center gap-2 text-sm">
-        <input id="alertOverrun" type="checkbox" />
-        Notify on surgery overrun
-      </label>
-
-      <label class="flex items-center gap-2 text-sm">
-        <input id="alertTightGap" type="checkbox" />
-        Notify on tight gap
-      </label>
-
-      <div class="flex items-center gap-2 text-sm">
-        <input id="alertUpcoming" type="checkbox" />
-        Notify before upcoming surgery
-        <input id="alertUpcomingMinutes" type="number" min="1"
-          class="w-20 border rounded px-2 py-1 text-xs" />
-        <span class="text-xs">minutes</span>
-      </div>
+    <!-- ALERT TOGGLE -->
+    <div class="flex items-center gap-3">
+      <input id="alertToggle" type="checkbox" class="accent-blue-600" />
+      <label class="text-sm">Enable critical alerts (overrun, conflicts)</label>
     </div>
 
-    <div class="pt-4 flex justify-end">
-      <button id="saveBtn"
-        class="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">
+    <!-- SAVE -->
+    <div class="pt-4 border-t flex justify-end">
+      <button
+        id="savePrefsBtn"
+        class="px-4 py-2 rounded-lg text-sm font-semibold
+               bg-blue-600 text-white hover:bg-blue-700">
         Save Preferences
       </button>
     </div>
 
+    <p id="saveStatus" class="hidden text-xs text-green-600">
+      Preferences saved successfully
+    </p>
+
   </section>
 
 </main>
+
 </body>
 </html>

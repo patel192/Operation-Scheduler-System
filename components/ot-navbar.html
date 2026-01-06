@@ -14,8 +14,7 @@
           <span class="font-semibold text-slate-800">
             Operation Scheduler
           </span>
-          <span
-            class="hidden sm:inline text-xs font-semibold text-orange-600">
+          <span class="hidden sm:inline text-xs font-semibold text-orange-600">
             OT Staff Panel
           </span>
         </div>
@@ -24,17 +23,17 @@
       <!-- DESKTOP NAV -->
       <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
         <a href="/ot/dashboard.html" data-nav class="nav-link">Dashboard</a>
-        <a href="/ot/schedule-board.html" data-nav class="nav-link">Schedule Board</a>
-        <a href="/ot/ot-rooms.html" data-nav class="nav-link">OT Rooms</a>
-        <a href="/ot/checklist.html" data-nav class="nav-link">Checklist</a>
+        <a href="/ot/my-schedule.html" data-nav class="nav-link">My Schedule</a>
+        <a href="/ot/alerts.html" data-nav class="nav-link">Alerts</a>
         <a href="/ot/profile.html" data-nav class="nav-link">Profile</a>
       </nav>
 
       <!-- RIGHT ACTIONS -->
       <div class="flex items-center gap-3">
 
-        <!-- STATUS -->
+        <!-- STATUS (DERIVED, READ-ONLY) -->
         <span
+          id="dutyStatus"
           class="hidden md:inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
           <span class="w-2 h-2 rounded-full bg-green-500"></span>
           On Duty
@@ -73,9 +72,8 @@
     <nav class="px-4 py-4 space-y-3 text-sm font-medium text-slate-700">
 
       <a href="/ot/dashboard.html" class="block nav-link">Dashboard</a>
-      <a href="/ot/schedule-board.html" class="block nav-link">Schedule Board</a>
-      <a href="/ot/ot-rooms.html" class="block nav-link">OT Rooms</a>
-      <a href="/ot/checklist.html" class="block nav-link">Checklist</a>
+      <a href="/ot/my-schedule.html" class="block nav-link">My Schedule</a>
+      <a href="/ot/alerts.html" class="block nav-link">Alerts</a>
       <a href="/ot/profile.html" class="block nav-link">Profile</a>
 
       <button
@@ -97,7 +95,7 @@
   }
 
   .nav-link:hover {
-    color: #ea580c; /* orange-600 */
+    color: #ea580c;
   }
 
   .nav-link.active {

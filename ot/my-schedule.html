@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OT Staff · My Schedule</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
+
+  <!-- Page Logic -->
+  <script type="module" defer src="/js/ot/my-schedule.js"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800">
+
+  <div id="navbar"></div>
+
+  <main class="max-w-7xl mx-auto px-3 py-3 space-y-4">
+
+    <!-- HEADER -->
+    <section class="flex items-center justify-between">
+      <div>
+        <h1 class="text-lg font-bold">My Schedule</h1>
+        <p id="selectedDateLabel" class="text-xs text-slate-500"></p>
+      </div>
+
+      <input
+        id="dateFilter"
+        type="date"
+        class="border rounded-md px-3 py-1.5 text-sm"
+      />
+    </section>
+
+    <!-- FOCUS + DETAILS PANEL -->
+    <section
+      id="focusPanel"
+      class="hidden bg-white border rounded-lg px-4 py-3 space-y-4">
+
+      <!-- STATUS ROW -->
+      <div class="flex justify-between items-center">
+        <span id="focusStatus" class="text-xs font-bold"></span>
+        <span id="focusCountdown" class="text-xs font-semibold"></span>
+      </div>
+
+      <!-- CORE DETAILS -->
+      <div class="grid grid-cols-6 gap-3 text-sm">
+        <div>
+          <p class="text-xs text-slate-500">Patient</p>
+          <p id="focusPatient" class="font-semibold"></p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Procedure</p>
+          <p id="focusProcedure"></p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Surgeon</p>
+          <p id="focusSurgeon"></p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">OT Room</p>
+          <p id="focusOT"></p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Department</p>
+          <p id="focusDept"></p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Time</p>
+          <p id="focusTime"></p>
+        </div>
+      </div>
+
+      <!-- TIMER BAR -->
+      <div class="h-2 bg-slate-200 rounded">
+        <div id="focusBar" class="h-2 rounded"></div>
+      </div>
+
+      <!-- EQUIPMENT + NOTES -->
+      <div class="grid grid-cols-2 gap-4 text-sm pt-3 border-t">
+
+        <div>
+          <p class="text-xs font-semibold text-slate-600 mb-1">Equipment</p>
+          <div id="focusEquipment" class="space-y-2"></div>
+        </div>
+
+        <div>
+          <p class="text-xs font-semibold text-slate-600 mb-1">Notes</p>
+          <div id="focusNotes" class="space-y-1 text-xs"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- READINESS STRIP -->
+    <section class="bg-white border rounded px-4 py-2 text-xs text-slate-600">
+      <span class="font-semibold text-green-700">✔ Readiness:</span>
+      Follow sterile protocol. Verify equipment. System time is accurate.
+    </section>
+
+    <!-- TABLE -->
+    <section class="bg-white border rounded-lg overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-100 text-slate-600">
+          <tr>
+            <th class="px-3 py-2 text-left">Time</th>
+            <th class="px-3 py-2 text-left">Status</th>
+            <th class="px-3 py-2 text-left">Patient</th>
+            <th class="px-3 py-2 text-left">Surgeon</th>
+            <th class="px-3 py-2 text-left">OT</th>
+            <th class="px-3 py-2 text-left">Dept</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleTable" class="divide-y"></tbody>
+      </table>
+    </section>
+
+    <div
+      id="emptyState"
+      class="hidden text-center py-10 text-sm text-slate-500">
+      No assigned surgeries for this date.
+    </div>
+
+  </main>
+</body>
+</html>

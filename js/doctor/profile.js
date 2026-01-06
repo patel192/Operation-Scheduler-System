@@ -7,75 +7,68 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 /* ELEMENTS */
-const minGapMinutes = document.getElementById("minGapMinutes");
-const maxDailySurgeries = document.getElementById("maxDailySurgeries");
-const workdayEls = document.querySelectorAll(".workday");
+const doctorName = document.getElementById("doctorName");
+const doctorEmail = document.getElementById("doctorEmail");
+const doctorDepartment = document.getElementById("doctorDepartment");
+
+const upcomingWindow = document.getElementById("upcomingWindow");
+const minGap = document.getElementById("minGap");
 const workStart = document.getElementById("workStart");
 const workEnd = document.getElementById("workEnd");
+const alertToggle = document.getElementById("alertToggle");
 
-const alertOverrun = document.getElementById("alertOverrun");
-const alertTightGap = document.getElementById("alertTightGap");
-const alertUpcoming = document.getElementById("alertUpcoming");
-const alertUpcomingMinutes = document.getElementById("alertUpcomingMinutes");
+const saveBtn = document.getElementById("savePrefsBtn");
+const saveStatus = document.getElementById("saveStatus");
 
-const saveBtn = document.getElementById("saveBtn");
+/* LOAD PROFILE + PREFS */
+async function loadProfile(uid, user) {
+  doctorName.textContent = user.displayName || "Doctor";
+  doctorEmail.textContent = user.email || "—";
 
-/* LOAD */
-async function loadPreferences(uid) {
-  const ref = doc(db, "doctorPreferences", uid);
+  const ref = doc(db, "doctorProfiles", uid);
   const snap = await getDoc(ref);
 
   if (!snap.exists()) return;
 
-  const p = snap.data();
+  const data = snap.data();
 
-  minGapMinutes.value = p.minGapMinutes ?? 30;
-  maxDailySurgeries.value = p.maxDailySurgeries ?? 6;
+  doctorDepartment.textContent = data.department || "—";
 
-  workdayEls.forEach(cb => {
-    cb.checked = p.workingHours?.days?.includes(cb.value);
-  });
+  upcomingWindow.value = data.upcomingWindowMinutes ?? 15;
+  minGap.value = data.minGapMinutes ?? 30;
 
-  workStart.value = p.workingHours?.start || "09:00";
-  workEnd.value = p.workingHours?.end || "18:00";
+  if (data.workingHours) {
+    workStart.value = data.workingHours.start || "";
+    workEnd.value = data.workingHours.end || "";
+  }
 
-  alertOverrun.checked = p.alertSettings?.overrun ?? true;
-  alertTightGap.checked = p.alertSettings?.tightGap ?? true;
-  alertUpcoming.checked = p.alertSettings?.upcoming ?? true;
-  alertUpcomingMinutes.value = p.alertSettings?.upcomingMinutes ?? 15;
+  alertToggle.checked = data.enableAlerts !== false;
 }
 
-/* SAVE */
+/* SAVE PREFS */
 async function savePreferences(uid) {
-  const days = [...workdayEls]
-    .filter(cb => cb.checked)
-    .map(cb => cb.value);
-
   const payload = {
-    minGapMinutes: Number(minGapMinutes.value),
-    maxDailySurgeries: Number(maxDailySurgeries.value),
+    upcomingWindowMinutes: Number(upcomingWindow.value) || 15,
+    minGapMinutes: Number(minGap.value) || 30,
+    enableAlerts: alertToggle.checked,
     workingHours: {
-      days,
-      start: workStart.value,
-      end: workEnd.value
-    },
-    alertSettings: {
-      overrun: alertOverrun.checked,
-      tightGap: alertTightGap.checked,
-      upcoming: alertUpcoming.checked,
-      upcomingMinutes: Number(alertUpcomingMinutes.value)
+      start: workStart.value || null,
+      end: workEnd.value || null
     },
     updatedAt: serverTimestamp()
   };
 
-  await setDoc(doc(db, "doctorPreferences", uid), payload, { merge: true });
-  alert("Preferences saved");
+  await setDoc(doc(db, "doctorProfiles", uid), payload, { merge: true });
+
+  saveStatus.classList.remove("hidden");
+  setTimeout(() => saveStatus.classList.add("hidden"), 2500);
 }
 
 /* INIT */
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged(async (user) => {
   if (!user) return;
 
-  loadPreferences(user.uid);
+  await loadProfile(user.uid, user);
+
   saveBtn.onclick = () => savePreferences(user.uid);
 });

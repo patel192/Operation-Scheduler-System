@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OT Staff · Alerts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Auth + Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
+  <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
+
+  <!-- Page Logic -->
+  <script type="module" defer src="/js/ot/alerts.js"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 space-y-4">
+
+    <!-- HEADER -->
+    <section>
+      <h1 class="text-2xl font-bold">Alerts</h1>
+      <p class="text-sm text-slate-500">
+        System-generated alerts related to your assigned surgeries
+      </p>
+    </section>
+
+    <!-- ALERT LIST -->
+    <section id="alertsContainer" class="space-y-3">
+      <!-- alerts injected -->
+    </section>
+
+    <!-- EMPTY STATE -->
+    <div
+      id="emptyState"
+      class="hidden text-center py-12 text-slate-500">
+      No alerts right now.
+    </div>
+
+  </main>
+
+</body>
+</html>

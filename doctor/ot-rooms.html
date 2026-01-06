@@ -16,22 +16,40 @@
     }
 
     .glass {
-      background: rgba(255,255,255,.96);
+      background: rgba(255,255,255,.97);
       backdrop-filter: blur(10px);
     }
 
-    .pulse {
-      animation: pulse 2s infinite;
+    .time-row {
+      height: 48px;
+      border-top: 1px dashed #e5e7eb;
     }
 
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); }
-      70% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
-      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+    .ot-cell {
+      position: relative;
+      border-left: 1px solid #e5e7eb;
     }
+
+    .block {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      border-radius: 10px;
+      padding: 6px;
+      font-size: 11px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    }
+
+    .ongoing { background: #16a34a; }
+    .scheduled { background: #2563eb; }
+    .completed { background: #64748b; }
+    .overrun { background: #dc2626; }
+
   </style>
 
-  <!-- Guards & Nav -->
+  <!-- Guards & Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/ot-rooms.js"></script>
@@ -39,31 +57,36 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1700px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1900px] mx-auto px-4 py-5 space-y-4">
 
   <!-- HEADER -->
-  <section class="flex items-center justify-between">
-    <div>
-      <h1 class="text-xl font-bold">OT Rooms</h1>
-      <p class="text-xs text-[--muted]">
-        Live operating theatre utilization & status
-      </p>
-    </div>
+  <section>
+    <h1 class="text-xl font-bold">OT Room Day Planner</h1>
+    <p class="text-xs text-[--muted]">
+      Time-based operating theatre grid (live)
+    </p>
   </section>
 
-  <!-- SUMMARY STRIP -->
+  <!-- SUMMARY -->
   <section
     id="otSummary"
     class="glass rounded-xl border px-4 py-2
            grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-semibold">
-    <!-- injected -->
   </section>
 
-  <!-- OT GRID -->
-  <section
-    id="otGrid"
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-    <!-- cards injected -->
+  <!-- GRID -->
+  <section class="glass rounded-2xl border overflow-x-auto">
+
+    <!-- HEADER ROW -->
+    <div
+      id="otHeader"
+      class="grid sticky top-0 z-10 bg-white"
+      style="grid-template-columns: 80px 1fr">
+    </div>
+
+    <!-- BODY -->
+    <div id="otGridBody"></div>
+
   </section>
 
 </main>

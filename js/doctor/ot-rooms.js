@@ -1,40 +1,50 @@
 import { auth, db } from "../firebase.js";
 import {
   collection,
-  query,
-  where,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ELEMENTS */
-const otGrid = document.getElementById("otGrid");
-const otSummary = document.getElementById("otSummary");
+/* ================= CONFIG ================= */
+const START_HOUR = 6;
+const END_HOUR = 22;
+const SLOT_MINUTES = 30;
+const PX_PER_SLOT = 48;
 
-/* HELPERS */
+/* ================= ELEMENTS ================= */
+const otSummary = document.getElementById("otSummary");
+const otHeader = document.getElementById("otHeader");
+const otGridBody = document.getElementById("otGridBody");
+
+/* ================= HELPERS ================= */
 const t = ts => ts.toDate();
-const mins = ms => Math.round(ms / 60000);
 
 function sameDay(a, b) {
   return a.toDateString() === b.toDateString();
 }
 
-/* STATE */
+function minutesFromStart(d) {
+  return (d.getHours() * 60 + d.getMinutes()) - (START_HOUR * 60);
+}
+
+function blockClass(s) {
+  if (s.status === "Ongoing" && new Date() > t(s.endTime)) return "overrun";
+  if (s.status === "Ongoing") return "ongoing";
+  if (s.status === "Scheduled") return "scheduled";
+  return "completed";
+}
+
+/* ================= STATE ================= */
 let schedules = [];
 
-/* LOAD */
+/* ================= LOAD ================= */
 function listen() {
-  const q = query(collection(db, "schedules"));
-
-  onSnapshot(q, snap => {
-    schedules = snap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
+  onSnapshot(collection(db, "schedules"), snap => {
+    schedules = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   });
 }
 
-/* RENDER */
+/* ================= RENDER ================= */
 function render() {
   const today = new Date();
 
@@ -43,7 +53,6 @@ function render() {
   );
 
   const otMap = {};
-
   todaySchedules.forEach(s => {
     if (!otMap[s.otRoomId]) {
       otMap[s.otRoomId] = {
@@ -57,108 +66,94 @@ function render() {
 
   const otRooms = Object.values(otMap);
 
-  /* SUMMARY */
-  const active = todaySchedules.filter(s => s.status === "Ongoing").length;
-  const total = otRooms.length;
-  const usedMinutes = todaySchedules.reduce(
-    (a, s) => a + mins(t(s.endTime) - t(s.startTime)),
-    0
+  /* ---------- SUMMARY ---------- */
+  const ongoing = todaySchedules.filter(s => s.status === "Ongoing").length;
+  const totalMinutes = todaySchedules.reduce(
+    (a, s) => a + (t(s.endTime) - t(s.startTime)) / 60000, 0
   );
 
   otSummary.innerHTML = `
-    <div>Total OT Rooms<br><span class="text-sm">${total}</span></div>
-    <div class="text-red-600">Ongoing Surgeries<br><span class="text-sm">${active}</span></div>
-    <div>Total Procedures<br><span class="text-sm">${todaySchedules.length}</span></div>
-    <div>Utilized Minutes<br><span class="text-sm">${usedMinutes}</span></div>
+    <div>Total OT Rooms<br><span class="text-sm">${otRooms.length}</span></div>
+    <div class="text-green-600">Ongoing<br><span class="text-sm">${ongoing}</span></div>
+    <div>Total Surgeries<br><span class="text-sm">${todaySchedules.length}</span></div>
+    <div>Utilized Minutes<br><span class="text-sm">${Math.round(totalMinutes)}</span></div>
     <div>Date<br><span class="text-sm">${today.toLocaleDateString()}</span></div>
   `;
 
-  /* GRID */
-  otGrid.innerHTML = "";
+  /* ---------- HEADER ---------- */
+  otHeader.innerHTML = "";
+  otHeader.style.gridTemplateColumns =
+    `80px repeat(${otRooms.length}, 220px)`;
 
+  otHeader.innerHTML += `<div class="text-xs font-semibold p-2">Time</div>`;
   otRooms.forEach(ot => {
-    const list = ot.list.sort(
-      (a, b) => t(a.startTime) - t(b.startTime)
-    );
+    otHeader.innerHTML += `
+      <div class="text-xs font-semibold p-2 border-l">
+        ${ot.name}
+      </div>`;
+  });
 
-    const current = list.find(s => s.status === "Ongoing");
-    const upcoming = list.find(s => s.status === "Scheduled");
+  /* ---------- GRID BODY ---------- */
+  otGridBody.innerHTML = "";
 
-    const overrun =
-      current && new Date() > t(current.endTime);
+  for (let h = START_HOUR * 60; h < END_HOUR * 60; h += SLOT_MINUTES) {
+    const row = document.createElement("div");
+    row.className = "grid";
+    row.style.gridTemplateColumns =
+      `80px repeat(${otRooms.length}, 220px)`;
 
-    const card = document.createElement("div");
-    card.className = `
-      glass rounded-2xl border p-4 space-y-3
-      ${overrun ? "pulse border-red-600" : ""}
-    `;
+    const label = document.createElement("div");
+    label.className = "time-row text-xs p-2 text-slate-500";
+    label.textContent =
+      `${String(Math.floor(h / 60)).padStart(2, "0")}:${h % 60 === 0 ? "00" : "30"}`;
 
-    card.innerHTML = `
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold">${ot.name}</h2>
-        <span class="text-xs px-2 py-0.5 rounded-full
-          ${
-            current
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }">
-          ${current ? "Occupied" : "Idle"}
-        </span>
-      </div>
+    row.appendChild(label);
 
-      <div class="text-sm space-y-1">
-        ${
-          current
-            ? `
-              <div>
-                <p class="text-xs text-slate-500">Current Surgery</p>
-                <p class="font-semibold">${current.procedure}</p>
-                <p class="text-xs text-slate-500">
-                  ${current.patientName} · ${current.department}
-                </p>
-              </div>
-            `
-            : `<p class="text-xs text-slate-500">No active surgery</p>`
-        }
-      </div>
+    otRooms.forEach(() => {
+      const cell = document.createElement("div");
+      cell.className = "time-row ot-cell";
+      row.appendChild(cell);
+    });
 
-      ${
-        upcoming
-          ? `
-            <div class="pt-2 border-t text-xs">
-              <p class="text-slate-500">Next:</p>
-              <p class="font-semibold">${upcoming.procedure}</p>
-              <p class="text-slate-500">
-                ${t(upcoming.startTime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })}
-              </p>
-            </div>
-          `
-          : `<p class="text-xs text-slate-400 pt-2">No upcoming surgery</p>`
-      }
+    otGridBody.appendChild(row);
+  }
 
-      ${
-        current
-          ? `
-            <div class="pt-2 text-right">
-              <a
-                href="/doctor/schedule-details.html?id=${current.id}"
-                class="text-xs font-semibold text-blue-600 hover:underline">
-                View Details →
-              </a>
-            </div>
-          `
-          : ""
-      }
-    `;
+  /* ---------- BLOCKS ---------- */
+  otRooms.forEach((ot, colIndex) => {
+    ot.list.forEach(s => {
+      const startMin = minutesFromStart(t(s.startTime));
+      const endMin = minutesFromStart(t(s.endTime));
 
-    otGrid.appendChild(card);
+      const top = (startMin / SLOT_MINUTES) * PX_PER_SLOT;
+      const height =
+        Math.max(((endMin - startMin) / SLOT_MINUTES) * PX_PER_SLOT, 36);
+
+      const block = document.createElement("div");
+      block.className = `block ${blockClass(s)}`;
+      block.style.top = `${top}px`;
+      block.style.height = `${height}px`;
+      block.style.left = `${80 + colIndex * 220 + 6}px`;
+      block.style.width = `208px`;
+
+      block.innerHTML = `
+        <div class="font-semibold truncate">${s.procedure}</div>
+        <div class="opacity-90 truncate">${s.patientName}</div>
+        <div class="opacity-80">
+          ${t(s.startTime).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}
+        </div>
+      `;
+
+      block.onclick = () => {
+        window.location.href =
+          `/doctor/schedule-details.html?id=${s.id}`;
+      };
+
+      otGridBody.appendChild(block);
+    });
   });
 }
 
-/* INIT */
+/* ================= INIT ================= */
 auth.onAuthStateChanged(u => {
   if (u) listen();
 });

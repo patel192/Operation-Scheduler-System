@@ -16,7 +16,7 @@ import { loadOtStaff } from "./loadOtStaff.js";
 import { loadDoctors } from "./loadDoctors.js";
 import { loadOtRooms } from "./loadOtRooms.js";
 import { loadDepartments } from "./loadDepartments.js";
-
+import { createScheduleCreatedAlerts } from "../automation/createScheduleAlerts.js";
 /* ================= STATE ================= */
 const steps = document.querySelectorAll(".form-section");
 const dots = document.querySelectorAll(".step-dot");
@@ -190,7 +190,7 @@ el.step3Back.onclick = () => showStep(1);
 el.step3Next.onclick = () => {
   state.surgeonId = el.surgeon.value;
   state.surgeonName = el.surgeon.selectedOptions[0]?.textContent;
-renderReview();
+  renderReview();
   showStep(3);
 };
 
@@ -232,7 +232,14 @@ el.confirm.onclick = async () => {
   });
 
   const scheduleId = ref.id;
-
+  await createScheduleCreatedAlerts({
+    id: scheduleId,
+    patientName: state.patientName,
+    procedure: state.procedure,
+    otRoomName: state.otRoomName,
+    surgeonId: state.surgeonId,
+    otStaffIds: state.otStaffIds,
+  });
   /* 🔒 LOCK RESOURCES IF ONGOING */
   if (status === "Ongoing") {
     await updateDoc(doc(db, "otRooms", state.otRoomId), {
