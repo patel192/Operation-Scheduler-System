@@ -17,6 +17,9 @@ const notesList = document.getElementById("notesList");
 const noteInput = document.getElementById("noteInput");
 const addNoteBtn = document.getElementById("addNoteBtn");
 const markCompletedBtn = document.getElementById("markCompletedBtn");
+const exportPdfBtn = document.getElementById("exportPdfBtn");
+const printBtn = document.getElementById("printBtn");
+const exportArea = document.getElementById("exportArea");
 
 /* ================= HELPERS ================= */
 const t = (ts) => ts.toDate();
@@ -52,6 +55,32 @@ function loadSchedule() {
     render(s);
   });
 }
+/* ================= EXPORT ================= */
+
+printBtn.onclick = () => {
+  window.print();
+};
+
+exportPdfBtn.onclick = () => {
+  if (!exportArea) return;
+
+  const opt = {
+    margin: 10,
+    filename: `Schedule-${scheduleId}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    },
+  };
+
+  html2pdf().set(opt).from(exportArea).save();
+};
 
 /* ================= RENDER ================= */
 function render(s) {
