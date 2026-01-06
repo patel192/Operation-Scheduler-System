@@ -10,7 +10,12 @@ import {
   arrayUnion,
   Timestamp,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {persistAlerts} from "../doctor/alert-generator.js"
+
+import { persistAlerts } from "../doctor/alert-generator.js";
+
+/* ================= CONFIG ================= */
+const UPCOMING_WINDOW_MIN = 15;
+const MIN_GAP_MINUTES = 30;
 
 /* ================= ELEMENTS ================= */
 const datePicker = document.getElementById("datePicker");
@@ -26,6 +31,7 @@ const statPatients = document.getElementById("statPatients");
 const inspectPanel = document.getElementById("inspectPanel");
 const inspectEmpty = document.getElementById("inspectEmpty");
 const inspectDetails = document.getElementById("inspectDetails");
+
 const noteInput = document.getElementById("noteInput");
 const addNoteBtn = document.getElementById("addNoteBtn");
 const markCompletedBtn = document.getElementById("markCompletedBtn");
@@ -37,77 +43,71 @@ let activeFilter = "All";
 let selectedId = null;
 let unsubscribe = null;
 
-const MIN_GAP_MINUTES = 30;
-
 /* ================= HELPERS ================= */
 const t = (ts) => ts.toDate();
+
 const time = (ts) =>
   t(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
+
+function resolvedStatus(s) {
+  return s.__derivedStatus || s.status;
+}
+
+function isUpcoming(schedule) {
+  const now = new Date();
+  const start = t(schedule.startTime);
+  const diffMin = (start - now) / 60000;
+  return diffMin > 0 && diffMin <= UPCOMING_WINDOW_MIN;
+}
 
 function minutesBetween(a, b) {
   return Math.round((b - a) / 60000);
 }
 
 function formatDurationShort(ms) {
-  const min = Math.floor(ms / 60000);
-  return `${min}m`;
+  return `${Math.floor(ms / 60000)}m`;
 }
 
 function progressPercent(start, end) {
-  const now = new Date();
   const planned = end - start;
-  const elapsed = now - start;
+  const elapsed = new Date() - start;
   return Math.min((elapsed / planned) * 100, 100);
 }
+
+/* ================= EXPORT ================= */
 function exportDayCSV() {
   const selectedDate = datePicker.value
     ? new Date(datePicker.value)
     : new Date();
 
-  const dayList = schedules.filter((s) =>
-    sameDay(t(s.startTime), selectedDate)
-  );
+  const rows = [
+    ["Date", "Start", "End", "Procedure", "Patient", "Department", "OT", "Status"],
+  ];
 
-  const filtered =
-    activeFilter === "All"
-      ? dayList
-      : dayList.filter((s) => s.status === activeFilter);
+  schedules
+    .filter((s) => sameDay(t(s.startTime), selectedDate))
+    .filter((s) => activeFilter === "All" || resolvedStatus(s) === activeFilter)
+    .forEach((s) =>
+      rows.push([
+        t(s.startTime).toLocaleDateString(),
+        time(s.startTime),
+        time(s.endTime),
+        s.procedure,
+        s.patientName,
+        s.department,
+        s.otRoomName,
+        resolvedStatus(s),
+      ])
+    );
 
-  if (!filtered.length) {
-    alert("No schedules to export for this date.");
+  if (rows.length === 1) {
+    alert("No schedules to export.");
     return;
   }
 
-  const rows = [
-    [
-      "Date",
-      "Start Time",
-      "End Time",
-      "Procedure",
-      "Patient",
-      "Department",
-      "OT Room",
-      "Status",
-    ],
-  ];
-
-  filtered.forEach((s) => {
-    rows.push([
-      t(s.startTime).toLocaleDateString(),
-      time(s.startTime),
-      time(s.endTime),
-      s.procedure,
-      s.patientName,
-      s.department,
-      s.otRoomName,
-      s.status,
-    ]);
-  });
-
   const csv = rows.map((r) => r.join(",")).join("\n");
-
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
@@ -122,50 +122,32 @@ function exportDayCSV() {
 /* ================= RISK DETECTION ================= */
 function detectRisks(dayList) {
   const risks = {};
-
-  const sorted = dayList
-    .slice()
-    .sort((a, b) => t(a.startTime) - t(b.startTime));
+  const sorted = [...dayList].sort(
+    (a, b) => t(a.startTime) - t(b.startTime)
+  );
 
   for (let i = 0; i < sorted.length; i++) {
     const curr = sorted[i];
     const currEnd = t(curr.endTime);
 
-    risks[curr.id] = {
-      overlap: false,
-      tightGap: false,
-      overrun: false,
-    };
+    risks[curr.id] = { overlap: false, tightGap: false, overrun: false };
 
-    // 🔴 Overrun
-    if (curr.status === "Ongoing" && new Date() > currEnd) {
+    if (resolvedStatus(curr) === "Ongoing" && new Date() > currEnd) {
       risks[curr.id].overrun = true;
     }
 
     const next = sorted[i + 1];
     if (!next) continue;
 
-    const nextStart = t(next.startTime);
-
-    // 🔴 Overlap
-    if (currEnd > nextStart) {
-      risks[curr.id].overlap = true;
-      risks[next.id] = risks[next.id] || {};
-      risks[next.id].overlap = true;
-    }
-
-    // 🟡 Tight gap
-    const gap = minutesBetween(currEnd, nextStart);
-    if (gap >= 0 && gap < MIN_GAP_MINUTES) {
-      risks[next.id] = risks[next.id] || {};
-      risks[next.id].tightGap = true;
-    }
+    const gap = minutesBetween(currEnd, t(next.startTime));
+    if (currEnd > t(next.startTime)) risks[curr.id].overlap = true;
+    if (gap >= 0 && gap < MIN_GAP_MINUTES) risks[next.id] = { tightGap: true };
   }
 
   return risks;
 }
 
-/* ================= REALTIME LISTENER ================= */
+/* ================= REALTIME ================= */
 function listenToSchedules() {
   if (!auth.currentUser) return;
 
@@ -174,14 +156,18 @@ function listenToSchedules() {
     where("surgeonId", "==", auth.currentUser.uid)
   );
 
-  if (unsubscribe) unsubscribe();
+  unsubscribe?.();
 
-  unsubscribe = onSnapshot(q,async (snapshot) => {
-    schedules = snapshot.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    }));
-    await persistAlerts(schedules,auth.currentUser.uid);
+  unsubscribe = onSnapshot(q, async (snap) => {
+    schedules = snap.docs.map((d) => {
+      const s = { id: d.id, ...d.data() };
+      if (s.status === "Scheduled" && isUpcoming(s)) {
+        s.__derivedStatus = "Upcoming";
+      }
+      return s;
+    });
+
+    await persistAlerts(schedules, auth.currentUser.uid);
     render();
   });
 }
@@ -198,145 +184,58 @@ function render() {
 
   const riskMap = detectRisks(dayList);
 
-  const filtered =
-    activeFilter === "All"
-      ? dayList
-      : dayList.filter((s) => s.status === activeFilter);
-
-  /* ---------- STATS ---------- */
   statTotal.textContent = dayList.length;
   statOngoing.textContent = dayList.filter(
-    (s) => s.status === "Ongoing"
+    (s) => resolvedStatus(s) === "Ongoing"
   ).length;
   statUpcoming.textContent = dayList.filter(
-    (s) => s.status === "Scheduled"
+    (s) => resolvedStatus(s) === "Upcoming"
   ).length;
   statCompleted.textContent = dayList.filter(
-    (s) => s.status === "Completed"
+    (s) => resolvedStatus(s) === "Completed"
   ).length;
 
   statOT.textContent = new Set(dayList.map((s) => s.otRoomId)).size;
   statPatients.textContent = new Set(dayList.map((s) => s.patientId)).size;
 
-  /* ---------- TIMELINE ---------- */
   timeline.innerHTML = "";
 
-  filtered
+  dayList
+    .filter(
+      (s) => activeFilter === "All" || resolvedStatus(s) === activeFilter
+    )
     .sort((a, b) => t(a.startTime) - t(b.startTime))
     .forEach((s) => {
       const risk = riskMap[s.id] || {};
-      let riskClass = "";
-      let riskLabel = "";
-
-      if (risk.overlap) {
-        riskClass = "border-l-4 border-red-600 bg-red-50";
-        riskLabel = "Overlap";
-      } else if (risk.overrun) {
-        riskClass = "border-l-4 border-red-600";
-        riskLabel = "Overrun";
-      } else if (risk.tightGap) {
-        riskClass = "border-l-4 border-yellow-500 bg-yellow-50";
-        riskLabel = "Tight gap";
-      }
-
       const row = document.createElement("div");
+
       row.className = `
-      grid grid-cols-[80px_1fr_100px_70px_90px] gap-3 py-2 cursor-pointer
-      hover:bg-slate-50 transition
-      ${s.id === selectedId ? "bg-slate-100" : ""}
-      ${riskClass}
-      ${risk.overrun ? "pulse" : ""}
-    `;
+        grid grid-cols-[80px_1fr_100px_70px_90px] gap-3 py-2 cursor-pointer
+        hover:bg-slate-50 transition
+        ${risk.overrun ? "border-l-4 border-red-600 pulse" : ""}
+      `;
 
       row.innerHTML = `
-      <!-- TIME -->
-      <div class="text-xs text-slate-500">
-        ${time(s.startTime)}
-      </div>
+        <div class="text-xs text-slate-500">${time(s.startTime)}</div>
 
-      <!-- PROCEDURE -->
-      <div>
-  <div class="font-semibold">${s.procedure}</div>
+        <div>
+          <div class="font-semibold">${s.procedure}</div>
+          <div class="text-xs text-slate-500">
+            ${s.patientName} · OT ${s.otRoomName}
+          </div>
+        </div>
 
-  <div class="text-xs text-slate-500">
-    ${s.patientName} · OT ${s.otRoomName}
-  </div>
+        <div class="text-xs font-semibold">${resolvedStatus(s)}</div>
+        <div class="text-xs">${s.department}</div>
 
-  ${
-    s.status === "Ongoing"
-      ? (() => {
-          const start = t(s.startTime);
-          const end = t(s.endTime);
-          const elapsed = new Date() - start;
-          const planned = end - start;
-          const pct = progressPercent(start, end);
-          const overrun = elapsed > planned;
+        <div class="text-right">
+          <button class="details-btn text-xs font-semibold text-blue-600">
+            Details →
+          </button>
+        </div>
+      `;
 
-          return `
-            <div class="mt-1">
-              <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                <div
-                  class="h-full transition-all
-                    ${overrun ? "bg-red-600" : "bg-blue-600"}"
-                  style="width:${pct}%">
-                </div>
-              </div>
-
-              <div class="flex justify-between text-[10px] mt-0.5
-                   ${
-                     overrun ? "text-red-600 font-semibold" : "text-slate-500"
-                   }">
-                <span>${formatDurationShort(elapsed)}</span>
-                <span>${formatDurationShort(planned)}</span>
-              </div>
-            </div>
-          `;
-        })()
-      : ""
-  }
-</div>
-
-
-      <!-- STATUS + RISK -->
-      <div class="text-xs font-semibold">
-        ${s.status}
-        ${
-          riskLabel
-            ? `<span class="ml-1 text-[10px] px-2 py-0.5 rounded-full
-               ${
-                 risk.overlap || risk.overrun
-                   ? "bg-red-100 text-red-700"
-                   : "bg-yellow-100 text-yellow-700"
-               }">
-               ${riskLabel}
-             </span>`
-            : ""
-        }
-      </div>
-
-      <!-- DEPARTMENT -->
-      <div class="text-xs">
-        ${s.department}
-      </div>
-
-      <!-- ACTION -->
-      <div class="text-right">
-        <button
-          data-id="${s.id}"
-          class="details-btn text-xs font-semibold
-                 px-3 py-1 rounded-lg
-                 border border-slate-200
-                 text-blue-600 hover:bg-blue-50
-                 transition">
-          Details →
-        </button>
-      </div>
-    `;
-
-      /* ROW CLICK → INLINE INSPECT */
       row.onclick = () => inspect(s.id);
-
-      /* DETAILS BUTTON → FULL PAGE */
       row.querySelector(".details-btn").onclick = (e) => {
         e.stopPropagation();
         window.location.href = `/doctor/schedule-details.html?id=${s.id}`;
@@ -358,35 +257,25 @@ function inspect(id) {
   inspectPanel.classList.remove("hidden");
 
   inspectDetails.innerHTML = `
-    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${
-      s.procedure
-    }</p></div>
-    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${
-      s.patientName
-    }</p></div>
-    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${
-      s.otRoomName
-    }</p></div>
-    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${
-      s.department
-    }</p></div>
-    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(
-      s.startTime
-    )} – ${time(s.endTime)}</p></div>
-    <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${
-      s.status
-    }</p></div>
+    <div><p class="text-xs text-slate-500">Procedure</p><p class="font-semibold">${s.procedure}</p></div>
+    <div><p class="text-xs text-slate-500">Patient</p><p class="font-semibold">${s.patientName}</p></div>
+    <div><p class="text-xs text-slate-500">OT Room</p><p class="font-semibold">${s.otRoomName}</p></div>
+    <div><p class="text-xs text-slate-500">Department</p><p class="font-semibold">${s.department}</p></div>
+    <div><p class="text-xs text-slate-500">Time</p><p class="font-semibold">${time(s.startTime)} – ${time(s.endTime)}</p></div>
+    <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${resolvedStatus(s)}</p></div>
   `;
 
-  markCompletedBtn.classList.toggle("hidden", s.status !== "Ongoing");
+  markCompletedBtn.classList.toggle(
+    "hidden",
+    resolvedStatus(s) !== "Ongoing"
+  );
 
   addNoteBtn.onclick = async () => {
-    const note = noteInput.value.trim();
-    if (!note) return;
+    if (!noteInput.value.trim()) return;
 
     await updateDoc(doc(db, "schedules", s.id), {
       notes: arrayUnion({
-        text: note,
+        text: noteInput.value,
         by: auth.currentUser.uid,
         at: Timestamp.now(),
       }),
@@ -406,18 +295,18 @@ function inspect(id) {
   };
 }
 
-/* ================= FILTER ================= */
+/* ================= INIT ================= */
 document.querySelectorAll(".filter-btn").forEach((btn) => {
   btn.onclick = () => {
     activeFilter = btn.dataset.filter;
     render();
   };
 });
+
 exportBtn.onclick = exportDayCSV;
 
-/* ================= INIT ================= */
-auth.onAuthStateChanged((user) => {
-  if (!user) return;
+auth.onAuthStateChanged((u) => {
+  if (!u) return;
   datePicker.valueAsDate = new Date();
   listenToSchedules();
 });
