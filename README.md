@@ -1,85 +1,170 @@
-README.md — Operation Scheduler System 
-Operation Scheduler System 
-Live URL: https://operation-scheduler-a44f8.web.app/ 
-A multi-role hospital operations scheduling system built with vanilla HTML, CSS, 
-JavaScript, and Firebase. The application streamlines OT (Operation Theatre) scheduling, 
-resource management, and coordination between administrators, doctors, OT staff, and 
-patients. 
-Problem Statement 
-Hospitals face operational inefficiencies when scheduling OT rooms, managing doctors, 
-patients, equipment, and staff availability using manual or fragmented systems. This 
-project provides a centralized web-based solution to manage hospital operations with 
-role-based access and real-time updates. 
-Key Features 
-Multi-role System 
-• Admin Dashboard 
-• Doctor Dashboard 
-• OT Staff Dashboard 
-• Patient Dashboard 
-Core Modules 
-• Authentication (Login, Register, Forgot Password, Email Verification) 
-• Role-based Access Control (middleware auth-guard) 
-• Department Management 
-• Doctor Management 
-• Patient Management 
-• OT Room Management 
-• Equipment Management 
-• Scheduling System 
-• Schedule Board (visual planner) 
-• Alerts and Notifications 
-• Insights and Activity Tracking 
-Functional Capabilities 
-• Create and manage OT schedules 
-• Conflict prevention (overlaps, availability) 
-• Alerts for upcoming and ongoing schedules 
-• Role-specific dashboards 
-• Modular JS architecture 
-• Firebase Authentication + Firestore backend 
-Tech Stack 
-• Frontend: HTML5, CSS3, Vanilla JavaScript 
-• Backend (BaaS): Firebase 
-o Firebase Authentication 
-o Firestore Database 
-o Firebase Hosting 
-• Architecture: Modular ES Modules 
-• Deployment: Firebase Hosting 
-Project Structure 
-project/ 
-├── admin/         
-├── doctor/        
-├── ot/            
-├── patient/       
-├── components/    
-├── middleware/    
-├── js/ 
-│   ├── admin/ 
-│   ├── doctor/ 
-│   ├── ot/ 
-│   ├── patient/ 
-│   ├── layout/ 
-│   ├── utils/ 
-│   └── firebase.js 
-├── index.html 
-├── login.html 
-└── firebase.json 
-   # Admin pages 
-   # Doctor pages 
-   # OT staff pages 
-   # Patient pages 
-   # Shared UI components 
-   # Auth guards 
-Setup Instructions (Local) 
-1. Clone the repository 
-git clone https://github.com/patel192/Operation-Scheduler-System.git 
-2. Open the project folder 
-3. Configure Firebase in js/firebase.js 
-4. Run locally using Live Server or similar extension 
-Deployment 
-Deployed using Firebase Hosting: 
-firebase login 
-firebase init hosting 
-firebase deploy 
-Status 
-This project is functional with core modules implemented. Further enhancements 
-(automation, analytics, scalability improvements) are planned as part of ongoing 
-development. 
+# 🏥 Operation Scheduler System
+
+A web-based hospital operation scheduling and management system built with HTML, CSS, JavaScript, and Firebase.  
+This project streamlines hospital operations by enabling administrators, doctors, OT staff, and patients to manage schedules, resources, and workflows efficiently.
+
+Live Demo: https://operation-scheduler-a44f8.web.app/
+
+---
+
+## 📌 Overview
+
+Operation Scheduler System is designed to solve real-world hospital workflow problems such as:
+- Managing operation theatres (OT)
+- Scheduling surgeries
+- Handling doctor availability
+- Managing equipment and departments
+- Coordinating between admin, doctors, OT staff, and patients
+
+The application supports multiple roles with separate dashboards and access control.
+
+---
+
+## 🚀 Features
+
+### Admin Panel
+- Manage departments
+- Manage doctors
+- Manage OT rooms
+- Manage equipment
+- Create and manage operation schedules
+- View system-wide dashboards
+- Approve user registrations
+- Monitor hospital resources
+
+### Doctor Panel
+- View personal schedule
+- Daily planner
+- Patient list
+- Insights dashboard
+- OT room availability
+- Profile management
+
+### OT Staff Panel
+- View assigned OT rooms
+- Alerts for upcoming operations
+- Schedule board
+- Dashboard
+
+### Patient Panel
+- View appointments
+- Appointment details
+- Reports
+- Profile management
+
+### Authentication & Security
+- Firebase Authentication (login, register, verify email)
+- Role-based access control
+- Route protection (auth-guard middleware)
+
+---
+
+## 🛠️ Tech Stack
+
+Frontend:
+- HTML5
+- CSS3
+- JavaScript (Vanilla)
+
+Backend / Services:
+- Firebase Authentication
+- Firebase Firestore Database
+- Firebase Hosting
+
+Tools:
+- Firebase CLI
+- Git & GitHub
+
+---
+
+## 📂 Project Structure
+
+project/
+├── admin/
+├── doctor/
+├── ot/
+├── patient/
+├── components/
+├── js/
+│ ├── admin/
+│ ├── doctor/
+│ ├── ot/
+│ ├── patient/
+│ ├── utils/
+│ └── firebase.js
+├── middleware/
+├── public/
+├── index.html
+├── login.html
+├── register.html
+└── firebase.json
+
+
+---
+
+## ⚙️ Setup Instructions
+
+1. Clone the repository:
+```bash
+git clone https://github.com/patel192/Operation-Scheduler-System.git
+cd Operation-Scheduler-System
+
+
+Install Firebase CLI (if not installed):
+
+npm install -g firebase-tools
+
+
+Login to Firebase:
+
+firebase login
+
+
+Run locally:
+
+firebase serve
+
+
+Deploy:
+
+firebase deploy
+
+📸 Screens Implemented
+
+Login & Register
+
+Admin Dashboard
+
+Doctor Dashboard
+
+OT Dashboard
+
+Patient Dashboard
+
+Scheduling Board
+
+Resource Management Pages
+
+📌 Project Status
+
+This project is actively under development.
+Future improvements include:
+
+Advanced analytics dashboards
+
+Real-time notifications
+
+Performance optimizations
+
+UI/UX refinements
+
+Audit logs and reporting
+
+👨‍💻 Author
+
+Muhammad Patel
+GitHub: https://github.com/patel192
+
+📄 License
+
+This project is for educational and internship demonstration purposes.
