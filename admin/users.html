@@ -12,16 +12,31 @@
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/users.js"></script>
+
+  <style>
+    .fade-up { animation: fadeUp .45s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .card {
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:22px;
+      box-shadow:0 8px 30px rgba(0,0,0,.04);
+    }
+  </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-100 via-white to-indigo-50 min-h-screen">
+<body class="bg-gradient-to-br from-slate-100 via-white to-indigo-50 min-h-screen text-slate-900">
 
 <div id="adminNavbar"></div>
 
-<main class="max-w-[1700px] mx-auto px-6 py-8 space-y-8">
+<main class="max-w-[1700px] mx-auto px-6 py-10 space-y-10 fade-up">
 
   <!-- HEADER -->
-  <section class="flex justify-between items-center">
+  <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
     <div>
       <h1 class="text-4xl font-bold tracking-tight flex items-center gap-3">
         <i data-lucide="users"></i>
@@ -35,24 +50,24 @@
 
   <!-- KPI STRIP -->
   <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">TOTAL USERS</p>
-      <h3 id="kpiTotal" class="text-4xl font-bold mt-2">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Total Users</p>
+      <h3 id="kpiTotal" class="text-4xl font-bold mt-3">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">ACTIVE</p>
-      <h3 id="kpiActive" class="text-4xl font-bold mt-2 text-emerald-600">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Active</p>
+      <h3 id="kpiActive" class="text-4xl font-bold mt-3 text-emerald-600">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">PENDING</p>
-      <h3 id="kpiPending" class="text-4xl font-bold mt-2 text-amber-600">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Pending</p>
+      <h3 id="kpiPending" class="text-4xl font-bold mt-3 text-amber-600">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">DISABLED</p>
-      <h3 id="kpiDisabled" class="text-4xl font-bold mt-2 text-rose-600">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Disabled</p>
+      <h3 id="kpiDisabled" class="text-4xl font-bold mt-3 text-rose-600">0</h3>
     </div>
   </section>
 
@@ -60,8 +75,8 @@
   <section class="grid lg:grid-cols-3 gap-6">
 
     <!-- ROLE DISTRIBUTION -->
-    <div class="bg-white rounded-2xl border p-6">
-      <h3 class="font-semibold mb-3 flex items-center gap-2">
+    <div class="card p-6">
+      <h3 class="font-semibold mb-4 flex items-center gap-2">
         <i data-lucide="pie-chart"></i>
         Role Distribution
       </h3>
@@ -69,8 +84,8 @@
     </div>
 
     <!-- STATUS BREAKDOWN -->
-    <div class="bg-white rounded-2xl border p-6">
-      <h3 class="font-semibold mb-3 flex items-center gap-2">
+    <div class="card p-6">
+      <h3 class="font-semibold mb-4 flex items-center gap-2">
         <i data-lucide="activity"></i>
         Status Overview
       </h3>
@@ -78,8 +93,8 @@
     </div>
 
     <!-- ATTENTION QUEUE -->
-    <div class="bg-white rounded-2xl border p-6">
-      <h3 class="font-semibold mb-3 flex items-center gap-2 text-amber-600">
+    <div class="card p-6">
+      <h3 class="font-semibold mb-4 flex items-center gap-2 text-amber-600">
         <i data-lucide="alert-triangle"></i>
         Needs Attention
       </h3>
@@ -94,8 +109,8 @@
 
   </section>
 
-  <!-- LIVE USERS TABLE -->
-  <section class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+  <!-- USERS TABLE -->
+  <section class="card overflow-hidden">
 
     <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
       <h3 class="font-semibold flex items-center gap-2">

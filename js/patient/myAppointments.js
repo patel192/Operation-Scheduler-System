@@ -1,78 +1,67 @@
-import { db } from "../firebase.js";
+import { auth, db } from "../firebase.js";
 import {
   collection,
   query,
   where,
   getDocs,
   orderBy,
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
 import { autoUpdateScheduleStatus } from "../utils/autoUpdateScheduleStatus.js";
+
 /* ================= ELEMENTS ================= */
-const patientIdSection = document.getElementById("patientIdSection");
-const appointmentsSection = document.getElementById("appointmentsSection");
-const appointmentsList = document.getElementById("appointmentsList");
+const loadingEl = document.getElementById("loading");
 const emptyState = document.getElementById("emptyState");
+const listEl = document.getElementById("appointmentsList");
 
-const patientIdInput = document.getElementById("patientIdInput");
-const loadBtn = document.getElementById("loadBtn");
-const changeIdBtn = document.getElementById("changeIdBtn");
-
-/* ================= INIT ================= */
-const savedPatientId = localStorage.getItem("patientId");
-
-if (savedPatientId) {
-  patientIdInput.value = savedPatientId;
-
-  (async () => {
-    // ✅ sync statuses once
-    await autoUpdateScheduleStatus();
-
-    // ✅ then load appointments
-    await loadAppointments(savedPatientId);
-  })();
-}
-
-/* ================= EVENTS ================= */
-loadBtn.onclick = async () => {
-  const patientId = patientIdInput.value.trim();
-
-  if (!patientId) {
-    alert("Please enter Patient ID");
+/* ================= AUTH INIT ================= */
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.replace("/login.html");
     return;
   }
 
-  localStorage.setItem("patientId", patientId);
+  try {
+    await autoUpdateScheduleStatus();
 
-  // ✅ sync statuses once per load
-  await autoUpdateScheduleStatus();
+    // Load user profile
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (!userSnap.exists()) {
+      throw new Error("User profile not found");
+    }
 
-  loadAppointments(patientId);
-};
+    const userData = userSnap.data();
+    const patientName = userData.displayName;
 
+    if (!patientName) {
+      throw new Error("User name missing on account");
+    }
 
-changeIdBtn.onclick = () => {
-  localStorage.removeItem("patientId");
-  appointmentsSection.classList.add("hidden");
-  patientIdSection.classList.remove("hidden");
-};
+    await loadAppointmentsByName(patientName);
+
+  } catch (err) {
+    console.error("❌ My Appointments Error:", err);
+    loadingEl.innerHTML = `<p class="text-red-600">Failed to load appointments</p>`;
+  }
+});
 
 /* ================= LOAD APPOINTMENTS ================= */
-async function loadAppointments(patientId) {
-  appointmentsList.innerHTML = "";
-  emptyState.classList.add("hidden");
-
-  patientIdSection.classList.add("hidden");
-  appointmentsSection.classList.remove("hidden");
+async function loadAppointmentsByName(patientName) {
+  loadingEl.classList.add("hidden");
+  listEl.classList.remove("hidden");
 
   const q = query(
     collection(db, "schedules"),
-    where("patientId", "==", patientId),
+    where("patientName", "==", patientName),
     orderBy("startTime", "asc")
   );
 
   const snap = await getDocs(q);
 
   if (snap.empty) {
+    listEl.classList.add("hidden");
     emptyState.classList.remove("hidden");
     return;
   }
@@ -86,31 +75,23 @@ async function loadAppointments(patientId) {
 
     const card = document.createElement("div");
     card.className =
-      "bg-white p-4 rounded-xl shadow border cursor-pointer hover:border-blue-400 transition";
+      "glass border border-[--border] rounded-2xl p-5 shadow-sm cursor-pointer hover:border-blue-500 transition";
 
     card.innerHTML = `
       <div class="flex justify-between items-start">
         <div>
-          <p class="font-semibold">${s.procedure}</p>
-          <p class="text-sm text-slate-500">
+          <h3 class="font-bold text-lg">${s.procedure}</h3>
+          <p class="text-sm text-slate-500 mt-1">
             ${start.toLocaleDateString()} •
-            ${start.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-            –
-            ${end.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            ${start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} –
+            ${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </p>
           <p class="text-sm text-slate-500">
-            OT Room: ${s.otRoom} • Dr. ${s.surgeonName}
+            OT: ${s.otRoomName} • Dr. ${s.surgeonName}
           </p>
         </div>
 
-        <span class="px-3 py-1 text-xs rounded-full font-semibold
-          ${statusClass(s.status)}">
+        <span class="px-3 py-1 text-xs rounded-full font-semibold ${statusClass(s.status)}">
           ${s.status}
         </span>
       </div>
@@ -120,7 +101,7 @@ async function loadAppointments(patientId) {
       window.location.href = `/patient/appointment-details.html?id=${id}`;
     };
 
-    appointmentsList.appendChild(card);
+    listEl.appendChild(card);
   });
 }
 

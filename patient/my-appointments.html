@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Appointment Details • Patient</title>
+  <title>My Appointments • Patient</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
       --primary:#0A6CFF;
-      --bg:#F1F5F9;
+      --bg:#F8FAFC;
       --card:#ffffff;
-      --text:#1E293B;
+      --text:#0F172A;
       --muted:#64748B;
       --border:#E5E7EB;
     }
 
     .glass {
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
     }
 
     .fade-in {
@@ -33,113 +32,38 @@
     }
   </style>
 
-  <!-- Navbar -->
+  <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadPatientNavbar.js"></script>
-
-  <!-- Script -->
-  <script type="module" defer src="/js/patient/appointmentDetails.js"></script>
+  <script type="module" defer src="/js/patient/myAppointments.js"></script>
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-4xl mx-auto px-4 py-10">
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-8">
 
   <!-- HEADER -->
-  <section class="text-center mb-12">
-    <h1 class="text-3xl font-bold">Appointment Details</h1>
+  <section class="text-center">
+    <h1 class="text-4xl font-extrabold tracking-tight">My Appointments</h1>
     <p class="text-sm text-[--muted] mt-2">
-      Complete information about your scheduled procedure
+      All your scheduled hospital procedures in one place
     </p>
   </section>
 
   <!-- LOADING -->
   <div id="loading" class="text-center py-20 text-[--muted] fade-in">
-    <div class="text-4xl mb-3">⏳</div>
-    <p class="font-semibold text-lg">Loading appointment details…</p>
+    <div class="mx-auto w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+    <p class="font-semibold text-lg">Loading your appointments…</p>
   </div>
 
-  <!-- ================= DETAILS ================= -->
-  <section id="detailsSection" class="hidden space-y-8 fade-in">
+  <!-- EMPTY -->
+  <div id="emptyState" class="hidden text-center text-[--muted] py-16">
+    <p class="text-lg font-semibold">No appointments found</p>
+    <p class="text-sm mt-2">You don't have any scheduled procedures yet.</p>
+  </div>
 
-    <!-- STATUS CARD -->
-    <section
-      class="glass border border-[--border] rounded-3xl shadow-lg
-             p-6 flex flex-col sm:flex-row sm:items-center
-             sm:justify-between gap-4">
-
-      <div>
-        <p class="text-sm text-[--muted]">Current Status</p>
-        <span
-          id="statusBadge"
-          class="inline-block mt-2 px-4 py-1.5 rounded-full
-                 text-sm font-semibold">
-        </span>
-      </div>
-
-      <button
-        onclick="history.back()"
-        class="text-sm font-semibold text-[--primary] hover:underline">
-        ← Back to Appointments
-      </button>
-    </section>
-
-    <!-- BASIC INFO -->
-    <section class="glass border border-[--border] rounded-3xl shadow p-6">
-      <h3 class="font-semibold text-lg mb-6">
-        Appointment Information
-      </h3>
-
-      <div class="grid sm:grid-cols-2 gap-6 text-sm">
-
-        <div>
-          <p class="text-[--muted]">Patient Name</p>
-          <p class="font-semibold text-base" id="patientName">—</p>
-        </div>
-
-        <div>
-          <p class="text-[--muted]">Patient ID</p>
-          <p class="font-semibold text-base" id="patientId">—</p>
-        </div>
-
-        <div>
-          <p class="text-[--muted]">Procedure</p>
-          <p class="font-semibold text-base" id="procedure">—</p>
-        </div>
-
-        <div>
-          <p class="text-[--muted]">Doctor</p>
-          <p class="font-semibold text-base" id="surgeon">—</p>
-        </div>
-
-        <div>
-          <p class="text-[--muted]">Operation Theatre</p>
-          <p class="font-semibold text-base" id="otRoom">—</p>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- TIME -->
-    <section class="glass border border-[--border] rounded-3xl shadow p-6">
-      <h3 class="font-semibold text-lg mb-2">
-        Scheduled Time
-      </h3>
-      <p class="text-sm text-slate-700" id="timeRange">—</p>
-    </section>
-
-    <!-- NOTES -->
-    <section class="glass border border-[--border] rounded-3xl shadow p-6">
-      <h3 class="font-semibold text-lg mb-2">
-        Notes from Hospital
-      </h3>
-      <p class="text-sm text-[--muted] leading-relaxed" id="notes">
-        —
-      </p>
-    </section>
-
-  </section>
+  <!-- LIST -->
+  <section id="appointmentsList" class="hidden space-y-4 fade-in"></section>
 
 </main>
-
 </body>
 </html>

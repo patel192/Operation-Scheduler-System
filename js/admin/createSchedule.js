@@ -16,6 +16,7 @@ import { loadOtStaff } from "./loadOtStaff.js";
 import { loadDoctors } from "./loadDoctors.js";
 import { loadOtRooms } from "./loadOtRooms.js";
 import { loadDepartments } from "./loadDepartments.js";
+import { loadPatients } from "./loadPatients.js";
 import { createScheduleCreatedAlerts } from "../automation/createScheduleAlerts.js";
 /* ================= STATE ================= */
 const steps = document.querySelectorAll(".form-section");
@@ -47,6 +48,7 @@ const el = {
 
   staff: document.getElementById("otStaffSelect"),
   surgeon: document.getElementById("surgeonSelect"),
+  patientSelect: document.getElementById("patientNameSelect"),
 };
 const review = {
   patient: document.getElementById("rvPatient"),
@@ -72,6 +74,7 @@ function renderReview() {
 await loadDepartments(el.department);
 await loadOtStaff(el.staff);
 await loadDoctors(el.surgeon);
+await loadPatients(el.patientSelect);
 
 function showStep(i) {
   steps.forEach((s, idx) => s.classList.toggle("hidden-step", idx !== i));
@@ -81,15 +84,16 @@ showStep(0);
 
 /* ================= STEP 1 ================= */
 el.step1Next.onclick = async () => {
+  const selected = el.patientSelect.selectedOptions[0];
   state.patientId =
     document.getElementById("patientIdInput").value || `PAT-${Date.now()}`;
-  state.patientName = document.getElementById("patientNameInput").value;
+  state.patientName = selected?.dataset.name || "";
   state.procedure = document.getElementById("procedureInput").value;
   state.notes = document.getElementById("notesInput").value;
   state.department = el.department.value;
 
-  if (!state.department || !state.procedure)
-    return alert("Department & procedure required");
+  if (!state.department || !state.procedure || !state.patientName)
+    return alert("Patient, department & procedure required");
 
   await loadOtRooms(el.otRoom, state.department);
   state.equipmentIds = [];

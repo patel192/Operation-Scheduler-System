@@ -9,15 +9,16 @@
 
   <style>
     :root {
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
     }
 
     .glass {
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(12px);
     }
 
     .pulse {
@@ -26,7 +27,7 @@
 
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); }
-      70% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+      70% { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
       100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
     }
   </style>
@@ -39,29 +40,27 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1700px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1700px] mx-auto px-6 py-8 space-y-6">
 
   <!-- HEADER -->
   <section>
-    <h1 class="text-xl font-bold">Equipment & Resources</h1>
-    <p class="text-xs text-[--muted]">
-      Equipment availability & surgical usage context
+    <h1 class="text-3xl font-bold tracking-tight">Equipment & Resources</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Availability, usage, and operational context of surgical equipment
     </p>
   </section>
 
   <!-- KPI STRIP -->
   <section
     id="equipmentSummary"
-    class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-semibold">
-    <!-- injected -->
+    class="glass rounded-2xl border border-[--border] px-6 py-3
+           grid grid-cols-2 md:grid-cols-5 gap-4 text-sm font-semibold shadow-sm">
   </section>
 
   <!-- EQUIPMENT GRID -->
   <section
     id="equipmentGrid"
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-    <!-- cards injected -->
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
   </section>
 
 </main>

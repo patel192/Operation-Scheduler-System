@@ -8,9 +8,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
@@ -18,79 +15,61 @@
   <script type="module" defer src="/js/admin/dashboard.js"></script>
 
   <style>
-    /* Smooth entry animation */
     .fade-up {
-      animation: fadeUp 0.5s ease forwards;
+      animation: fadeUp .5s ease forwards;
     }
 
     @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Ongoing pulse */
     .pulse-amber {
       animation: pulseAmber 2s infinite;
     }
 
     @keyframes pulseAmber {
-
-      0%,
-      100% {
-        background-color: rgb(254 243 199);
-      }
-
-      50% {
-        background-color: rgb(253 230 138);
-      }
+      0%,100% { background-color: rgb(254 243 199); }
+      50% { background-color: rgb(253 230 138); }
     }
   </style>
 </head>
 
-<body class="bg-sky-50 text-slate-900 min-h-screen">
+<body class="bg-slate-50 text-slate-900 min-h-screen">
 
   <div id="adminNavbar"></div>
 
-  <main class="max-w-[1700px] mx-auto px-5 py-5 grid grid-cols-12 gap-5">
+  <main class="max-w-[1800px] mx-auto px-4 py-6 grid grid-cols-12 gap-6">
 
     <!-- LEFT -->
-    <section class="col-span-3 space-y-5 fade-up">
+    <section class="col-span-12 lg:col-span-3 space-y-6 fade-up">
 
-      <!-- HEALTH -->
-      <div class="bg-white rounded-2xl p-5 border shadow-sm">
-        <div class="flex items-center gap-2 text-sky-700">
+      <!-- SYSTEM HEALTH -->
+      <div class="bg-white rounded-2xl border shadow-sm p-6">
+        <div class="flex items-center gap-2 text-blue-700">
           <i data-lucide="activity"></i>
           <h3 class="font-semibold">System Health</h3>
         </div>
 
-        <p id="healthScore" class="text-4xl font-bold text-sky-700 mt-4">
-          0%
-        </p>
+        <p id="healthScore" class="text-5xl font-bold text-blue-700 mt-4">0%</p>
 
-        <div class="mt-4 space-y-2 text-sm">
-          <div class="flex justify-between items-center">
-            <span class="flex gap-2 items-center text-slate-600">
+        <div class="mt-6 space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="flex items-center gap-2 text-slate-600">
               <i data-lucide="hospital" class="w-4"></i> OT Utilization
             </span>
             <span id="otUtilization" class="font-semibold text-blue-600">0%</span>
           </div>
 
-          <div class="flex justify-between items-center">
-            <span class="flex gap-2 items-center text-slate-600">
-              <i data-lucide="stethoscope" class="w-4"></i> Equipment Load
+          <div class="flex justify-between">
+            <span class="flex items-center gap-2 text-slate-600">
+              <i data-lucide="cpu" class="w-4"></i> Equipment Load
             </span>
             <span id="equipmentUtilization" class="font-semibold text-emerald-600">0%</span>
           </div>
 
-          <div class="flex justify-between items-center">
-            <span class="flex gap-2 items-center text-slate-600">
+          <div class="flex justify-between">
+            <span class="flex items-center gap-2 text-slate-600">
               <i data-lucide="users" class="w-4"></i> Staff Busy
             </span>
             <span id="staffUtilization" class="font-semibold text-amber-600">0%</span>
@@ -99,8 +78,8 @@
       </div>
 
       <!-- ALERTS -->
-      <div class="bg-white rounded-2xl p-5 border shadow-sm">
-        <div class="flex items-center gap-2 text-red-600 mb-3">
+      <div class="bg-white rounded-2xl border shadow-sm p-6">
+        <div class="flex items-center gap-2 text-red-600 mb-4">
           <i data-lucide="alert-triangle"></i>
           <h3 class="font-semibold">Critical Alerts</h3>
         </div>
@@ -109,19 +88,16 @@
           <li class="text-slate-400">No active alerts</li>
         </ul>
       </div>
-
     </section>
 
     <!-- CENTER -->
-    <section class="col-span-6 space-y-5 fade-up">
+    <section class="col-span-12 lg:col-span-6 space-y-6 fade-up">
 
-      <!-- LIVE OPS -->
-      <div class="bg-white rounded-2xl border shadow-sm">
-        <div class="px-5 py-3 border-b bg-sky-100 rounded-t-2xl flex items-center gap-2">
-          <i data-lucide="clock" class="text-sky-700"></i>
-          <h2 class="font-semibold text-sky-900">
-            Live Surgeries
-          </h2>
+      <!-- LIVE SURGERIES -->
+      <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+        <div class="px-6 py-3 bg-blue-50 border-b flex items-center gap-2">
+          <i data-lucide="clock" class="text-blue-600"></i>
+          <h2 class="font-semibold">Live Surgeries</h2>
         </div>
 
         <div id="liveOperations" class="divide-y"></div>
@@ -131,13 +107,11 @@
         </div>
       </div>
 
-      <!-- TODAY -->
-      <div class="bg-white rounded-2xl border shadow-sm">
-        <div class="px-5 py-3 border-b flex items-center gap-2">
+      <!-- TODAY TABLE -->
+      <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+        <div class="px-6 py-3 border-b flex items-center gap-2">
           <i data-lucide="calendar-days"></i>
-          <h2 class="font-semibold">
-            Today’s OT Schedule
-          </h2>
+          <h2 class="font-semibold">Today's OT Schedule</h2>
         </div>
 
         <div class="overflow-x-auto">
@@ -145,63 +119,58 @@
             <thead class="bg-slate-100 text-slate-600">
               <tr>
                 <th class="p-3 text-left">Patient</th>
-                <th class="p-3">OT</th>
-                <th class="p-3">Time</th>
-                <th class="p-3">Surgeon</th>
-                <th class="p-3">Status</th>
+                <th class="p-3 text-center">OT</th>
+                <th class="p-3 text-center">Time</th>
+                <th class="p-3 text-left">Surgeon</th>
+                <th class="p-3 text-center">Status</th>
               </tr>
             </thead>
             <tbody id="todayTable" class="divide-y"></tbody>
           </table>
         </div>
       </div>
-      <!-- ===== CHARTS ===== -->
-      <div class="grid grid-cols-2 gap-4 p-4 border-t bg-slate-50">
 
-        <!-- USER DISTRIBUTION -->
-        <div class="bg-white rounded-xl p-4 border shadow-sm">
-          <h4 class="text-sm font-semibold mb-2 flex items-center gap-2">
+      <!-- CHARTS -->
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="bg-white rounded-2xl p-5 border shadow-sm">
+          <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
             <i data-lucide="users"></i> Staff Distribution
           </h4>
-          <canvas id="userChart" height="140"></canvas>
+          <canvas id="userChart" height="160"></canvas>
         </div>
 
-        <!-- DEPARTMENT LOAD -->
-        <div class="bg-white rounded-xl p-4 border shadow-sm">
-          <h4 class="text-sm font-semibold mb-2 flex items-center gap-2">
-            <i data-lucide="layers"></i> Department Load (Today)
+        <div class="bg-white rounded-2xl p-5 border shadow-sm">
+          <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
+            <i data-lucide="layers"></i> Department Load
           </h4>
-          <canvas id="deptChart" height="140"></canvas>
+          <canvas id="deptChart" height="160"></canvas>
         </div>
-
       </div>
-
     </section>
 
     <!-- RIGHT -->
-    <section class="col-span-3 space-y-5 fade-up">
+    <section class="col-span-12 lg:col-span-3 space-y-6 fade-up">
 
-      <div class="bg-white rounded-2xl p-5 border shadow-sm">
-        <h3 class="font-semibold flex items-center gap-2 mb-3">
+      <div class="bg-white rounded-2xl p-6 border shadow-sm">
+        <h3 class="font-semibold flex items-center gap-2 mb-4">
           <i data-lucide="layout-grid"></i> OT Rooms
         </h3>
-        <ul id="otList" class="text-sm space-y-1"></ul>
+        <ul id="otList" class="text-sm space-y-2"></ul>
       </div>
 
-      <div class="bg-white rounded-2xl p-5 border shadow-sm">
-        <h3 class="font-semibold flex items-center gap-2 mb-3">
+      <div class="bg-white rounded-2xl p-6 border shadow-sm">
+        <h3 class="font-semibold flex items-center gap-2 mb-4">
           <i data-lucide="cpu"></i> Equipment In Use
         </h3>
-        <ul id="equipmentList" class="text-sm space-y-1"></ul>
+        <ul id="equipmentList" class="text-sm space-y-2"></ul>
       </div>
 
-      <div class="bg-white rounded-2xl p-5 border shadow-sm">
-        <h3 class="font-semibold flex items-center gap-2 mb-3">
+      <div class="bg-white rounded-2xl p-6 border shadow-sm">
+        <h3 class="font-semibold flex items-center gap-2 mb-4">
           <i data-lucide="user-check"></i> Staff Occupancy
         </h3>
-        <ul id="staffList" class="text-sm space-y-1"></ul>
+        <ul id="staffList" class="text-sm space-y-2"></ul>
       </div>
-
     </section>
 
   </main>
@@ -211,5 +180,4 @@
   </script>
 
 </body>
-
 </html>

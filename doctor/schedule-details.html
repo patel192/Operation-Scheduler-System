@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <title>Schedule Details · Doctor</title>
@@ -11,15 +10,15 @@
   <style>
     :root {
       --primary: #2563eb;
-      --bg: #F1F5F9;
-      --text: #1E293B;
-      --muted: #64748B;
-      --border: #E5E7EB;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e5e7eb;
     }
 
     .glass {
-      background: rgba(255, 255, 255, .96);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(12px);
     }
 
     .pulse {
@@ -27,36 +26,20 @@
     }
 
     @media print {
-
-      header,
-      nav,
-      button {
+      header, nav, button, a {
         display: none !important;
       }
-
-      body {
-        background: white !important;
-      }
-
+      body { background: white !important; }
       .glass {
         box-shadow: none !important;
         border: 1px solid #ccc !important;
       }
     }
 
-
     @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(220, 38, 38, .35);
-      }
-
-      70% {
-        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
-      }
-
-      100% {
-        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
-      }
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, .35); }
+      70% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
   </style>
 
@@ -65,122 +48,131 @@
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/schedule-details.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 </head>
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-  <main class="max-w-[1600px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1600px] mx-auto px-6 py-8 space-y-6">
 
-    <!-- HEADER -->
-    <section class="flex items-center justify-between">
+  <!-- HEADER -->
+  <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">Schedule Details</h1>
+      <p class="text-sm text-[--muted] mt-1">
+        Procedure execution & clinical context
+      </p>
+    </div>
 
-      <div>
-        <h1 class="text-xl font-bold">Schedule Details</h1>
-        <p class="text-xs text-[--muted]">
-          Procedure execution & clinical context
-        </p>
-      </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="exportPdfBtn"
+        class="text-xs font-semibold px-4 py-2 rounded-lg border border-slate-300
+               text-slate-700 hover:bg-slate-100 transition">
+        Export PDF
+      </button>
 
-      <div class="flex items-center gap-3">
-        <button id="exportPdfBtn" class="text-xs font-semibold px-3 py-1.5 rounded-lg
-             border border-slate-300
-             text-slate-700 hover:bg-slate-100">
-          Export PDF
-        </button>
+      <button id="printBtn"
+        class="text-xs font-semibold px-4 py-2 rounded-lg border border-slate-300
+               text-slate-700 hover:bg-slate-100 transition">
+        Print
+      </button>
 
-        <button id="printBtn" class="text-xs font-semibold px-3 py-1.5 rounded-lg
-             border border-slate-300
-             text-slate-700 hover:bg-slate-100">
-          Print
-        </button>
+      <a href="/doctor/my-schedule.html"
+         class="text-sm font-semibold text-blue-600 hover:underline ml-1">
+        ← Back
+      </a>
+    </div>
+  </section>
 
-        <a href="/doctor/my-schedule.html" class="text-sm font-semibold text-blue-600 hover:underline ml-2">
-          ← Back
-        </a>
-      </div>
+  <div id="exportArea" class="space-y-5">
 
+    <!-- TOP SUMMARY -->
+    <section id="topSummary"
+      class="glass rounded-2xl border border-[--border] px-5 py-4
+             grid grid-cols-2 md:grid-cols-6 gap-4 text-xs font-semibold shadow-sm">
+      <!-- injected -->
     </section>
 
-    <div id="exportArea">
-      <!-- TOP SUMMARY -->
-      <section id="topSummary" class="glass rounded-xl border px-4 py-3
-         grid grid-cols-2 md:grid-cols-6 gap-3 text-xs font-semibold">
+    <!-- MAIN GRID -->
+    <section class="grid grid-cols-12 gap-5">
 
-        <!-- injected -->
-      </section>
+      <!-- LEFT -->
+      <section class="col-span-12 md:col-span-7 glass rounded-2xl border border-[--border] p-6 space-y-5 shadow-sm">
 
-      <!-- MAIN GRID -->
-      <section class="grid grid-cols-12 gap-4">
+        <h2 class="font-semibold text-sm tracking-wide">Procedure Overview</h2>
 
-        <!-- LEFT: CORE DETAILS -->
-        <section class="col-span-12 md:col-span-7 glass rounded-2xl border p-4 space-y-4">
+        <div id="coreDetails" class="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm">
+          <!-- injected -->
+        </div>
 
-          <h2 class="font-semibold text-sm">Procedure Overview</h2>
+        <!-- NOTES -->
+        <div class="pt-4 border-t space-y-3">
+          <p class="text-xs text-slate-500">Procedure Notes</p>
 
-          <div id="coreDetails" class="grid grid-cols-2 gap-4 text-sm">
-            <!-- injected -->
-          </div>
+          <div id="notesList" class="space-y-2"></div>
 
-          <!-- NOTES -->
-          <div>
-            <p class="text-xs text-slate-500 mb-1">Procedure Notes</p>
-            <div id="notesList" class="space-y-2 mb-2"></div>
+          <textarea
+            id="noteInput"
+            rows="2"
+            placeholder="Add intra-operative or post-op note…"
+            class="w-full border rounded-xl px-4 py-3 text-sm
+                   focus:ring-2 focus:ring-blue-200 focus:outline-none">
+          </textarea>
 
-            <textarea id="noteInput" rows="2" placeholder="Add intra-operative or post-op note…" class="w-full border rounded-lg px-3 py-2 text-sm
-               focus:ring-2 focus:ring-blue-200"></textarea>
-
-            <button id="addNoteBtn" class="mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg
-               bg-slate-800 text-white hover:bg-slate-900">
+          <div class="flex justify-end">
+            <button id="addNoteBtn"
+              class="text-xs font-semibold px-4 py-2 rounded-lg
+                     bg-slate-900 text-white hover:bg-black transition">
               Add Note
             </button>
           </div>
-
-        </section>
-
-        <!-- RIGHT: STATUS + CONTEXT -->
-        <aside class="col-span-12 md:col-span-5 glass rounded-2xl border p-4 space-y-4">
-
-          <h2 class="font-semibold text-sm">Live Status</h2>
-
-          <div id="statusPanel" class="space-y-3 text-sm">
-            <!-- injected -->
-          </div>
-          <!-- LIVE SURGERY TIMER -->
-          <div id="liveTimer" class="hidden space-y-2 pt-3 border-t">
-            <p class="text-xs text-slate-500">Live Surgery Timer</p>
-
-            <div class="flex justify-between text-sm font-semibold">
-              <span id="elapsedTime">00m</span>
-              <span id="remainingTime" class="text-slate-500">–</span>
-            </div>
-
-            <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-              <div id="progressBar" class="h-full bg-blue-600 transition-all duration-500" style="width: 0%">
-              </div>
-            </div>
-
-            <p id="overrunLabel" class="hidden text-xs font-semibold text-red-600">
-              Overrun detected
-            </p>
-          </div>
-
-
-          <div class="pt-3 border-t flex justify-end">
-            <button id="markCompletedBtn" class="hidden px-4 py-2 rounded-lg text-sm font-semibold
-               bg-green-600 text-white hover:bg-green-700">
-              Mark Completed
-            </button>
-          </div>
-
-        </aside>
+        </div>
 
       </section>
-    </div>
 
+      <!-- RIGHT -->
+      <aside class="col-span-12 md:col-span-5 glass rounded-2xl border border-[--border] p-6 space-y-5 shadow-sm">
 
-  </main>
+        <h2 class="font-semibold text-sm tracking-wide">Live Status</h2>
+
+        <div id="statusPanel" class="space-y-3 text-sm">
+          <!-- injected -->
+        </div>
+
+        <!-- LIVE TIMER -->
+        <div id="liveTimer" class="hidden space-y-3 pt-4 border-t">
+          <p class="text-xs text-slate-500">Live Surgery Timer</p>
+
+          <div class="flex justify-between text-sm font-semibold">
+            <span id="elapsedTime">00m</span>
+            <span id="remainingTime" class="text-slate-500">–</span>
+          </div>
+
+          <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+            <div id="progressBar"
+                 class="h-full bg-blue-600 transition-all duration-500"
+                 style="width: 0%">
+            </div>
+          </div>
+
+          <p id="overrunLabel" class="hidden text-xs font-semibold text-red-600">
+            Overrun detected
+          </p>
+        </div>
+
+        <div class="pt-4 border-t flex justify-end">
+          <button id="markCompletedBtn"
+            class="hidden px-5 py-2.5 rounded-xl text-sm font-semibold
+                   bg-green-600 text-white hover:bg-green-700 transition">
+            Mark Completed
+          </button>
+        </div>
+
+      </aside>
+
+    </section>
+  </div>
+
+</main>
 
 </body>
-
-</html>
+</</html>

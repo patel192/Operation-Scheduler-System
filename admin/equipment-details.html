@@ -6,121 +6,144 @@
   <title>Equipment Details · Admin</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/equipment-details.js"></script>
+
+  <style>
+    .fade-up { animation: fadeUp .45s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .card {
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:22px;
+      box-shadow:0 8px 30px rgba(0,0,0,.04);
+    }
+  </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen text-slate-800">
 
   <div id="adminNavbar"></div>
 
-  <main class="max-w-5xl mx-auto px-6 py-6">
+  <main class="max-w-6xl mx-auto px-6 py-10 space-y-8 fade-up">
 
     <!-- HEADER -->
-    <div class="flex items-center justify-between mb-6">
+    <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
       <div>
-        <h1 class="text-2xl font-bold" id="equipmentName">—</h1>
-        <p class="text-sm text-slate-500">
-          Equipment details & operational status
+        <h1 class="text-4xl font-bold" id="equipmentName">—</h1>
+        <p class="text-sm text-slate-500 mt-1">
+          Equipment details & operational control
         </p>
       </div>
 
-      <div class="flex gap-2">
+      <div class="flex gap-3">
         <a
           id="editEquipmentBtn"
           href="#"
-          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          Edit
+          class="px-5 py-2.5 text-sm bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition">
+          Edit Equipment
         </a>
 
         <a
           href="/admin/resources.html"
-          class="px-4 py-2 text-sm border rounded-lg">
+          class="px-5 py-2.5 text-sm border rounded-xl bg-white hover:bg-slate-50 transition">
           Back to Resources
         </a>
       </div>
-    </div>
+    </section>
 
-    <!-- MAIN CARD -->
-    <section class="bg-white border rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- MAIN GRID -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-      <!-- LEFT -->
-      <div class="md:col-span-2 space-y-4">
+      <!-- DETAILS -->
+      <div class="lg:col-span-2 card p-8 space-y-6">
 
-        <div>
-          <p class="text-sm text-slate-500">Category</p>
-          <p class="font-medium" id="equipmentCategory">—</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500">Category</p>
+            <p class="text-lg font-semibold mt-1" id="equipmentCategory">—</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500">Departments</p>
+            <p class="text-lg font-semibold mt-1" id="equipmentDepartments">—</p>
+          </div>
         </div>
 
         <div>
-          <p class="text-sm text-slate-500">Departments</p>
-          <p class="font-medium" id="equipmentDepartments">—</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">Description</p>
+          <p id="equipmentDescription" class="text-slate-700 leading-relaxed mt-2">—</p>
+        </div>
+
+      </div>
+
+      <!-- STATUS PANEL -->
+      <div class="card p-8 space-y-6">
+
+        <div>
+          <p class="text-xs font-semibold uppercase text-slate-500">Status</p>
+          <div id="equipmentStatus" class="mt-2"></div>
+
+          <div class="mt-4 space-y-2">
+            <button
+              id="markMaintenanceBtn"
+              class="hidden w-full px-4 py-2 text-sm rounded-xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition">
+              Put Under Maintenance
+            </button>
+
+            <button
+              id="restoreActiveBtn"
+              class="hidden w-full px-4 py-2 text-sm rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+              Restore to Active
+            </button>
+
+            <p
+              id="maintenanceHint"
+              class="hidden text-xs text-slate-500">
+              Equipment currently in use cannot be placed under maintenance.
+            </p>
+          </div>
         </div>
 
         <div>
-          <p class="text-sm text-slate-500">Description</p>
-          <p id="equipmentDescription" class="text-slate-700">—</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">Current OT Room</p>
+          <p class="font-semibold mt-1" id="currentOtRoom">—</p>
+        </div>
+
+        <div>
+          <p class="text-xs font-semibold uppercase text-slate-500">Current Schedule</p>
+          <p id="currentSchedule" class="mt-1">—</p>
+        </div>
+
+        <div>
+          <p class="text-xs font-semibold uppercase text-slate-500">Last Used</p>
+          <p class="mt-1" id="lastUsedAt">—</p>
         </div>
 
       </div>
 
-      <!-- RIGHT -->
-      <div class="space-y-4">
-
-        <div>
-          <p class="text-sm text-slate-500">Status</p>
-          <div id="equipmentStatus" class="mb-2"></div>
-
-          <!-- MAINTENANCE ACTIONS -->
-          <button
-            id="markMaintenanceBtn"
-            class="hidden px-3 py-1 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700">
-            Put Under Maintenance
-          </button>
-
-          <button
-            id="restoreActiveBtn"
-            class="hidden px-3 py-1 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700">
-            Restore to Active
-          </button>
-
-          <p
-            id="maintenanceHint"
-            class="hidden text-xs text-slate-500 mt-1">
-            Equipment currently in use cannot be put under maintenance.
-          </p>
-        </div>
-
-        <div>
-          <p class="text-sm text-slate-500">Current OT Room</p>
-          <p class="font-medium" id="currentOtRoom">—</p>
-        </div>
-
-        <div>
-          <p class="text-sm text-slate-500">Current Schedule</p>
-          <p id="currentSchedule">—</p>
-        </div>
-
-        <div>
-          <p class="text-sm text-slate-500">Last Used</p>
-          <p id="lastUsedAt">—</p>
-        </div>
-
-      </div>
     </section>
 
     <!-- IMAGE -->
-    <section class="mt-6">
+    <section class="card p-6 max-w-md">
+      <p class="text-xs font-semibold uppercase text-slate-500 mb-3">Equipment Image</p>
       <img
         id="equipmentImage"
         src=""
         alt="Equipment Image"
-        class="max-w-sm rounded-xl border hidden" />
+        class="w-full rounded-xl border hidden object-contain bg-white" />
     </section>
 
   </main>
+
+  <script>lucide.createIcons();</script>
 
 </body>
 </html>

@@ -10,10 +10,11 @@
   <style>
     :root {
       --primary:#2563eb;
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
     }
 
     .glass {
@@ -21,13 +22,13 @@
       backdrop-filter: blur(10px);
     }
 
-    .pulse {
-      animation: pulse 2s infinite;
+    .fade-in {
+      animation: fade .25s ease;
     }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); }
-      70% { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
-      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(4px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
@@ -39,22 +40,22 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1700px] mx-auto px-4 py-5 space-y-3">
+<main class="max-w-[1600px] mx-auto px-6 py-8 space-y-6">
 
   <!-- HEADER -->
   <section class="flex items-center justify-between">
     <div>
-      <h1 class="text-xl font-bold">Doctor Dashboard</h1>
-      <p class="text-xs text-[--muted]">
+      <h1 class="text-3xl font-bold tracking-tight">Doctor Dashboard</h1>
+      <p class="text-sm text-[--muted] mt-1">
         Today · <span id="todayLabel"></span>
       </p>
     </div>
   </section>
 
-  <!-- SUMMARY + IMPACT (COMPACT STRIP) -->
+  <!-- SUMMARY STRIP -->
   <section
-    class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-6 gap-2 text-xs font-semibold">
+    class="glass rounded-2xl border border-[--border] p-4
+           grid grid-cols-2 md:grid-cols-6 gap-4 text-sm font-semibold">
 
     <div>Today: <span id="sumToday">0</span></div>
     <div class="text-red-600">Ongoing: <span id="sumOngoing">0</span></div>
@@ -66,31 +67,31 @@
   </section>
 
   <!-- MAIN GRID -->
-  <section class="grid grid-cols-12 gap-4">
+  <section class="grid grid-cols-12 gap-6">
 
-    <!-- LEFT: TODAY SCHEDULES (DENSE LIST) -->
+    <!-- LEFT -->
     <section
-      class="col-span-12 md:col-span-7 glass rounded-2xl border p-3">
+      class="col-span-12 md:col-span-7 glass rounded-2xl border border-[--border] p-5">
 
-      <div class="flex items-center justify-between mb-2">
-        <h2 class="font-semibold text-sm">Today’s Surgeries</h2>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold">Today’s Surgeries</h2>
         <span class="text-xs text-[--muted]">Live · Click to inspect</span>
       </div>
 
       <div
         id="scheduleList"
-        class="divide-y text-sm">
-        <!-- rows injected -->
+        class="divide-y text-sm fade-in">
+        <!-- injected by JS -->
       </div>
 
     </section>
 
-    <!-- RIGHT COLUMN -->
-    <aside class="col-span-12 md:col-span-5 space-y-3">
+    <!-- RIGHT -->
+    <aside class="col-span-12 md:col-span-5 space-y-6">
 
       <!-- LIVE DETAILS -->
-      <section class="glass rounded-2xl border p-4">
-        <h2 class="font-semibold text-sm mb-2">Live Details</h2>
+      <section class="glass rounded-2xl border border-[--border] p-5">
+        <h2 class="font-semibold mb-3">Live Details</h2>
 
         <div
           id="detailsEmpty"
@@ -100,56 +101,56 @@
 
         <div
           id="detailsPanel"
-          class="hidden grid grid-cols-2 gap-3 text-sm">
+          class="hidden grid grid-cols-2 gap-4 text-sm fade-in">
           <!-- injected -->
         </div>
       </section>
 
-      <!-- TODAY CONTRIBUTION -->
-      <section class="glass rounded-2xl border p-4">
-        <h3 class="text-sm font-semibold mb-2">Today’s Contribution</h3>
+      <!-- CONTRIBUTION -->
+      <section class="glass rounded-2xl border border-[--border] p-5">
+        <h3 class="font-semibold mb-3">Today’s Contribution</h3>
 
-        <div class="grid grid-cols-2 gap-3 text-sm">
-          <div class="bg-slate-50 rounded-lg p-3">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="bg-slate-50 rounded-xl p-4">
             <p class="text-xs text-[--muted]">Patients</p>
-            <p id="contriPatients" class="text-lg font-bold">0</p>
+            <p id="contriPatients" class="text-xl font-bold">0</p>
           </div>
-          <div class="bg-slate-50 rounded-lg p-3">
+          <div class="bg-slate-50 rounded-xl p-4">
             <p class="text-xs text-[--muted]">Procedures</p>
-            <p id="contriProcedures" class="text-lg font-bold">0</p>
+            <p id="contriProcedures" class="text-xl font-bold">0</p>
           </div>
-          <div class="bg-slate-50 rounded-lg p-3">
+          <div class="bg-slate-50 rounded-xl p-4">
             <p class="text-xs text-[--muted]">Avg Duration</p>
-            <p id="contriAvg" class="text-sm font-semibold">—</p>
+            <p id="contriAvg" class="font-semibold">—</p>
           </div>
-          <div class="bg-slate-50 rounded-lg p-3">
+          <div class="bg-slate-50 rounded-xl p-4">
             <p class="text-xs text-[--muted]">On-Time Rate</p>
-            <p id="contriOnTime" class="text-sm font-semibold text-green-600">—</p>
+            <p id="contriOnTime" class="font-semibold text-green-600">—</p>
           </div>
         </div>
       </section>
 
-      <!-- FOCUS & WELLBEING -->
-      <section class="glass rounded-2xl border p-4">
-        <h3 class="text-sm font-semibold mb-2">Focus & Wellbeing</h3>
+      <!-- FOCUS -->
+      <section class="glass rounded-2xl border border-[--border] p-5">
+        <h3 class="font-semibold mb-3">Focus & Wellbeing</h3>
 
         <div class="space-y-2 text-sm text-[--muted]">
           <div class="flex justify-between">
             <span>Continuous Work</span>
-            <span id="focusWork" class="font-semibold text-slate-700">—</span>
+            <span id="focusWork" class="font-semibold text-slate-800">—</span>
           </div>
           <div class="flex justify-between">
             <span>Last Break</span>
-            <span id="focusBreak" class="font-semibold text-slate-700">—</span>
+            <span id="focusBreak" class="font-semibold text-slate-800">—</span>
           </div>
           <div class="flex justify-between">
             <span>Remaining Today</span>
-            <span id="focusRemaining" class="font-semibold text-slate-700">—</span>
+            <span id="focusRemaining" class="font-semibold text-slate-800">—</span>
           </div>
         </div>
 
-        <div class="pt-2 mt-2 border-t text-xs text-[--muted]">
-          Short breaks between procedures improve precision and focus.
+        <div class="pt-3 mt-3 border-t text-xs text-[--muted]">
+          Short breaks between procedures improve accuracy and endurance.
         </div>
       </section>
 

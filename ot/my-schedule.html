@@ -7,6 +7,31 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <style>
+    :root {
+      --primary:#2563eb;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(6px); }
+      to { opacity:1; transform:none; }
+    }
+  </style>
+
   <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
@@ -15,112 +40,113 @@
   <script type="module" defer src="/js/ot/my-schedule.js"></script>
 </head>
 
-<body class="bg-slate-100 text-slate-800">
+<body class="bg-[--bg] text-[--text] min-h-screen">
 
   <div id="navbar"></div>
 
-  <main class="max-w-7xl mx-auto px-3 py-3 space-y-4">
+  <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
 
     <!-- HEADER -->
-    <section class="flex items-center justify-between">
+    <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-lg font-bold">My Schedule</h1>
-        <p id="selectedDateLabel" class="text-xs text-slate-500"></p>
+        <h1 class="text-3xl font-bold tracking-tight">My Schedule</h1>
+        <p id="selectedDateLabel" class="text-sm text-[--muted] mt-1"></p>
       </div>
 
       <input
         id="dateFilter"
         type="date"
-        class="border rounded-md px-3 py-1.5 text-sm"
+        class="border border-[--border] rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
       />
     </section>
 
-    <!-- FOCUS + DETAILS PANEL -->
+    <!-- FOCUS PANEL -->
     <section
       id="focusPanel"
-      class="hidden bg-white border rounded-lg px-4 py-3 space-y-4">
+      class="hidden glass border border-[--border] rounded-3xl p-6 space-y-6 fade-in">
 
       <!-- STATUS ROW -->
       <div class="flex justify-between items-center">
-        <span id="focusStatus" class="text-xs font-bold"></span>
-        <span id="focusCountdown" class="text-xs font-semibold"></span>
+        <span id="focusStatus" class="text-sm font-bold"></span>
+        <span id="focusCountdown" class="text-sm font-semibold text-slate-600"></span>
       </div>
 
       <!-- CORE DETAILS -->
-      <div class="grid grid-cols-6 gap-3 text-sm">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-6 text-sm">
         <div>
-          <p class="text-xs text-slate-500">Patient</p>
+          <p class="text-xs uppercase text-[--muted]">Patient</p>
           <p id="focusPatient" class="font-semibold"></p>
         </div>
         <div>
-          <p class="text-xs text-slate-500">Procedure</p>
+          <p class="text-xs uppercase text-[--muted]">Procedure</p>
           <p id="focusProcedure"></p>
         </div>
         <div>
-          <p class="text-xs text-slate-500">Surgeon</p>
+          <p class="text-xs uppercase text-[--muted]">Surgeon</p>
           <p id="focusSurgeon"></p>
         </div>
         <div>
-          <p class="text-xs text-slate-500">OT Room</p>
+          <p class="text-xs uppercase text-[--muted]">OT Room</p>
           <p id="focusOT"></p>
         </div>
         <div>
-          <p class="text-xs text-slate-500">Department</p>
+          <p class="text-xs uppercase text-[--muted]">Department</p>
           <p id="focusDept"></p>
         </div>
         <div>
-          <p class="text-xs text-slate-500">Time</p>
+          <p class="text-xs uppercase text-[--muted]">Time</p>
           <p id="focusTime"></p>
         </div>
       </div>
 
-      <!-- TIMER BAR -->
-      <div class="h-2 bg-slate-200 rounded">
-        <div id="focusBar" class="h-2 rounded"></div>
+      <!-- TIMER -->
+      <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+        <div id="focusBar" class="h-2 rounded-full"></div>
       </div>
 
       <!-- EQUIPMENT + NOTES -->
-      <div class="grid grid-cols-2 gap-4 text-sm pt-3 border-t">
+      <div class="grid sm:grid-cols-2 gap-6 pt-6 border-t border-[--border]">
 
         <div>
-          <p class="text-xs font-semibold text-slate-600 mb-1">Equipment</p>
-          <div id="focusEquipment" class="space-y-2"></div>
+          <p class="text-xs font-semibold text-[--muted] mb-2">Equipment</p>
+          <div id="focusEquipment" class="space-y-3"></div>
         </div>
 
         <div>
-          <p class="text-xs font-semibold text-slate-600 mb-1">Notes</p>
-          <div id="focusNotes" class="space-y-1 text-xs"></div>
+          <p class="text-xs font-semibold text-[--muted] mb-2">Notes</p>
+          <div id="focusNotes" class="space-y-2 text-xs"></div>
         </div>
 
       </div>
     </section>
 
     <!-- READINESS STRIP -->
-    <section class="bg-white border rounded px-4 py-2 text-xs text-slate-600">
+    <section class="glass border border-[--border] rounded-2xl px-5 py-3 text-sm text-[--muted]">
       <span class="font-semibold text-green-700">✔ Readiness:</span>
       Follow sterile protocol. Verify equipment. System time is accurate.
     </section>
 
     <!-- TABLE -->
-    <section class="bg-white border rounded-lg overflow-x-auto">
+    <section class="glass border border-[--border] rounded-3xl overflow-x-auto fade-in">
       <table class="w-full text-sm">
-        <thead class="bg-slate-100 text-slate-600">
+        <thead class="bg-slate-50 text-slate-600 border-b">
           <tr>
-            <th class="px-3 py-2 text-left">Time</th>
-            <th class="px-3 py-2 text-left">Status</th>
-            <th class="px-3 py-2 text-left">Patient</th>
-            <th class="px-3 py-2 text-left">Surgeon</th>
-            <th class="px-3 py-2 text-left">OT</th>
-            <th class="px-3 py-2 text-left">Dept</th>
+            <th class="px-4 py-3 text-left">Time</th>
+            <th class="px-4 py-3 text-left">Status</th>
+            <th class="px-4 py-3 text-left">Patient</th>
+            <th class="px-4 py-3 text-left">Surgeon</th>
+            <th class="px-4 py-3 text-left">OT</th>
+            <th class="px-4 py-3 text-left">Dept</th>
           </tr>
         </thead>
         <tbody id="scheduleTable" class="divide-y"></tbody>
       </table>
     </section>
 
+    <!-- EMPTY -->
     <div
       id="emptyState"
-      class="hidden text-center py-10 text-sm text-slate-500">
+      class="hidden text-center py-12 text-sm text-[--muted]">
       No assigned surgeries for this date.
     </div>
 

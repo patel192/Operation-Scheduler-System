@@ -10,15 +10,16 @@
   <style>
     :root {
       --primary:#2563eb;
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
     }
 
     .glass {
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(12px);
     }
   </style>
 
@@ -30,44 +31,48 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1500px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1500px] mx-auto px-6 py-8 space-y-6">
 
   <!-- HEADER -->
-  <section class="flex justify-between items-center">
+  <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h1 class="text-xl font-bold">My Activity</h1>
-      <p class="text-xs text-[--muted]">
-        Clinical actions & schedule lifecycle
+      <h1 class="text-3xl font-bold tracking-tight">My Activity</h1>
+      <p class="text-sm text-[--muted] mt-1">
+        Clinical actions, notes, and schedule lifecycle events
       </p>
     </div>
 
     <input
       id="dateFilter"
       type="date"
-      class="border rounded-lg px-3 py-1.5 text-sm"
+      class="border border-[--border] rounded-xl px-4 py-2 text-sm
+             bg-white shadow-sm focus:ring-2 focus:ring-blue-200"
     />
   </section>
 
   <!-- SUMMARY -->
   <section
     id="activitySummary"
-    class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-4 gap-2
-           text-xs font-semibold">
+    class="glass rounded-2xl border border-[--border]
+           px-6 py-3 grid grid-cols-2 md:grid-cols-4 gap-4
+           text-sm font-semibold shadow-sm">
     <!-- injected -->
   </section>
 
   <!-- TIMELINE -->
-  <section class="glass rounded-2xl border p-4">
+  <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm">
 
-    <h2 class="font-semibold text-sm mb-3">Activity Timeline</h2>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-base">Activity Timeline</h2>
+      <span class="text-xs text-[--muted]">Newest first</span>
+    </div>
 
     <div
       id="activityTimeline"
-      class="relative pl-6 space-y-4 text-sm">
+      class="relative pl-8 space-y-5 text-sm">
 
       <!-- vertical line -->
-      <div class="absolute left-2 top-0 bottom-0 w-px bg-slate-200"></div>
+      <div class="absolute left-3 top-0 bottom-0 w-px bg-slate-200"></div>
 
       <!-- items injected -->
 

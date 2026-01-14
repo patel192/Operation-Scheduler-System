@@ -11,88 +11,113 @@
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/doctor-details.js"></script>
+
+  <style>
+    .card {
+      background: white;
+      border-radius: 22px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 30px rgba(0,0,0,.04);
+    }
+
+    .soft {
+      background: linear-gradient(180deg, #ffffff, #f9fafb);
+    }
+
+    .timeline-card {
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .timeline-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.06);
+    }
+  </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-50 min-h-screen">
 
 <div id="adminNavbar"></div>
 
-<main class="max-w-[1500px] mx-auto px-6 py-8 space-y-8">
+<main class="max-w-[1500px] mx-auto px-6 py-10 space-y-10">
 
   <!-- HERO -->
-  <section class="rounded-3xl p-8 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xl">
+  <section class="rounded-3xl p-10 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xl">
+
     <a href="/admin/doctors.html" class="text-sm opacity-80 hover:underline">
       ← Doctors
     </a>
 
-    <h1 id="doctorName" class="text-3xl font-bold mt-3 flex items-center gap-3">
-      <i data-lucide="stethoscope"></i>
-      —
-    </h1>
+    <div class="mt-4 space-y-2">
+      <h1 id="doctorName" class="text-4xl font-bold flex items-center gap-3">
+        <i data-lucide="stethoscope"></i>
+        —
+      </h1>
 
-    <p id="doctorEmail" class="text-sm opacity-90 mt-1">—</p>
+      <p id="doctorEmail" class="text-sm opacity-90">—</p>
+    </div>
 
-    <div class="flex gap-4 mt-4">
+    <div class="flex flex-wrap gap-4 mt-6">
       <span id="statusBadge"
-        class="px-4 py-2 rounded-full bg-white/20 text-sm font-semibold">
+        class="px-5 py-2 rounded-full bg-white/20 text-sm font-semibold">
         —
       </span>
 
       <button id="toggleStatusBtn"
-        class="px-5 py-2 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-indigo-50">
+        class="px-6 py-2 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-indigo-50 transition">
         —
       </button>
     </div>
   </section>
 
   <!-- KPI STRIP -->
-  <section class="grid md:grid-cols-4 gap-6">
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-sm text-slate-500">Department</p>
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Department</p>
       <p id="department" class="text-xl font-semibold mt-2">—</p>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-sm text-slate-500">Availability</p>
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Availability</p>
       <p id="availability" class="text-xl font-semibold mt-2 capitalize">—</p>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-sm text-slate-500">Upcoming</p>
-      <h3 id="upcomingCount" class="text-3xl font-bold mt-2">0</h3>
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Upcoming</p>
+      <h3 id="upcomingCount" class="text-4xl font-bold mt-2">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 border shadow-sm">
-      <p class="text-sm text-slate-500">Completed</p>
-      <h3 id="completedCount" class="text-3xl font-bold mt-2">0</h3>
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Completed</p>
+      <h3 id="completedCount" class="text-4xl font-bold mt-2">0</h3>
     </div>
   </section>
 
-  <!-- SCHEDULE TIMELINE -->
-  <section class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+  <!-- TIMELINE -->
+  <section class="card overflow-hidden">
 
-    <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-      <h3 class="font-semibold flex items-center gap-2">
+    <div class="px-6 py-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-50">
+      <h3 class="font-semibold flex items-center gap-2 text-lg">
         <i data-lucide="calendar"></i>
         Surgery Timeline
       </h3>
 
       <div class="flex gap-2">
         <button id="tabUpcoming"
-          class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold">
+          class="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold">
           Upcoming
         </button>
         <button id="tabPast"
-          class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm font-semibold">
+          class="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-300 transition">
           Past
         </button>
       </div>
     </div>
 
-    <div id="timelineList" class="p-6 space-y-4"></div>
+    <div id="timelineList" class="p-8 space-y-5"></div>
 
     <div id="timelineEmpty"
-      class="hidden p-10 text-center text-slate-400">
+      class="hidden p-12 text-center text-slate-400">
       No schedules found.
     </div>
 

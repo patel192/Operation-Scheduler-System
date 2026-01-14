@@ -2,83 +2,79 @@
 <html lang="en" class="scroll-smooth">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login — Operation Scheduler</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Theme Variables -->
   <style>
     :root {
       --primary: #0A6CFF;
-      --secondary: #4FC3A1;
+      --secondary: #22C55E;
       --bg: #F8FAFC;
-      --text: #1E293B;
+      --text: #0F172A;
       --muted: #64748B;
     }
   </style>
 </head>
 
-<body class="bg-[--bg] text-[--text] font-sans min-h-screen flex items-center justify-center p-4">
+<body class="bg-[--bg] text-[--text] min-h-screen flex items-center justify-center p-6">
 
-  <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl grid md:grid-cols-2 overflow-hidden">
+  <div class="w-full max-w-6xl bg-white rounded-3xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
 
-    <!-- LEFT PANEL (ILLUSTRATION) -->
-    <div class="bg-gradient-to-b from-blue-50 to-blue-100 p-10 flex flex-col justify-center items-center text-center">
-      <h2 class="text-3xl font-bold text-[--primary]">Welcome Back</h2>
+    <!-- LEFT BRAND PANEL -->
+    <div class="relative bg-gradient-to-br from-blue-50 to-blue-100 p-10 flex flex-col justify-center">
 
-      <p class="mt-3 text-[--muted] text-sm">
-        Login to access your schedules, patient records, and operation workflows.
+      <h2 class="text-4xl font-extrabold text-[--primary] leading-tight">
+        Operation Scheduler
+      </h2>
+
+      <p class="mt-4 text-[--muted] max-w-sm text-sm leading-relaxed">
+        Secure access to schedules, OT workflows, patient records and hospital dashboards.
       </p>
 
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/5/59/Doctor_with_stethoscope_icon.svg"
-        alt="Medical Illustration"
-        class="w-60 mt-6"
+        src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=900&auto=format&fit=crop"
+        alt="Hospital Team"
+        class="rounded-2xl mt-8 shadow-lg border"
       />
+
+      <div class="absolute bottom-6 left-10 text-xs text-[--muted]">
+        Trusted by healthcare professionals
+      </div>
     </div>
 
-    <!-- RIGHT PANEL (LOGIN FORM) -->
+    <!-- RIGHT LOGIN PANEL -->
     <div class="p-10 flex flex-col justify-center">
 
-      <h2 class="text-2xl font-bold mb-6">Login to Your Account</h2>
+      <h2 class="text-3xl font-extrabold mb-2">Welcome Back</h2>
+      <p class="text-sm text-[--muted] mb-6">Login to your hospital workspace</p>
 
-      <!-- SOCIAL LOGIN (OPTIONAL) -->
-      <div class="space-y-3 mb-6">
+      <!-- GOOGLE LOGIN -->
+      <button id="googleBtn"
+        class="w-full flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
+        <img src="https://img.icons8.com/color/48/google-logo.png" class="w-5 h-5" alt="Google">
+        Continue with Google
+      </button>
 
-        <!-- Google Login -->
-        <button id="googleBtn" class="w-full flex items-center justify-center gap-2 border border-gray-300 py-2.5 rounded-xl font-semibold hover:bg-gray-50">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" class="w-5 h-5">
-            <path fill="#4285F4"
-              d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027">
-            </path>
-            <path fill="#34A853"
-              d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1">
-            </path>
-            <path fill="#FBBC05"
-              d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782">
-            </path>
-            <path fill="#EB4335"
-              d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251">
-            </path>
-          </svg>
-          Continue with Google
-        </button>
+      <div class="text-center my-6 text-xs font-semibold text-gray-400">OR</div>
 
-      </div>
-
-      <!-- FORM -->
+      <!-- LOGIN FORM -->
       <form class="space-y-4" id="login-form">
 
-        <input id="email-input" type="email" placeholder="Email" required
-          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
+        <input id="email-input" type="email" placeholder="Email address" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[--primary]" />
 
         <input id="password-input" type="password" placeholder="Password" required
-          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[--primary]">
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[--primary]" />
 
         <div class="flex justify-end">
-          <a href="/forgot-password.html" class="text-sm text-[--primary] font-medium hover:underline">Forgot password?</a>
+          <a href="/forgot-password.html" class="text-sm text-[--primary] font-semibold hover:underline">
+            Forgot password?
+          </a>
         </div>
 
         <button id="login-btn"
@@ -87,16 +83,16 @@
         </button>
       </form>
 
-      <!-- SIGNUP LINK -->
-      <p class="mt-5 text-center text-sm text-[--muted]">
-        Don't have an account?
+      <!-- REGISTER LINK -->
+      <p class="mt-6 text-center text-sm text-[--muted]">
+        Don’t have an account?
         <a href="register.html" class="text-[--primary] font-semibold hover:underline">Create one</a>
       </p>
 
     </div>
-
   </div>
-<script type="module" src="js/login.js"></script>
-</body>
 
+  <!-- Your existing JS stays exactly the same -->
+  <script type="module" src="js/login.js"></script>
+</body>
 </html>

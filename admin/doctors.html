@@ -12,65 +12,91 @@
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/doctors.js"></script>
+
+  <style>
+    .card {
+      background: white;
+      border-radius: 22px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 26px rgba(0,0,0,.04);
+    }
+
+    .soft {
+      background: linear-gradient(180deg, #ffffff, #f9fafb);
+    }
+
+    .table-row {
+      transition: background 0.15s ease;
+    }
+
+    .table-row:hover {
+      background: #f8fafc;
+    }
+  </style>
 </head>
 
-<body class="bg-slate-100 text-slate-900 min-h-screen">
+<body class="bg-slate-50 text-slate-900 min-h-screen">
 
 <div id="adminNavbar"></div>
 
-<main class="max-w-[1600px] mx-auto px-6 py-6 space-y-6">
+<main class="max-w-[1600px] mx-auto px-6 py-10 space-y-10">
 
   <!-- HEADER -->
-  <section class="flex justify-between items-center">
+  <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-bold flex items-center gap-2">
+      <h1 class="text-3xl font-bold flex items-center gap-3">
         <i data-lucide="stethoscope"></i>
         Doctors
       </h1>
-      <p class="text-sm text-slate-500">
-        Department-wise doctors & availability
+      <p class="text-sm text-slate-500 mt-1">
+        Department-wise doctors & availability overview
       </p>
     </div>
   </section>
 
   <!-- KPI STRIP -->
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="bg-white rounded-xl p-4 border">
-      <p class="text-xs text-slate-500 font-semibold">TOTAL</p>
-      <h3 id="kpiTotal" class="text-2xl font-bold">0</h3>
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Total</p>
+      <h3 id="kpiTotal" class="text-3xl font-bold mt-2">0</h3>
     </div>
-    <div class="bg-white rounded-xl p-4 border">
-      <p class="text-xs text-slate-500 font-semibold">ACTIVE</p>
-      <h3 id="kpiActive" class="text-2xl font-bold text-emerald-600">0</h3>
+
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Active</p>
+      <h3 id="kpiActive" class="text-3xl font-bold mt-2 text-emerald-600">0</h3>
     </div>
-    <div class="bg-white rounded-xl p-4 border">
-      <p class="text-xs text-slate-500 font-semibold">BUSY</p>
-      <h3 id="kpiBusy" class="text-2xl font-bold text-amber-600">0</h3>
+
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Busy</p>
+      <h3 id="kpiBusy" class="text-3xl font-bold mt-2 text-amber-600">0</h3>
     </div>
-    <div class="bg-white rounded-xl p-4 border">
-      <p class="text-xs text-slate-500 font-semibold">DEPARTMENTS</p>
-      <h3 id="kpiDepartments" class="text-2xl font-bold">0</h3>
+
+    <div class="card p-6 soft">
+      <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Departments</p>
+      <h3 id="kpiDepartments" class="text-3xl font-bold mt-2">0</h3>
     </div>
   </section>
 
-  <!-- MAIN -->
-  <section class="grid grid-cols-12 gap-6">
+  <!-- MAIN GRID -->
+  <section class="grid grid-cols-12 gap-8">
 
     <!-- TABLE -->
-    <div class="col-span-8 bg-white rounded-2xl border overflow-hidden">
-      <div class="px-6 py-4 border-b font-semibold">
-        Doctors List
+    <div class="col-span-12 lg:col-span-8 card overflow-hidden">
+
+      <div class="px-6 py-5 border-b font-semibold flex items-center gap-2">
+        <i data-lucide="users"></i>
+        Doctors Directory
       </div>
 
-      <div class="max-h-[520px] overflow-y-auto">
+      <div class="max-h-[540px] overflow-y-auto">
         <table class="w-full text-sm">
           <thead class="bg-slate-50 sticky top-0 z-10 text-slate-500">
             <tr>
-              <th class="px-6 py-3 text-left">Doctor</th>
-              <th class="px-6 py-3 text-left">Department</th>
-              <th class="px-6 py-3 text-left">Availability</th>
-              <th class="px-6 py-3 text-left">Status</th>
-              <th class="px-6 py-3 text-right">Actions</th>
+              <th class="px-6 py-4 text-left">Doctor</th>
+              <th class="px-6 py-4 text-left">Department</th>
+              <th class="px-6 py-4 text-left">Availability</th>
+              <th class="px-6 py-4 text-left">Status</th>
+              <th class="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody id="doctorTable" class="divide-y"></tbody>
@@ -79,18 +105,18 @@
     </div>
 
     <!-- ANALYTICS -->
-    <div class="col-span-4 space-y-4">
+    <div class="col-span-12 lg:col-span-4 space-y-6">
 
-      <div class="bg-white rounded-xl p-4 border">
-        <p class="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div class="card p-6">
+        <p class="text-sm font-semibold mb-3 flex items-center gap-2">
           <i data-lucide="activity"></i>
-          Availability
+          Availability Distribution
         </p>
         <canvas id="availabilityChart" height="140"></canvas>
       </div>
 
-      <div class="bg-white rounded-xl p-4 border">
-        <p class="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div class="card p-6">
+        <p class="text-sm font-semibold mb-3 flex items-center gap-2">
           <i data-lucide="layers"></i>
           Department Distribution
         </p>

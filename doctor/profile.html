@@ -7,116 +7,144 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <style>
+    :root {
+      --primary:#2563eb;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(12px);
+    }
+  </style>
+
   <!-- Guards & Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadDoctorNavbar.js"></script>
   <script type="module" defer src="/js/doctor/profile.js"></script>
 </head>
 
-<body class="bg-slate-100 text-slate-800 min-h-screen">
+<body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+<main class="max-w-4xl mx-auto px-6 py-8 space-y-8">
 
   <!-- HEADER -->
   <section>
-    <h1 class="text-xl font-bold">Doctor Profile</h1>
-    <p class="text-xs text-slate-500">
-      Account information & scheduling preferences
+    <h1 class="text-3xl font-bold tracking-tight">Doctor Profile</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Account information and scheduling preferences
     </p>
   </section>
 
   <!-- BASIC INFO -->
-  <section class="bg-white rounded-2xl border p-6 space-y-4">
-    <h2 class="text-sm font-semibold">Basic Information</h2>
+  <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm space-y-5">
+    <h2 class="text-base font-semibold">Basic Information</h2>
 
-    <div class="grid grid-cols-2 gap-4 text-sm">
+    <div class="grid sm:grid-cols-2 gap-6 text-sm">
       <div>
-        <p class="text-xs text-slate-500">Name</p>
-        <p id="doctorName" class="font-semibold">—</p>
+        <p class="text-xs text-[--muted] uppercase tracking-wide">Name</p>
+        <p id="doctorName" class="font-semibold text-base mt-1">—</p>
       </div>
 
       <div>
-        <p class="text-xs text-slate-500">Email</p>
-        <p id="doctorEmail" class="font-semibold">—</p>
+        <p class="text-xs text-[--muted] uppercase tracking-wide">Email</p>
+        <p id="doctorEmail" class="font-semibold text-base mt-1">—</p>
       </div>
 
       <div>
-        <p class="text-xs text-slate-500">Department</p>
-        <p id="doctorDepartment" class="font-semibold">—</p>
+        <p class="text-xs text-[--muted] uppercase tracking-wide">Department</p>
+        <p id="doctorDepartment" class="font-semibold text-base mt-1">—</p>
       </div>
 
       <div>
-        <p class="text-xs text-slate-500">Role</p>
-        <p class="font-semibold">Doctor</p>
+        <p class="text-xs text-[--muted] uppercase tracking-wide">Role</p>
+        <p class="font-semibold text-base mt-1">Doctor</p>
       </div>
     </div>
   </section>
 
   <!-- PREFERENCES -->
-  <section class="bg-white rounded-2xl border p-6 space-y-6">
+  <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm space-y-8">
 
-    <h2 class="text-sm font-semibold">Scheduling Preferences</h2>
+    <h2 class="text-base font-semibold">Scheduling Preferences</h2>
 
     <!-- UPCOMING WINDOW -->
     <div>
-      <label class="text-xs text-slate-500">
-        Upcoming surgery window (minutes before start)
+      <label class="text-sm font-medium block mb-1">
+        Upcoming surgery alert window
       </label>
+      <p class="text-xs text-[--muted] mb-2">
+        Minutes before surgery start to mark as upcoming
+      </p>
       <input
         id="upcomingWindow"
         type="number"
         min="5"
         max="120"
-        class="mt-1 w-32 border rounded-lg px-3 py-1.5 text-sm"
+        class="w-40 border border-[--border] rounded-xl px-4 py-2 text-sm
+               bg-white shadow-sm focus:ring-2 focus:ring-blue-200"
       />
     </div>
 
     <!-- GAP -->
     <div>
-      <label class="text-xs text-slate-500">
-        Minimum gap between surgeries (minutes)
+      <label class="text-sm font-medium block mb-1">
+        Minimum gap between surgeries
       </label>
+      <p class="text-xs text-[--muted] mb-2">
+        Helps detect risky back-to-back scheduling
+      </p>
       <input
         id="minGap"
         type="number"
         min="0"
         max="180"
-        class="mt-1 w-32 border rounded-lg px-3 py-1.5 text-sm"
+        class="w-40 border border-[--border] rounded-xl px-4 py-2 text-sm
+               bg-white shadow-sm focus:ring-2 focus:ring-blue-200"
       />
     </div>
 
     <!-- WORKING HOURS -->
     <div>
-      <label class="text-xs text-slate-500">
+      <label class="text-sm font-medium block mb-2">
         Preferred working hours
       </label>
 
-      <div class="flex gap-3 mt-1">
-        <input id="workStart" type="time" class="border rounded-lg px-3 py-1.5 text-sm" />
-        <span class="text-sm text-slate-500 self-center">to</span>
-        <input id="workEnd" type="time" class="border rounded-lg px-3 py-1.5 text-sm" />
+      <div class="flex items-center gap-4">
+        <input id="workStart" type="time"
+          class="border border-[--border] rounded-xl px-4 py-2 text-sm bg-white shadow-sm" />
+        <span class="text-sm text-[--muted]">to</span>
+        <input id="workEnd" type="time"
+          class="border border-[--border] rounded-xl px-4 py-2 text-sm bg-white shadow-sm" />
       </div>
     </div>
 
     <!-- ALERT TOGGLE -->
-    <div class="flex items-center gap-3">
-      <input id="alertToggle" type="checkbox" class="accent-blue-600" />
-      <label class="text-sm">Enable critical alerts (overrun, conflicts)</label>
+    <div class="flex items-center gap-3 pt-2">
+      <input id="alertToggle" type="checkbox" class="accent-blue-600 scale-110" />
+      <label class="text-sm font-medium">
+        Enable critical alerts (overrun, conflicts, unsafe gaps)
+      </label>
     </div>
 
     <!-- SAVE -->
-    <div class="pt-4 border-t flex justify-end">
+    <div class="pt-6 border-t flex items-center justify-between">
+      <p id="saveStatus" class="hidden text-sm text-green-600 font-medium">
+        Preferences saved successfully
+      </p>
+
       <button
         id="savePrefsBtn"
-        class="px-4 py-2 rounded-lg text-sm font-semibold
-               bg-blue-600 text-white hover:bg-blue-700">
+        class="px-6 py-2.5 rounded-xl text-sm font-semibold
+               bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition">
         Save Preferences
       </button>
     </div>
-
-    <p id="saveStatus" class="hidden text-xs text-green-600">
-      Preferences saved successfully
-    </p>
 
   </section>
 

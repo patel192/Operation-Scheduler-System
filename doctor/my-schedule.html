@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <title>My Schedule · Doctor</title>
@@ -10,28 +9,31 @@
 
   <style>
     :root {
-      --primary: #2563eb;
-      --bg: #F1F5F9;
-      --text: #1E293B;
-      --muted: #64748B;
-      --border: #E5E7EB;
+      --primary:#2563eb;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
     }
 
     .filter-btn {
-      padding: 2px 8px;
-      border-radius: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
       background: #f1f5f9;
+      transition: all .2s;
     }
 
     .filter-btn.active {
       background: #2563eb;
       color: white;
-    }
-
-
-    .glass {
-      background: rgba(255, 255, 255, .96);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
     }
 
     .pulse {
@@ -39,17 +41,9 @@
     }
 
     @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(220, 38, 38, .35);
-      }
-
-      70% {
-        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
-      }
-
-      100% {
-        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
-      }
+      0% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); }
+      70% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
     }
   </style>
 
@@ -61,116 +55,123 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-  <main class="max-w-[1700px] mx-auto px-4 py-5 space-y-3">
+<main class="max-w-[1700px] mx-auto px-6 py-8 space-y-6">
 
-    <!-- HEADER -->
-    <section class="flex items-center justify-between gap-4">
-      <div>
-        <h1 class="text-xl font-bold">My Schedule</h1>
-        <p class="text-xs text-[--muted]">
-          Daily surgical plan & execution
-        </p>
+  <!-- HEADER -->
+  <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">My Schedule</h1>
+      <p class="text-sm text-[--muted] mt-1">
+        Daily surgical plan & execution
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <input
+        id="datePicker"
+        type="date"
+        class="border border-[--border] bg-white rounded-xl px-4 py-2 text-sm shadow-sm"
+      />
+
+      <button
+        id="exportBtn"
+        class="text-sm font-semibold px-4 py-2 rounded-xl border border-[--border]
+               bg-white hover:bg-slate-50 transition">
+        Export Day
+      </button>
+    </div>
+  </section>
+
+  <!-- STATS STRIP -->
+  <section class="glass rounded-2xl border border-[--border] px-6 py-3
+           grid grid-cols-2 md:grid-cols-6 gap-4 text-sm font-semibold shadow-sm">
+
+    <div>Total: <span id="statTotal">0</span></div>
+    <div class="text-red-600">Ongoing: <span id="statOngoing">0</span></div>
+    <div class="text-blue-600">Upcoming: <span id="statUpcoming">0</span></div>
+    <div class="text-green-600">Completed: <span id="statCompleted">0</span></div>
+    <div>OT Rooms: <span id="statOT">0</span></div>
+    <div>Patients: <span id="statPatients">0</span></div>
+
+  </section>
+
+  <!-- MAIN GRID -->
+  <section class="grid grid-cols-12 gap-6">
+
+    <!-- LEFT -->
+    <section class="col-span-12 md:col-span-7 glass rounded-3xl border border-[--border] p-5 space-y-4">
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 class="font-semibold text-lg">Schedule Timeline</h2>
+
+        <div class="flex gap-2 text-xs flex-wrap">
+          <button data-filter="All" class="filter-btn">All</button>
+          <button data-filter="Scheduled" class="filter-btn">Upcoming</button>
+          <button data-filter="Ongoing" class="filter-btn">Ongoing</button>
+          <button data-filter="Completed" class="filter-btn">Completed</button>
+        </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <input id="datePicker" type="date" class="border rounded-lg px-3 py-1.5 text-sm" />
-
-        <button id="exportBtn" class="text-xs font-semibold px-3 py-1.5 rounded-lg
-             border border-slate-300
-             text-slate-700 hover:bg-slate-100 transition">
-          Export Day
-        </button>
+      <div class="flex gap-6 text-xs text-[--muted]">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-red-600 rounded-full"></span> Overlap / Overrun
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-yellow-500 rounded-full"></span> Tight gap
+        </div>
       </div>
-    </section>
 
-
-    <!-- INLINE DAY STATS -->
-    <section class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-6 gap-2 text-xs font-semibold">
-
-      <div>Total: <span id="statTotal">0</span></div>
-      <div class="text-red-600">Ongoing: <span id="statOngoing">0</span></div>
-      <div class="text-blue-600">Upcoming: <span id="statUpcoming">0</span></div>
-      <div class="text-green-600">Completed: <span id="statCompleted">0</span></div>
-      <div>OT Rooms: <span id="statOT">0</span></div>
-      <div>Patients: <span id="statPatients">0</span></div>
+      <div id="scheduleTimeline" class="divide-y text-sm"></div>
 
     </section>
 
-    <!-- MAIN GRID -->
-    <section class="grid grid-cols-12 gap-4">
+    <!-- RIGHT -->
+    <aside class="col-span-12 md:col-span-5 glass rounded-3xl border border-[--border] p-6 space-y-5">
 
-      <!-- LEFT: SCHEDULE TIMELINE -->
-      <section class="col-span-12 md:col-span-7 glass rounded-2xl border p-3">
+      <h2 class="font-semibold text-lg">Schedule Inspector</h2>
 
-        <div class="flex justify-between items-center mb-2">
-          <h2 class="font-semibold text-sm">Schedule Timeline</h2>
-          <div class="flex gap-2 text-xs">
-            <button data-filter="All" class="filter-btn">All</button>
-            <button data-filter="Scheduled" class="filter-btn">Upcoming</button>
-            <button data-filter="Ongoing" class="filter-btn">Ongoing</button>
-            <button data-filter="Completed" class="filter-btn">Completed</button>
-          </div>
+      <div id="inspectEmpty" class="text-sm text-[--muted]">
+        Select a schedule to inspect
+      </div>
 
-        </div>
-        <div class="flex gap-3 text-[11px] text-slate-600 mt-1">
-          <div class="flex items-center gap-1">
-            <span class="w-2 h-2 bg-red-600 rounded-full"></span> Overlap / Overrun
-          </div>
-          <div class="flex items-center gap-1">
-            <span class="w-2 h-2 bg-yellow-500 rounded-full"></span> Tight gap
-          </div>
-        </div>
+      <div id="inspectPanel" class="hidden space-y-5 text-sm">
 
-        <div id="scheduleTimeline" class="divide-y text-sm">
-          <!-- rows injected -->
-        </div>
+        <div id="inspectDetails" class="grid grid-cols-2 gap-4"></div>
 
-      </section>
+        <div>
+          <p class="text-xs text-[--muted] mb-2">Add Procedure Note</p>
+          <textarea
+            id="noteInput"
+            rows="2"
+            placeholder="Add intra-operative or post-op note…"
+            class="w-full border border-[--border] rounded-xl px-4 py-3 text-sm
+                   focus:ring-2 focus:ring-blue-200"
+          ></textarea>
 
-      <!-- RIGHT: SCHEDULE INSPECTOR -->
-      <aside class="col-span-12 md:col-span-5 glass rounded-2xl border p-4 space-y-3">
-
-        <h2 class="font-semibold text-sm">Schedule Inspector</h2>
-
-        <div id="inspectEmpty" class="text-sm text-[--muted]">
-          Select a schedule to inspect
+          <button
+            id="addNoteBtn"
+            class="mt-3 text-sm font-semibold px-4 py-2 rounded-xl
+                   bg-slate-900 text-white hover:bg-black">
+            Add Note
+          </button>
         </div>
 
-        <div id="inspectPanel" class="hidden space-y-4 text-sm">
-
-          <!-- DETAILS GRID -->
-          <div id="inspectDetails" class="grid grid-cols-2 gap-3"></div>
-
-          <!-- NOTES -->
-          <div>
-            <p class="text-xs text-slate-500 mb-1">Add Procedure Note</p>
-            <textarea id="noteInput" rows="2" placeholder="Add intra-operative or post-op note…" class="w-full border rounded-lg px-3 py-2 text-sm
-               focus:ring-2 focus:ring-blue-200"></textarea>
-
-            <button id="addNoteBtn" class="mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg
-               bg-slate-800 text-white hover:bg-slate-900">
-              Add Note
-            </button>
-          </div>
-
-          <!-- ACTIONS -->
-          <div class="flex justify-end gap-3 pt-2 border-t">
-            <button id="markCompletedBtn" class="hidden px-4 py-2 rounded-lg text-sm font-semibold
-               bg-green-600 text-white hover:bg-green-700">
-              Mark Completed
-            </button>
-          </div>
-
+        <div class="flex justify-end gap-3 pt-3 border-t">
+          <button
+            id="markCompletedBtn"
+            class="hidden px-5 py-2 rounded-xl text-sm font-semibold
+                   bg-green-600 text-white hover:bg-green-700">
+            Mark Completed
+          </button>
         </div>
 
-      </aside>
+      </div>
 
+    </aside>
 
-    </section>
+  </section>
 
-  </main>
+</main>
 
 </body>
-
 </html>

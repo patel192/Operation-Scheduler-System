@@ -10,15 +10,17 @@
 
   <style>
     :root {
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
+      --primary:#2563eb;
     }
 
     .glass {
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(12px);
     }
   </style>
 
@@ -30,56 +32,66 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1700px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1600px] mx-auto px-6 py-8 space-y-8">
 
   <!-- HEADER -->
   <section>
-    <h1 class="text-xl font-bold">Doctor Insights</h1>
-    <p class="text-xs text-[--muted]">
-      Performance, workload & operational exposure
+    <h1 class="text-3xl font-bold tracking-tight">Doctor Insights</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Performance, workload patterns and operational exposure
     </p>
   </section>
 
   <!-- KPI STRIP -->
   <section
     id="kpiStrip"
-    class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-6 gap-2 text-xs font-semibold">
-    <!-- injected -->
+    class="glass rounded-2xl border border-[--border] px-6 py-4
+           grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4
+           text-sm font-semibold shadow-sm">
   </section>
 
   <!-- MAIN GRID -->
-  <section class="grid grid-cols-12 gap-4">
+  <section class="grid grid-cols-12 gap-6">
 
     <!-- LEFT COLUMN -->
-    <section class="col-span-12 md:col-span-7 space-y-4">
+    <section class="col-span-12 lg:col-span-7 space-y-6">
 
       <!-- WORKLOAD TREND -->
-      <section class="glass rounded-2xl border p-4">
-        <h2 class="font-semibold text-sm mb-3">Workload Trend (Last 7 Days)</h2>
+      <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-semibold text-base">Workload Trend</h2>
+          <span class="text-xs text-[--muted]">Last 7 days</span>
+        </div>
         <canvas id="workloadChart" height="120"></canvas>
       </section>
 
       <!-- PROCEDURE EFFICIENCY -->
-      <section class="glass rounded-2xl border p-4">
-        <h2 class="font-semibold text-sm mb-3">Recent Procedure Efficiency</h2>
-        <div id="efficiencyList" class="space-y-2 text-sm"></div>
+      <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-semibold text-base">Recent Procedure Efficiency</h2>
+          <span class="text-xs text-[--muted]">Latest 5 surgeries</span>
+        </div>
+
+        <div
+          id="efficiencyList"
+          class="space-y-3 text-sm divide-y divide-slate-100">
+        </div>
       </section>
 
     </section>
 
     <!-- RIGHT COLUMN -->
-    <aside class="col-span-12 md:col-span-5 space-y-4">
+    <aside class="col-span-12 lg:col-span-5 space-y-6">
 
       <!-- STATUS DISTRIBUTION -->
-      <section class="glass rounded-2xl border p-4">
-        <h2 class="font-semibold text-sm mb-3">Procedure Status</h2>
+      <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm">
+        <h2 class="font-semibold text-base mb-4">Procedure Status Breakdown</h2>
         <canvas id="statusChart" height="180"></canvas>
       </section>
 
       <!-- OT UTILIZATION -->
-      <section class="glass rounded-2xl border p-4">
-        <h2 class="font-semibold text-sm mb-3">OT Utilization</h2>
+      <section class="glass rounded-2xl border border-[--border] p-6 shadow-sm">
+        <h2 class="font-semibold text-base mb-4">OT Room Utilization</h2>
         <canvas id="otChart" height="200"></canvas>
       </section>
 
@@ -90,4 +102,4 @@
 </main>
 
 </body>
-</html>
+</</html>

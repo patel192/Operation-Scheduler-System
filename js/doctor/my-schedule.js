@@ -12,7 +12,7 @@ import {
   getDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-import { persistAlerts } from "../doctor/alert-generator.js";
+import { persistAlerts } from "../automation/persistAlerts.js";
 
 /* ================= ELEMENTS ================= */
 const datePicker = document.getElementById("datePicker");

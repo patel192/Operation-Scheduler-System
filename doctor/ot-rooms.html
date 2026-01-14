@@ -9,44 +9,51 @@
 
   <style>
     :root {
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
     }
 
     .glass {
-      background: rgba(255,255,255,.97);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
     }
 
     .time-row {
-      height: 48px;
+      height: 52px;
       border-top: 1px dashed #e5e7eb;
     }
 
     .ot-cell {
       position: relative;
       border-left: 1px solid #e5e7eb;
+      background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.01));
     }
 
     .block {
       position: absolute;
       left: 6px;
       right: 6px;
-      border-radius: 10px;
-      padding: 6px;
-      font-size: 11px;
+      border-radius: 14px;
+      padding: 8px;
+      font-size: 12px;
       color: white;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,.12);
+      box-shadow: 0 10px 25px rgba(0,0,0,.15);
+      transition: transform .15s ease, box-shadow .15s ease;
     }
 
-    .ongoing { background: #16a34a; }
-    .scheduled { background: #2563eb; }
-    .completed { background: #64748b; }
-    .overrun { background: #dc2626; }
+    .block:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(0,0,0,.2);
+    }
 
+    .ongoing { background: linear-gradient(135deg,#16a34a,#22c55e); }
+    .scheduled { background: linear-gradient(135deg,#2563eb,#3b82f6); }
+    .completed { background: linear-gradient(135deg,#64748b,#94a3b8); }
+    .overrun { background: linear-gradient(135deg,#dc2626,#ef4444); }
   </style>
 
   <!-- Guards & Navbar -->
@@ -57,35 +64,35 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1900px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1900px] mx-auto px-6 py-8 space-y-6">
 
   <!-- HEADER -->
   <section>
-    <h1 class="text-xl font-bold">OT Room Day Planner</h1>
-    <p class="text-xs text-[--muted]">
-      Time-based operating theatre grid (live)
+    <h1 class="text-3xl font-bold tracking-tight">OT Room Day Planner</h1>
+    <p class="text-sm text-[--muted] mt-1">
+      Real-time time-grid view of operating theatres
     </p>
   </section>
 
   <!-- SUMMARY -->
   <section
     id="otSummary"
-    class="glass rounded-xl border px-4 py-2
-           grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-semibold">
+    class="glass rounded-2xl border border-[--border] px-6 py-3
+           grid grid-cols-2 md:grid-cols-5 gap-4 text-sm font-semibold shadow-sm">
   </section>
 
   <!-- GRID -->
-  <section class="glass rounded-2xl border overflow-x-auto">
+  <section class="glass rounded-3xl border border-[--border] overflow-x-auto shadow-sm">
 
     <!-- HEADER ROW -->
     <div
       id="otHeader"
-      class="grid sticky top-0 z-10 bg-white"
+      class="grid sticky top-0 z-10 bg-white/90 backdrop-blur border-b"
       style="grid-template-columns: 80px 1fr">
     </div>
 
     <!-- BODY -->
-    <div id="otGridBody"></div>
+    <div id="otGridBody" class="relative"></div>
 
   </section>
 

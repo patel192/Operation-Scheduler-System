@@ -9,10 +9,12 @@
 
   <style>
     :root {
-      --bg:#F1F5F9;
-      --text:#1E293B;
-      --muted:#64748B;
-      --border:#E5E7EB;
+      --primary:#2563eb;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
     }
 
     .glass {
@@ -22,6 +24,15 @@
 
     .hour-line {
       border-top: 1px dashed #e5e7eb;
+    }
+
+    .fade-in {
+      animation: fade .25s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(4px); }
+      to { opacity:1; transform:none; }
     }
   </style>
 
@@ -33,13 +44,13 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-[1800px] mx-auto px-4 py-5 space-y-4">
+<main class="max-w-[1700px] mx-auto px-6 py-8 space-y-6">
 
   <!-- HEADER -->
-  <section class="flex items-center justify-between">
+  <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h1 class="text-xl font-bold">Day Planner</h1>
-      <p class="text-xs text-[--muted]">
+      <h1 class="text-3xl font-bold tracking-tight">Day Planner</h1>
+      <p class="text-sm text-[--muted] mt-1">
         Visual timeline of surgeries by time
       </p>
     </div>
@@ -47,39 +58,43 @@
     <input
       id="datePicker"
       type="date"
-      class="border rounded-lg px-3 py-1.5 text-sm"
+      class="border border-[--border] bg-white rounded-xl px-4 py-2 text-sm shadow-sm"
     />
   </section>
 
   <!-- LEGEND -->
-  <section class="flex flex-wrap gap-4 text-xs text-slate-600">
-    <div class="flex items-center gap-1">
+  <section class="flex flex-wrap gap-6 text-xs text-slate-600">
+    <div class="flex items-center gap-2">
       <span class="w-3 h-3 rounded bg-blue-500"></span> Upcoming
     </div>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-2">
       <span class="w-3 h-3 rounded bg-green-500"></span> Ongoing
     </div>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-2">
       <span class="w-3 h-3 rounded bg-slate-400"></span> Completed
     </div>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-2">
       <span class="w-3 h-3 rounded bg-red-500"></span> Overrun
     </div>
   </section>
 
-  <!-- PLANNER GRID -->
-  <section class="glass rounded-2xl border overflow-hidden">
+  <!-- PLANNER CONTAINER -->
+  <section class="glass rounded-3xl border border-[--border] overflow-hidden shadow-sm fade-in">
 
-    <div class="grid grid-cols-[80px_1fr]">
+    <div class="grid grid-cols-[90px_1fr]">
 
       <!-- HOURS -->
-      <div id="hourColumn" class="bg-slate-50 text-xs text-slate-500">
-        <!-- injected -->
+      <div
+        id="hourColumn"
+        class="bg-slate-50 text-xs text-slate-500 border-r border-[--border]">
+        <!-- injected by JS -->
       </div>
 
       <!-- TIMELINE -->
-      <div id="plannerCanvas" class="relative">
-        <!-- injected -->
+      <div
+        id="plannerCanvas"
+        class="relative bg-white">
+        <!-- injected by JS -->
       </div>
 
     </div>

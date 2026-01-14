@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,32 +15,33 @@
   <style>
     .card {
       background: white;
-      border-radius: 18px;
+      border-radius: 20px;
       border: 1px solid #e5e7eb;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, .05);
+      box-shadow: 0 6px 20px rgba(0,0,0,.04);
     }
 
     .kpi {
       display: flex;
-      gap: 14px;
+      gap: 16px;
       align-items: center;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
       font-size: 0.7rem;
       font-weight: 600;
-      background: #eef2ff;
+      background: linear-gradient(135deg,#eef2ff,#e0e7ff);
       color: #4338ca;
-      margin-right: 4px;
-      margin-bottom: 4px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border: 1px solid #e0e7ff;
     }
 
     .table-row {
-      transition: background 0.15s ease, transform 0.15s ease;
+      transition: all 0.15s ease;
     }
 
     .table-row:hover {
@@ -50,67 +50,70 @@
   </style>
 </head>
 
-<body class="bg-slate-100 text-slate-800 min-h-screen">
+<body class="bg-slate-50 text-slate-800 min-h-screen">
   <div id="adminNavbar"></div>
 
-  <main class="max-w-[1500px] mx-auto px-4 py-10 space-y-8">
+  <main class="max-w-[1500px] mx-auto px-5 py-10 space-y-8">
 
     <!-- HEADER -->
-    <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <section class="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
       <div>
         <h1 class="text-3xl font-bold flex items-center gap-2">
-          <i data-lucide="layers"></i> Departments
+          <i data-lucide="layers"></i>
+          Departments
         </h1>
         <p class="text-sm text-slate-500 mt-1">
           Structural control over medical departments & OT allocation
         </p>
       </div>
 
-      <a href="/admin/add-department.html" class="inline-flex items-center gap-2 px-6 py-2 rounded-xl
-              bg-indigo-600 text-white font-semibold hover:bg-indigo-700">
-        <i data-lucide="plus"></i> Add Department
+      <a href="/admin/add-department.html"
+        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl
+               bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+        <i data-lucide="plus"></i>
+        Add Department
       </a>
     </section>
 
     <!-- KPI GRID -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-      <div class="card p-5 kpi">
-        <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center">
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="card p-6 kpi">
+        <div class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
           <i data-lucide="layers"></i>
         </div>
         <div>
           <p class="text-xs text-slate-500 font-semibold uppercase">Departments</p>
-          <h3 id="kpiTotal" class="text-2xl font-bold">0</h3>
+          <h3 id="kpiTotal" class="text-2xl font-bold mt-1">0</h3>
         </div>
       </div>
 
-      <div class="card p-5 kpi">
-        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+      <div class="card p-6 kpi">
+        <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
           <i data-lucide="check-circle"></i>
         </div>
         <div>
           <p class="text-xs text-slate-500 font-semibold uppercase">Active</p>
-          <h3 id="kpiActive" class="text-2xl font-bold">0</h3>
+          <h3 id="kpiActive" class="text-2xl font-bold mt-1">0</h3>
         </div>
       </div>
 
-      <div class="card p-5 kpi">
-        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+      <div class="card p-6 kpi">
+        <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
           <i data-lucide="stethoscope"></i>
         </div>
         <div>
           <p class="text-xs text-slate-500 font-semibold uppercase">Doctors</p>
-          <h3 id="kpiDoctors" class="text-2xl font-bold">0</h3>
+          <h3 id="kpiDoctors" class="text-2xl font-bold mt-1">0</h3>
         </div>
       </div>
 
-      <div class="card p-5 kpi">
-        <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+      <div class="card p-6 kpi">
+        <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
           <i data-lucide="hospital"></i>
         </div>
         <div>
           <p class="text-xs text-slate-500 font-semibold uppercase">OT Rooms</p>
-          <h3 id="kpiOTs" class="text-2xl font-bold">0</h3>
+          <h3 id="kpiOTs" class="text-2xl font-bold mt-1">0</h3>
         </div>
       </div>
     </section>
@@ -118,25 +121,27 @@
     <!-- TABLE -->
     <section class="card overflow-hidden">
 
-      <div class="px-6 py-4 border-b flex justify-between items-center">
+      <div class="px-6 py-5 border-b flex justify-between items-center">
         <h2 class="font-semibold text-lg">Department Directory</h2>
         <span class="text-sm text-slate-500">Live administrative view</span>
       </div>
 
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50 text-slate-600">
-          <tr>
-            <th class="px-6 py-4 text-left">Department</th>
-            <th class="px-6 py-4">Head</th>
-            <th class="px-6 py-4">Doctors</th>
-            <th class="px-6 py-4">OT Rooms</th>
-            <th class="px-6 py-4">Status</th>
-            <th class="px-6 py-4 text-right">Actions</th>
-          </tr>
-        </thead>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-slate-600">
+            <tr>
+              <th class="px-6 py-4 text-left">Department</th>
+              <th class="px-6 py-4">Head</th>
+              <th class="px-6 py-4">Doctors</th>
+              <th class="px-6 py-4">OT Rooms</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
 
-        <tbody id="departmentTableBody" class="divide-y"></tbody>
-      </table>
+          <tbody id="departmentTableBody" class="divide-y"></tbody>
+        </table>
+      </div>
 
     </section>
 
@@ -146,5 +151,4 @@
     lucide.createIcons();
   </script>
 </body>
-
 </html>

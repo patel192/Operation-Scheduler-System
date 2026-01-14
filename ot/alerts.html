@@ -7,6 +7,31 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <style>
+    :root {
+      --primary:#2563eb;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(6px); }
+      to { opacity:1; transform:none; }
+    }
+  </style>
+
   <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
@@ -15,24 +40,27 @@
   <script type="module" defer src="/js/ot/alerts.js"></script>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-[--bg] text-[--text] min-h-screen">
 
   <div id="navbar"></div>
 
-  <main class="max-w-5xl mx-auto px-4 py-6 space-y-4">
+  <main class="max-w-5xl mx-auto px-6 py-10 space-y-8">
 
+    <!-- HEADER -->
     <section>
-      <h1 class="text-2xl font-bold">Alerts</h1>
-      <p class="text-sm text-slate-500">
+      <h1 class="text-3xl font-bold tracking-tight">Alerts</h1>
+      <p class="text-sm text-[--muted] mt-1">
         System-generated alerts related to your assigned surgeries
       </p>
     </section>
 
-    <section id="alertsContainer" class="space-y-3"></section>
+    <!-- ALERT LIST -->
+    <section id="alertsContainer" class="space-y-4 fade-in"></section>
 
+    <!-- EMPTY STATE -->
     <div
       id="emptyState"
-      class="hidden text-center py-12 text-slate-500">
+      class="hidden text-center py-16 text-sm text-[--muted]">
       No alerts right now.
     </div>
 

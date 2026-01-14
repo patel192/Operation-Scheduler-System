@@ -11,16 +11,31 @@
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" src="/js/layout/loadAdminNavbar.js"></script>
   <script type="module" defer src="/js/admin/approvals-dashboard.js"></script>
+
+  <style>
+    .fade-up { animation: fadeUp .45s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .card {
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:22px;
+      box-shadow:0 8px 30px rgba(0,0,0,.04);
+    }
+  </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-100 via-white to-indigo-50 min-h-screen">
 
 <div id="adminNavbar"></div>
 
-<main class="max-w-[1600px] mx-auto px-6 py-8 space-y-8">
+<main class="max-w-[1600px] mx-auto px-6 py-10 space-y-10 fade-up">
 
   <!-- HEADER -->
-  <section class="flex justify-between items-center">
+  <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
     <div>
       <h1 class="text-4xl font-bold tracking-tight flex items-center gap-3">
         <i data-lucide="user-check"></i>
@@ -34,32 +49,32 @@
 
   <!-- KPI STRIP -->
   <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
-    <div class="bg-white rounded-2xl border p-6 shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">TOTAL REQUESTS</p>
-      <h3 id="kpiTotal" class="text-4xl font-bold mt-2">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Total Requests</p>
+      <h3 id="kpiTotal" class="text-4xl font-bold mt-3">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl border p-6 shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">DOCTORS</p>
-      <h3 id="kpiDoctors" class="text-4xl font-bold mt-2 text-indigo-600">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Doctors</p>
+      <h3 id="kpiDoctors" class="text-4xl font-bold mt-3 text-indigo-600">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl border p-6 shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">OT STAFF</p>
-      <h3 id="kpiOtStaff" class="text-4xl font-bold mt-2 text-emerald-600">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">OT Staff</p>
+      <h3 id="kpiOtStaff" class="text-4xl font-bold mt-3 text-emerald-600">0</h3>
     </div>
 
-    <div class="bg-white rounded-2xl border p-6 shadow-sm">
-      <p class="text-xs text-slate-500 font-semibold">OTHERS</p>
-      <h3 id="kpiOthers" class="text-4xl font-bold mt-2 text-slate-600">0</h3>
+    <div class="card p-6">
+      <p class="text-xs text-slate-500 font-semibold uppercase">Others</p>
+      <h3 id="kpiOthers" class="text-4xl font-bold mt-3 text-slate-600">0</h3>
     </div>
   </section>
 
-  <!-- PRIORITY QUEUE -->
+  <!-- MAIN GRID -->
   <section class="grid lg:grid-cols-3 gap-6">
 
     <!-- QUEUE -->
-    <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+    <div class="lg:col-span-2 card overflow-hidden">
       <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
         <h3 class="font-semibold flex items-center gap-2">
           <i data-lucide="clock"></i>
@@ -77,17 +92,17 @@
     </div>
 
     <!-- INFO PANEL -->
-    <div class="bg-white rounded-2xl border p-6 shadow-sm">
-      <h3 class="font-semibold flex items-center gap-2 mb-4">
+    <div class="card p-6">
+      <h3 class="font-semibold flex items-center gap-2 mb-5">
         <i data-lucide="shield-alert"></i>
         Approval Guidelines
       </h3>
 
       <ul class="text-sm text-slate-600 space-y-3">
-        <li>• Verify email & role legitimacy</li>
-        <li>• Doctors require department mapping</li>
-        <li>• OT staff must match shift policy</li>
-        <li>• Reject suspicious registrations</li>
+        <li class="flex gap-2"><span>•</span> Verify email & role legitimacy</li>
+        <li class="flex gap-2"><span>•</span> Doctors require department mapping</li>
+        <li class="flex gap-2"><span>•</span> OT staff must match shift policy</li>
+        <li class="flex gap-2"><span>•</span> Reject suspicious registrations</li>
       </ul>
 
       <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">

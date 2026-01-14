@@ -7,6 +7,31 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e5e7eb;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(6px); }
+      to { opacity:1; transform:none; }
+    }
+  </style>
+
   <!-- Auth + Navbar -->
   <script type="module" defer src="/middleware/auth-guard.js"></script>
   <script type="module" defer src="/js/layout/loadOtNavbar.js"></script>
@@ -15,130 +40,134 @@
   <script type="module" defer src="/js/ot/dashboard.js"></script>
 </head>
 
-<body class="bg-slate-100 text-slate-800">
+<body class="bg-[--bg] text-[--text] min-h-screen">
 
   <div id="navbar"></div>
 
-  <main class="max-w-7xl mx-auto px-3 py-3 grid grid-cols-12 gap-3">
+  <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
 
     <!-- HEADER -->
-    <section class="col-span-12 flex items-center justify-between">
+    <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-lg font-bold">OT Duty Dashboard</h1>
-        <p id="todayDate" class="text-xs text-slate-500"></p>
+        <h1 class="text-3xl font-bold tracking-tight">OT Duty Dashboard</h1>
+        <p id="todayDate" class="text-sm text-[--muted] mt-1"></p>
       </div>
 
       <div
         id="availability"
-        class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+        class="px-4 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
         Idle
       </div>
     </section>
 
-    <!-- POSITIVE THOUGHT -->
-    <section class="col-span-12 bg-white border rounded px-3 py-2 text-xs text-slate-600">
+    <!-- SYSTEM STATUS -->
+    <section class="glass border border-[--border] rounded-2xl p-4 text-sm text-[--muted]">
       <span class="font-semibold text-green-700">✔ System Status:</span>
       <span id="positiveThought">Everything is running smoothly.</span>
     </section>
 
-    <!-- TIME CONTEXT -->
-    <section class="col-span-12 grid grid-cols-4 gap-2 text-xs">
-      <div class="bg-white border rounded p-2">
-        <p class="text-slate-500">Current Time</p>
-        <p id="nowTime" class="font-bold text-sm"></p>
+    <!-- METRICS -->
+    <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
+
+      <div class="glass border rounded-2xl p-5">
+        <p class="text-[--muted]">Current Time</p>
+        <p id="nowTime" class="text-xl font-bold mt-2"></p>
       </div>
-      <div class="bg-white border rounded p-2">
-        <p class="text-slate-500">Shift Progress</p>
-        <p id="shiftProgress" class="font-bold text-sm">—</p>
+
+      <div class="glass border rounded-2xl p-5">
+        <p class="text-[--muted]">Shift Progress</p>
+        <p id="shiftProgress" class="text-xl font-bold mt-2">—</p>
       </div>
-      <div class="bg-white border rounded p-2">
-        <p class="text-slate-500">Assigned Today</p>
-        <p id="totalToday" class="font-bold text-sm">0</p>
+
+      <div class="glass border rounded-2xl p-5">
+        <p class="text-[--muted]">Assigned Today</p>
+        <p id="totalToday" class="text-xl font-bold mt-2">0</p>
       </div>
-      <div class="bg-white border rounded p-2">
-        <p class="text-slate-500">Next Event</p>
-        <p id="nextEventTime" class="font-bold text-sm">—</p>
+
+      <div class="glass border rounded-2xl p-5">
+        <p class="text-[--muted]">Next Event</p>
+        <p id="nextEventTime" class="text-xl font-bold mt-2">—</p>
       </div>
+
     </section>
 
-    <!-- CURRENT / NEXT SURGERY -->
+    <!-- SCHEDULE BLOCK -->
     <section
       id="scheduleBlock"
-      class="col-span-12 bg-white border rounded px-3 py-3 space-y-3">
+      class="glass border border-[--border] rounded-3xl shadow-sm p-6 space-y-6 fade-in">
 
       <!-- CURRENT -->
-      <div id="currentBlock" class="hidden">
-        <div class="flex justify-between text-xs font-semibold text-orange-700">
+      <div id="currentBlock" class="hidden space-y-4">
+        <div class="flex justify-between text-sm font-semibold text-orange-700">
           <span>ONGOING SURGERY</span>
           <span id="currentRemaining"></span>
         </div>
 
-        <div class="grid grid-cols-6 gap-2 text-sm mt-1">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
           <div>
-            <p class="text-xs text-slate-500">Patient</p>
+            <p class="text-[--muted] text-xs uppercase">Patient</p>
             <p id="currentPatient" class="font-semibold"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">Procedure</p>
+            <p class="text-[--muted] text-xs uppercase">Procedure</p>
             <p id="currentProcedure"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">Surgeon</p>
+            <p class="text-[--muted] text-xs uppercase">Surgeon</p>
             <p id="currentSurgeon"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">OT</p>
+            <p class="text-[--muted] text-xs uppercase">OT</p>
             <p id="currentOT"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">Time</p>
+            <p class="text-[--muted] text-xs uppercase">Time</p>
             <p id="currentTime"></p>
           </div>
         </div>
 
-        <!-- TIMER BAR -->
-        <div class="mt-2 h-2 bg-slate-200 rounded">
-          <div id="currentBar" class="h-2 bg-orange-500 rounded"></div>
+        <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div id="currentBar" class="h-2 bg-orange-500 rounded-full"></div>
         </div>
       </div>
 
       <!-- NEXT -->
-      <div id="nextBlock" class="hidden border-t pt-3">
-        <div class="flex justify-between text-xs font-semibold text-blue-700">
+      <div id="nextBlock" class="hidden space-y-4 border-t pt-6">
+        <div class="flex justify-between text-sm font-semibold text-blue-700">
           <span>NEXT SURGERY</span>
           <span id="nextCountdown"></span>
         </div>
 
-        <div class="grid grid-cols-6 gap-2 text-sm mt-1">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
           <div>
-            <p class="text-xs text-slate-500">Patient</p>
+            <p class="text-[--muted] text-xs uppercase">Patient</p>
             <p id="nextPatient" class="font-semibold"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">Procedure</p>
+            <p class="text-[--muted] text-xs uppercase">Procedure</p>
             <p id="nextProcedure"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">Surgeon</p>
+            <p class="text-[--muted] text-xs uppercase">Surgeon</p>
             <p id="nextSurgeon"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">OT</p>
+            <p class="text-[--muted] text-xs uppercase">OT</p>
             <p id="nextOT"></p>
           </div>
           <div>
-            <p class="text-xs text-slate-500">Start</p>
+            <p class="text-[--muted] text-xs uppercase">Start</p>
             <p id="nextTime"></p>
           </div>
         </div>
 
-        <!-- TIMER BAR -->
-        <div class="mt-2 h-2 bg-slate-200 rounded">
-          <div id="nextBar" class="h-2 bg-blue-500 rounded"></div>
+        <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div id="nextBar" class="h-2 bg-blue-500 rounded-full"></div>
         </div>
       </div>
 
-      <div id="emptyState" class="hidden text-center text-sm text-slate-500 py-6">
+      <!-- EMPTY -->
+      <div id="emptyState" class="hidden text-center text-sm text-[--muted] py-10">
         No assigned surgeries. Stay alert.
       </div>
 

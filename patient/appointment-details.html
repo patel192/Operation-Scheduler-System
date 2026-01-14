@@ -8,6 +8,31 @@
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <style>
+    :root {
+      --primary:#0A6CFF;
+      --bg:#F8FAFC;
+      --card:#ffffff;
+      --text:#0F172A;
+      --muted:#64748B;
+      --border:#E5E7EB;
+    }
+
+    .glass {
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(14px);
+    }
+
+    .fade-in {
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity:0; transform: translateY(8px); }
+      to { opacity:1; transform:none; }
+    }
+  </style>
+
   <!-- Navbar -->
   <script type="module" src="/js/layout/loadPatientNavbar.js"></script>
 
@@ -17,27 +42,27 @@
 
 <body class="bg-[--bg] text-[--text] min-h-screen">
 
-<main class="max-w-4xl mx-auto px-4 py-8">
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-8">
 
   <!-- HEADER -->
-  <section class="mb-8">
-    <h1 class="text-2xl font-bold">Appointment Details</h1>
-    <p class="text-sm text-[--muted] mt-1">
-      View full information about your scheduled operation
+  <section class="text-center">
+    <h1 class="text-4xl font-extrabold tracking-tight">Appointment Details</h1>
+    <p class="text-sm text-[--muted] mt-2">
+      Complete overview of your scheduled medical procedure
     </p>
   </section>
 
   <!-- LOADING STATE -->
-  <div id="loading" class="text-center py-16 text-[--muted]">
-    <div class="text-3xl mb-3">⏳</div>
-    <p class="font-semibold">Loading appointment details…</p>
+  <div id="loading" class="text-center py-20 text-[--muted] fade-in">
+    <div class="mx-auto w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+    <p class="font-semibold text-lg">Loading appointment details…</p>
   </div>
 
   <!-- ================= DETAILS ================= -->
-  <section id="detailsSection" class="hidden space-y-6">
+  <section id="detailsSection" class="hidden space-y-8 fade-in">
 
-    <!-- STATUS CARD -->
-    <section class="bg-white rounded-2xl shadow p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <!-- STATUS + BACK -->
+    <section class="glass border border-[--border] rounded-3xl shadow-sm p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <p class="text-sm text-[--muted]">Current Status</p>
         <span id="statusBadge"
@@ -47,55 +72,55 @@
 
       <button
         onclick="history.back()"
-        class="text-sm font-semibold text-[--primary] hover:underline">
+        class="inline-flex items-center gap-2 text-sm font-semibold text-[--primary] hover:underline">
         ← Back to Appointments
       </button>
     </section>
 
     <!-- BASIC INFO -->
-    <section class="bg-white rounded-2xl shadow p-6">
-      <h3 class="font-semibold mb-4">Appointment Information</h3>
+    <section class="glass border border-[--border] rounded-3xl shadow-sm p-8">
+      <h3 class="font-bold text-xl mb-6">Appointment Information</h3>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+      <div class="grid sm:grid-cols-2 gap-8 text-sm">
 
         <div>
-          <p class="text-[--muted]">Patient Name</p>
-          <p class="font-semibold" id="patientName"></p>
+          <p class="text-[--muted] uppercase text-xs tracking-wide">Patient Name</p>
+          <p class="font-semibold text-base mt-1" id="patientName"></p>
         </div>
 
         <div>
-          <p class="text-[--muted]">Patient ID</p>
-          <p class="font-semibold" id="patientId"></p>
+          <p class="text-[--muted] uppercase text-xs tracking-wide">Patient ID</p>
+          <p class="font-semibold text-base mt-1" id="patientId"></p>
         </div>
 
         <div>
-          <p class="text-[--muted]">Procedure</p>
-          <p class="font-semibold" id="procedure"></p>
+          <p class="text-[--muted] uppercase text-xs tracking-wide">Procedure</p>
+          <p class="font-semibold text-base mt-1" id="procedure"></p>
         </div>
 
         <div>
-          <p class="text-[--muted]">Doctor</p>
-          <p class="font-semibold" id="surgeon"></p>
+          <p class="text-[--muted] uppercase text-xs tracking-wide">Doctor</p>
+          <p class="font-semibold text-base mt-1" id="surgeon"></p>
         </div>
 
         <div>
-          <p class="text-[--muted]">Operation Theatre</p>
-          <p class="font-semibold" id="otRoom"></p>
+          <p class="text-[--muted] uppercase text-xs tracking-wide">Operation Theatre</p>
+          <p class="font-semibold text-base mt-1" id="otRoom"></p>
         </div>
 
       </div>
     </section>
 
     <!-- TIME -->
-    <section class="bg-white rounded-2xl shadow p-6">
-      <h3 class="font-semibold mb-2">Scheduled Time</h3>
+    <section class="glass border border-[--border] rounded-3xl shadow-sm p-8">
+      <h3 class="font-bold text-xl mb-3">Scheduled Time</h3>
       <p class="text-sm text-slate-700" id="timeRange"></p>
     </section>
 
     <!-- NOTES -->
-    <section class="bg-white rounded-2xl shadow p-6">
-      <h3 class="font-semibold mb-2">Notes from Hospital</h3>
-      <p class="text-sm text-[--muted]" id="notes"></p>
+    <section class="glass border border-[--border] rounded-3xl shadow-sm p-8">
+      <h3 class="font-bold text-xl mb-3">Notes from Hospital</h3>
+      <p class="text-sm text-[--muted] leading-relaxed" id="notes"></p>
     </section>
 
   </section>
