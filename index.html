@@ -1,193 +1,326 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Operation Scheduler — Hospital Management</title>
+  <title>Operation Scheduler — OT Management System</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script type="module" src="js/firebase.js"></script>
-
-  <style>
-    :root{
-      --primary: #0A6CFF;
-      --secondary: #22C55E;
-      --bg: #F8FAFC;
-      --muted: #64748B;
-      --text: #0F172A;
-    }
-
-    @keyframes floatUpDown {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-12px); }
-    }
-    .animate-float { animation: floatUpDown 6s ease-in-out infinite alternate; }
-  </style>
 </head>
 
-<body class="bg-[#F8FAFC] text-[--text] antialiased">
+<body class="bg-slate-50 text-slate-900">
 
-<!-- HEADER -->
-<header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <div class="font-extrabold text-xl text-[--primary]">Operation Scheduler</div>
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="font-extrabold text-xl text-blue-600">Operation Scheduler</h1>
 
-    <nav class="hidden md:flex gap-8 text-sm font-semibold">
-      <a href="#features" class="hover:text-[--primary]">Features</a>
-      <a href="#workflow" class="hover:text-[--primary]">Workflow</a>
-      <a href="#roles" class="hover:text-[--primary]">Roles</a>
-      <a href="#security" class="hover:text-[--primary]">Security</a>
-    </nav>
+      <nav class="hidden md:flex gap-8 font-semibold text-sm">
+        <a href="#features" class="hover:text-blue-600">Features</a>
+        <a href="#workflow" class="hover:text-blue-600">Workflow</a>
+        <a href="#roles" class="hover:text-blue-600">Roles</a>
+        <a href="#security" class="hover:text-blue-600">Security</a>
+      </nav>
 
-    <div class="flex gap-3">
-      <a href="login.html" class="px-4 py-2 border border-[--primary] text-[--primary] rounded-lg font-semibold text-sm">Login</a>
-      <a href="register.html" class="px-5 py-2 bg-[--primary] text-white rounded-lg font-semibold text-sm shadow">Get Started</a>
-    </div>
-  </div>
-</header>
-
-<main>
-
-<!-- HERO -->
-<section class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-14 items-center">
-  <div>
-    <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-4 py-1 rounded-full">
-      Hospital OT Management Platform
-    </span>
-
-    <h1 class="mt-6 text-5xl font-extrabold leading-tight text-[--primary]">
-      Smart Operation Scheduling for Modern Hospitals
-    </h1>
-
-    <p class="mt-6 text-lg text-[--muted] max-w-xl">
-      Manage OT rooms, surgeons, staff availability, patient workflows and hospital resources in one secure system.
-    </p>
-
-    <div class="mt-8 flex gap-4">
-      <a href="register.html" class="px-7 py-3 bg-[--secondary] text-white font-bold rounded-xl shadow-lg">
-        Start Free Trial
-      </a>
-      <a href="#workflow" class="px-7 py-3 border-2 border-[--primary] text-[--primary] font-bold rounded-xl">
-        View Workflow
-      </a>
-    </div>
-
-    <div class="mt-10 flex gap-6">
-      <div class="bg-white px-6 py-4 rounded-xl shadow">
-        <p class="font-extrabold text-[--primary] text-xl">99.9%</p>
-        <p class="text-sm text-[--muted]">Uptime</p>
-      </div>
-      <div class="bg-white px-6 py-4 rounded-xl shadow">
-        <p class="font-extrabold text-[--primary] text-xl">Secure</p>
-        <p class="text-sm text-[--muted]">HIPAA Ready</p>
+      <div class="flex gap-3">
+        <a href="login.html" class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm">Login</a>
+        <a href="register.html" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm shadow hover:bg-blue-700">
+          Request Demo
+        </a>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="animate-float">
-    <img src="https://images.unsplash.com/photo-1580281657521-47a4f1a4f7c9?q=80&w=1000&auto=format&fit=crop" 
-         alt="Hospital Dashboard" 
-         class="rounded-3xl shadow-2xl border">
-  </div>
-</section>
+  <main>
 
-<!-- FEATURES -->
-<section id="features" class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- HERO -->
+    <section class="bg-gradient-to-br from-blue-50 via-white to-emerald-50 py-24">
+      <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/calendar.png" class="w-10 mb-4">
-    <h3 class="font-bold text-lg text-[--primary]">Conflict-Free Scheduling</h3>
-    <p class="text-sm text-[--muted] mt-2">Automatic checks prevent double booking of OT rooms and doctors.</p>
-  </div>
+        <div>
+          <span class="bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full text-xs font-bold">
+            Operation Theater Management Platform
+          </span>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/doctor-male.png" class="w-10 mb-4">
-    <h3 class="font-bold text-lg text-[--primary]">Doctor & Staff Control</h3>
-    <p class="text-sm text-[--muted] mt-2">Track availability, shifts and workload centrally.</p>
-  </div>
+          <h1 class="mt-6 text-5xl font-extrabold leading-tight">
+            Smart Surgery Scheduling for Modern Hospitals
+          </h1>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/medical-records.png" class="w-10 mb-4">
-    <h3 class="font-bold text-lg text-[--primary]">Patient Records</h3>
-    <p class="text-sm text-[--muted] mt-2">Centralized access to patient details and surgical history.</p>
-  </div>
+          <p class="mt-6 text-lg text-slate-600 max-w-xl">
+            Coordinate surgeons, staff, operation theaters, and patients in one intelligent system.
+            Prevent conflicts and streamline surgical workflows.
+          </p>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/medical-tools.png" class="w-10 mb-4">
-    <h3 class="font-bold text-lg text-[--primary]">Resource Booking</h3>
-    <p class="text-sm text-[--muted] mt-2">Manage OT equipment and consumables easily.</p>
-  </div>
+          <div class="mt-8 flex gap-4">
+            <a href="register.html"
+              class="px-7 py-3 bg-blue-600 text-white rounded-xl font-bold shadow hover:bg-blue-700">
+              Request Demo
+            </a>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/upload-to-cloud.png" class="w-10 mb-4">
-    <h3 class="font-bold text-lg text-[--primary]">Secure Reports</h3>
-    <p class="text-sm text-[--muted] mt-2">Upload consent forms, reports, and documents securely.</p>
-  </div>
+            <a href="#features"
+              class="px-7 py-3 border-2 border-blue-600 text-blue-600 rounded-xl font-bold hover:bg-blue-50">
+              View Features
+            </a>
+          </div>
+        </div>
 
-  <div class="bg-white p-6 rounded-2xl shadow">
-    <img src="https://img.icons8.com/ios-filled/50/0A6CFF/combo-chart.png" class="w-10 mb-4">
-    <h3 class="font-bold text-lg text-[--primary]">Analytics Dashboard</h3>
-    <p class="text-sm text-[--muted] mt-2">Track utilization, performance, and efficiency metrics.</p>
-  </div>
-</section>
+        <div>
+          <img src="/public/assets/hero.png" alt="Dashboard" class="rounded-3xl shadow-2xl border">
+        </div>
 
-<!-- WORKFLOW -->
-<section id="workflow" class="bg-white py-20">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-3xl font-extrabold">How It Works</h2>
+      </div>
+    </section>
 
-    <div class="grid md:grid-cols-4 gap-8 mt-10">
-      <div class="bg-slate-50 p-6 rounded-xl shadow">Add doctors, OT rooms and patients</div>
-      <div class="bg-slate-50 p-6 rounded-xl shadow">Create surgery schedule</div>
-      <div class="bg-slate-50 p-6 rounded-xl shadow">System validates conflicts</div>
-      <div class="bg-slate-50 p-6 rounded-xl shadow">Track progress and reports</div>
-    </div>
-  </div>
-</section>
+    <!-- FEATURES -->
+    <section id="features" class="py-20">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-3xl font-extrabold text-center">
+          Powerful Features for Surgical Management
+        </h2>
 
-<!-- ROLES -->
-<section id="roles" class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-3 gap-8">
-  <div class="bg-white p-6 rounded-2xl shadow text-center">
-    <img src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?q=80&w=300" class="w-20 h-20 rounded-full mx-auto object-cover">
-    <h3 class="mt-4 font-bold text-[--primary]">Admin</h3>
-    <p class="text-sm text-[--muted] mt-2">Manages entire system and audits.</p>
-  </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
 
-  <div class="bg-white p-6 rounded-2xl shadow text-center">
-    <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=300" class="w-20 h-20 rounded-full mx-auto object-cover">
-    <h3 class="mt-4 font-bold text-[--primary]">Doctor</h3>
-    <p class="text-sm text-[--muted] mt-2">Manages surgeries and patient updates.</p>
-  </div>
+          <div class="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
+            <h3 class="font-bold text-blue-600">Conflict-Free Scheduling</h3>
+            <p class="text-sm text-slate-600 mt-2">Prevent double booking automatically.</p>
+          </div>
 
-  <div class="bg-white p-6 rounded-2xl shadow text-center">
-    <img src="https://images.unsplash.com/photo-1580281657521-47a4f1a4f7c9?q=80&w=300" class="w-20 h-20 rounded-full mx-auto object-cover">
-    <h3 class="mt-4 font-bold text-[--primary]">OT Staff</h3>
-    <p class="text-sm text-[--muted] mt-2">Handles daily OT operations.</p>
-  </div>
-</section>
+          <div class="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
+            <h3 class="font-bold text-blue-600">Staff Management</h3>
+            <p class="text-sm text-slate-600 mt-2">Track availability and workload.</p>
+          </div>
 
-<!-- SECURITY -->
-<section id="security" class="max-w-7xl mx-auto px-6 pb-20">
-  <div class="bg-gradient-to-r from-[--primary] to-blue-600 text-white rounded-3xl p-10">
-    <h2 class="text-3xl font-extrabold">Security & Compliance</h2>
-    <p class="mt-4 max-w-xl text-white/90">
-      Role-based access, audit logs, encryption and secure storage ensure data integrity and compliance.
-    </p>
-  </div>
-</section>
+          <div class="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
+            <h3 class="font-bold text-blue-600">Patient Records</h3>
+            <p class="text-sm text-slate-600 mt-2">Centralized surgical history.</p>
+          </div>
 
-<!-- FOOTER -->
-<footer class="bg-slate-100 py-8">
-  <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-    <small class="text-slate-500">© 2025 Operation Scheduler. All rights reserved.</small>
-    <div class="flex gap-6 text-slate-500">
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-    </div>
-  </div>
-</footer>
+        </div>
+      </div>
+    </section>
 
-</main>
+    <!-- WORKFLOW -->
+    <section id="workflow" class="py-24 bg-gradient-to-b from-white to-blue-50">
+
+      <div class="max-w-7xl mx-auto px-6 text-center">
+
+        <h2 class="text-4xl font-extrabold text-slate-900">
+          How Operation Scheduler Works
+        </h2>
+
+        <p class="mt-4 text-slate-600 max-w-2xl mx-auto">
+          Streamline surgical workflows from planning to completion with an intelligent,
+          conflict-aware scheduling system.
+        </p>
+
+        <div class="grid md:grid-cols-4 gap-10 mt-16">
+
+          <!-- STEP 1 -->
+          <div class="relative bg-white p-8 rounded-2xl shadow hover:shadow-xl transition">
+
+            <div class="w-12 h-12 mx-auto flex items-center justify-center
+                    bg-blue-600 text-white font-bold rounded-full text-lg">
+              1
+            </div>
+
+            <h3 class="mt-6 font-bold text-lg text-blue-600">
+              Register Resources
+            </h3>
+
+            <p class="text-sm text-slate-600 mt-2">
+              Add operation theaters, doctors, staff, and equipment into the system.
+            </p>
+
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="relative bg-white p-8 rounded-2xl shadow hover:shadow-xl transition">
+
+            <div class="w-12 h-12 mx-auto flex items-center justify-center
+                    bg-blue-600 text-white font-bold rounded-full text-lg">
+              2
+            </div>
+
+            <h3 class="mt-6 font-bold text-lg text-blue-600">
+              Schedule Surgeries
+            </h3>
+
+            <p class="text-sm text-slate-600 mt-2">
+              Plan procedures by assigning surgeons, OT rooms, and time slots.
+            </p>
+
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="relative bg-white p-8 rounded-2xl shadow hover:shadow-xl transition">
+
+            <div class="w-12 h-12 mx-auto flex items-center justify-center
+                    bg-blue-600 text-white font-bold rounded-full text-lg">
+              3
+            </div>
+
+            <h3 class="mt-6 font-bold text-lg text-blue-600">
+              Conflict Detection
+            </h3>
+
+            <p class="text-sm text-slate-600 mt-2">
+              The system automatically prevents overlaps and resource conflicts.
+            </p>
+
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="relative bg-white p-8 rounded-2xl shadow hover:shadow-xl transition">
+
+            <div class="w-12 h-12 mx-auto flex items-center justify-center
+                    bg-blue-600 text-white font-bold rounded-full text-lg">
+              4
+            </div>
+
+            <h3 class="mt-6 font-bold text-lg text-blue-600">
+              Monitor & Analyze
+            </h3>
+
+            <p class="text-sm text-slate-600 mt-2">
+              Track surgery progress, room utilization, and operational efficiency.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ROLES WITH IMAGES -->
+    <section id="roles" class="py-20">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-3xl font-extrabold text-center mb-12">
+          Role-Based Access
+        </h2>
+
+        <div class="grid lg:grid-cols-3 gap-8 text-center">
+
+          <!-- ADMIN -->
+          <div class="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
+            <img src="/public/assets/admin.png" class="w-24 h-24 rounded-full mx-auto object-cover border">
+            <h3 class="mt-4 font-bold text-blue-600">Admin</h3>
+            <p class="text-sm text-slate-600 mt-2">
+              Manages users, schedules, and system settings.
+            </p>
+          </div>
+
+          <!-- DOCTOR -->
+          <div class="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
+            <img src="/public/assets/doctor.png" class="w-24 h-24 rounded-full mx-auto object-cover border">
+            <h3 class="mt-4 font-bold text-blue-600">Doctor</h3>
+            <p class="text-sm text-slate-600 mt-2">
+              Handles surgeries and patient updates.
+            </p>
+          </div>
+
+          <!-- OT STAFF -->
+          <div class="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
+            <img src="/public/assets/ot-staff.png" class="w-24 h-24 rounded-full mx-auto object-cover border">
+            <h3 class="mt-4 font-bold text-blue-600">OT Staff</h3>
+            <p class="text-sm text-slate-600 mt-2">
+              Manages operation theater activities daily.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="security" class="py-20">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="bg-blue-600 text-white rounded-3xl p-12 text-center shadow-xl">
+          <h2 class="text-3xl font-extrabold">Security & Compliance</h2>
+          <p class="mt-4 text-blue-100 max-w-2xl mx-auto">
+            Role-based access, audit logs, encryption, and secure storage ensure
+            patient data integrity and compliance.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-300 pt-16 pb-8">
+
+      <div class="max-w-7xl mx-auto px-6">
+
+        <!-- TOP FOOTER -->
+        <div class="grid md:grid-cols-4 gap-12">
+
+          <!-- BRAND -->
+          <div>
+            <h3 class="text-xl font-extrabold text-white">
+              Operation Scheduler
+            </h3>
+
+            <p class="mt-4 text-sm text-slate-400">
+              Intelligent operation theater scheduling platform designed to improve
+              efficiency, reduce conflicts, and streamline surgical workflows.
+            </p>
+          </div>
+
+          <!-- PRODUCT LINKS -->
+          <div>
+            <h4 class="font-semibold text-white">Product</h4>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li><a href="#features" class="hover:text-white">Features</a></li>
+              <li><a href="#workflow" class="hover:text-white">Workflow</a></li>
+              <li><a href="#roles" class="hover:text-white">Roles</a></li>
+              <li><a href="#security" class="hover:text-white">Security</a></li>
+            </ul>
+          </div>
+
+          <!-- COMPANY -->
+          <div>
+            <h4 class="font-semibold text-white">Company</h4>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li><a href="#" class="hover:text-white">About</a></li>
+              <li><a href="#" class="hover:text-white">Contact</a></li>
+              <li><a href="#" class="hover:text-white">Support</a></li>
+              <li><a href="#" class="hover:text-white">Careers</a></li>
+            </ul>
+          </div>
+
+          <!-- CONTACT -->
+          <div>
+            <h4 class="font-semibold text-white">Contact</h4>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li>Email: support@operationscheduler.com</li>
+              <li>Phone: +91 XXXXX XXXXX</li>
+              <li>Location: India</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- DIVIDER -->
+        <div class="border-t border-slate-700 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+
+          <small class="text-slate-500">
+            © 2025 Operation Scheduler. All rights reserved.
+          </small>
+
+          <div class="flex gap-6 text-sm text-slate-400">
+            <a href="#" class="hover:text-white">Privacy Policy</a>
+            <a href="#" class="hover:text-white">Terms of Service</a>
+          </div>
+
+        </div>
+
+      </div>
+    </footer>
+
+
+  </main>
 </body>
+
 </html>
